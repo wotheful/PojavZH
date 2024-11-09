@@ -18,6 +18,8 @@ static const char *sphal_namespaces[3] = {
         "sphal", "vendor", "default"
 };
 
+// Constant
+static const char *vulkan_prefix = "vulkan.";
 
 __attribute__((visibility("default"), used)) void app__pojav_linkerhook_pass_handles(void* data, void* android_dlopen_ext,
                                                                                     void* android_get_exported_namespace) {

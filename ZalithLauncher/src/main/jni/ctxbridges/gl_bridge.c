@@ -83,7 +83,7 @@ gl_render_window_t* gl_init_context(gl_render_window_t *share) {
     return bundle;
 }
 
-void gl_swap_surface(gl_render_window_t* bundle) {
+static void gl_swap_surface(gl_render_window_t* bundle) {
     if(bundle->nativeSurface != NULL) {
         ANativeWindow_release(bundle->nativeSurface);
     }
@@ -102,9 +102,9 @@ void gl_swap_surface(gl_render_window_t* bundle) {
         bundle->surface = eglCreatePbufferSurface_p(g_EglDisplay, bundle->config, pbuffer_attrs);
     }
     //eglMakeCurrent_p(g_EglDisplay, bundle->surface, bundle->surface, bundle->context);
-}
+};
 
-void gl_make_current(gl_render_window_t* bundle) {
+static void gl_make_current(gl_render_window_t* bundle) {
     if(bundle == NULL) {
         if(eglMakeCurrent_p(g_EglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
             currentBundle = NULL;
@@ -133,9 +133,9 @@ void gl_make_current(gl_render_window_t* bundle) {
         __android_log_print(ANDROID_LOG_ERROR, g_LogTag, "eglMakeCurrent returned with error: %04x", eglGetError_p());
     }
 
-}
+};
 
-void gl_swap_buffers() {
+static void gl_swap_buffers() {
     if(currentBundle->state == STATE_RENDERER_NEW_WINDOW) {
         eglMakeCurrent_p(g_EglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT); //detach everything to destroy the old EGLSurface
         gl_swap_surface(currentBundle);
@@ -151,18 +151,18 @@ void gl_swap_buffers() {
             __android_log_print(ANDROID_LOG_INFO, g_LogTag, "The window has died, awaiting window change");
     }
 
-}
+};
 
-void gl_setup_window() {
+static void gl_setup_window() {
     if(pojav_environ->mainWindowBundle != NULL) {
         __android_log_print(ANDROID_LOG_INFO, g_LogTag, "Main window bundle is not NULL, changing state");
         pojav_environ->mainWindowBundle->state = STATE_RENDERER_NEW_WINDOW;
         pojav_environ->mainWindowBundle->newNativeSurface = pojav_environ->pojavWindow;
     }
-}
+};
 
-void gl_swap_interval(int swapInterval) {
+static void gl_swap_interval(int swapInterval) {
     if(pojav_environ->force_vsync) swapInterval = 1;
 
     eglSwapInterval_p(g_EglDisplay, swapInterval);
-}
+};
