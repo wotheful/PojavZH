@@ -19,10 +19,10 @@ typedef struct {
 bool gl_init();
 gl_render_window_t* gl_get_current();
 gl_render_window_t* gl_init_context(gl_render_window_t* share);
-static void gl_make_current(gl_render_window_t* bundle);
-static void gl_swap_buffers();
-static void gl_setup_window();
-static void gl_swap_interval(int swapInterval);
+void gl_make_current(gl_render_window_t* bundle);
+void gl_swap_buffers();
+void gl_setup_window();
+void gl_swap_interval(int swapInterval);
 
 
 #endif //POJAVLAUNCHER_GL_BRIDGE_H
