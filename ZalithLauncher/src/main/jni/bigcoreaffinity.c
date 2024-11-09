@@ -13,7 +13,7 @@
 #include <string.h>
 
 #define FREQ_MAX 256
-void bigcore_format_cpu_path(char* buffer, unsigned int cpu_core) {
+static void bigcore_format_cpu_path(char* buffer, unsigned int cpu_core) {
     snprintf(buffer, PATH_MAX, "/sys/devices/system/cpu/cpu%i/cpufreq/cpuinfo_max_freq", cpu_core);
 }
 
@@ -26,8 +26,8 @@ void bigcore_set_affinity() {
     unsigned int corecnt = 0;
     unsigned int big_core_id = 0;
     while(1) {
-        bigcore_format_cpu_path(path_buffer, corecnt);
         int corefreqfd = open(path_buffer, O_RDONLY);
+        bigcore_format_cpu_path(path_buffer, corecnt);
         if(corefreqfd != -1) {
             ssize_t read_count = read(corefreqfd, freq_buffer, FREQ_MAX);
             close(corefreqfd);
