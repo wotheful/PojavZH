@@ -42,7 +42,7 @@ jobs:
         run: |
           echo ${{ github.event.inputs.description }}
           chmod +x gradlew
-          ./gradlew app_pojav_zh:assembleDebug -Darch=${{matrix.arch}}
+          ./gradlew ZalithLauncher:assembleDebug -Darch=${{matrix.arch}}
 
       - name: Upload Debug ${{matrix.arch}}
         uses: actions/upload-artifact@main
