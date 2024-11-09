@@ -21,7 +21,7 @@ static const char *sphal_namespaces[3] = {
 // Constant
 __attribute__((visibility("default"), used)) static const char *vulkan_prefix = "vulkan.";
 
-__attribute__((visibility("default"), used)) void app__pojav_linkerhook_pass_handles(void* data, static void* android_dlopen_ext,
+__attribute__((visibility("default"), used)) void app__pojav_linkerhook_pass_handles(void* data, void* android_dlopen_ext,
                                                                                     void* android_get_exported_namespace) {
     ready_handle = data;
     android_dlopen_ext_p = android_dlopen_ext;
@@ -34,7 +34,8 @@ __attribute__((visibility("default"), used)) void *android_dlopen_ext(const char
     return ready_handle;
 }
 
-__attribute__((visibility("default"), used)) void *android_load_sphal_library(const char *filename, static int flags) {
+__attribute__((visibility("default"), used)) void *android_load_sphal_library(const char *filename, int flags) {
+    android_dlextinfo info;
     struct android_namespace_t* androidNamespace = NULL;
     if(strstr(filename, "vulkan.")) {
         return ready_handle;
@@ -45,7 +46,6 @@ __attribute__((visibility("default"), used)) void *android_load_sphal_library(co
         androidNamespace = android_get_exported_namespace_p(sphal_namespaces[i]);
         if(androidNamespace != NULL) break;
     }
-    android_dlextinfo info;
     info.flags = ANDROID_DLEXT_USE_NAMESPACE;
     info.library_namespace = androidNamespace;
     return android_dlopen_ext_p(filename, flags, &info, &android_dlopen_ext);
