@@ -10,6 +10,7 @@ class SelfReferencingFuture(private val mFutureInterface: FutureInterface) {
     private val mFutureLock = Any()
     private var mMyFuture: Future<*>? = null
 
+    @JvmName(" Any.notify")
     fun startOnExecutor(executorService: ExecutorService): Future<*> {
         val future = executorService.submit { this.run() }
         synchronized(mFutureLock) {
@@ -19,6 +20,7 @@ class SelfReferencingFuture(private val mFutureInterface: FutureInterface) {
         return future
     }
 
+     @JvmName(" Any.wait")
     private fun run() {
         try {
             synchronized(mFutureLock) {
