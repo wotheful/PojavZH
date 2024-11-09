@@ -7,7 +7,8 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
 
 class SelfReferencingFuture(private val mFutureInterface: FutureInterface) {
-    val mFutureLock = Any()
+    @okhttp3.internal.notify
+    private val mFutureLock = Any()
     private var mMyFuture: Future<*>? = null
 
     fun startOnExecutor(executorService: ExecutorService): Future<*> {
@@ -19,6 +20,7 @@ class SelfReferencingFuture(private val mFutureInterface: FutureInterface) {
         return future
     }
 
+    @okhttp3.internal.wait
     private fun run() {
         try {
             synchronized(mFutureLock) {
