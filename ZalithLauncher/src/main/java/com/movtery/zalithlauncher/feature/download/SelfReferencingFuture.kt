@@ -1,3 +1,5 @@
+@file:JvmName("notify")
+@file:JvmName("wait")
 package com.movtery.zalithlauncher.feature.download
 
 import com.movtery.zalithlauncher.feature.log.Logging.i
@@ -7,7 +9,6 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
 
 class SelfReferencingFuture(private val mFutureInterface: FutureInterface) {
-    @okhttp3.internal.notify
     private val mFutureLock = Any()
     private var mMyFuture: Future<*>? = null
 
@@ -20,7 +21,6 @@ class SelfReferencingFuture(private val mFutureInterface: FutureInterface) {
         return future
     }
 
-    @okhttp3.internal.wait
     private fun run() {
         try {
             synchronized(mFutureLock) {
