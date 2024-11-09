@@ -104,7 +104,7 @@ static void gl_swap_surface(gl_render_window_t* bundle) {
     //eglMakeCurrent_p(g_EglDisplay, bundle->surface, bundle->surface, bundle->context);
 }
 
-static void gl_make_current(gl_render_window_t* bundle) {
+void gl_make_current(gl_render_window_t* bundle) {
     bool hasSetMainWindow = false;
     if(bundle == NULL) {
         if(eglMakeCurrent_p(g_EglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
@@ -135,7 +135,7 @@ static void gl_make_current(gl_render_window_t* bundle) {
 
 }
 
-static void gl_swap_buffers() {
+void gl_swap_buffers() {
     if(currentBundle->state == STATE_RENDERER_NEW_WINDOW) {
         eglMakeCurrent_p(g_EglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT); //detach everything to destroy the old EGLSurface
         gl_swap_surface(currentBundle);
@@ -153,7 +153,7 @@ static void gl_swap_buffers() {
 
 }
 
-static void gl_setup_window() {
+void gl_setup_window() {
     if(pojav_environ->mainWindowBundle != NULL) {
         __android_log_print(ANDROID_LOG_INFO, g_LogTag, "Main window bundle is not NULL, changing state");
         pojav_environ->mainWindowBundle->state = STATE_RENDERER_NEW_WINDOW;
@@ -161,7 +161,7 @@ static void gl_setup_window() {
     }
 }
 
-static void gl_swap_interval(int swapInterval) {
+void gl_swap_interval(int swapInterval) {
     if(pojav_environ->force_vsync) swapInterval = 1;
 
     eglSwapInterval_p(g_EglDisplay, swapInterval);
