@@ -36,6 +36,7 @@ import com.movtery.zalithlauncher.context.ContextExecutor;
 import com.movtery.zalithlauncher.databinding.ActivityBasemainBinding;
 import com.movtery.zalithlauncher.databinding.ViewControlSettingsBinding;
 import com.movtery.zalithlauncher.databinding.ViewGameSettingsBinding;
+import com.movtery.zalithlauncher.event.single.RefreshHotbarEvent;
 import com.movtery.zalithlauncher.feature.ProfileLanguageSelector;
 import com.movtery.zalithlauncher.feature.background.BackgroundManager;
 import com.movtery.zalithlauncher.feature.background.BackgroundType;
@@ -75,6 +76,7 @@ import net.kdt.pojavlaunch.utils.MCOptionUtils;
 import net.kdt.pojavlaunch.value.launcherprofiles.LauncherProfiles;
 import net.kdt.pojavlaunch.value.launcherprofiles.MinecraftProfile;
 
+import org.greenrobot.eventbus.EventBus;
 import org.lwjgl.glfw.CallbackBridge;
 
 import java.io.File;
@@ -130,11 +132,8 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
         ControlLayout controlLayout = binding.mainControlLayout;
         mControlSettingsBinding = ViewControlSettingsBinding.inflate(getLayoutInflater());
         new ControlSettingsClickListener(mControlSettingsBinding, controlLayout);
-        mControlSettingsBinding.export.setText(R.string.customctrl_editor_exit);
+        mControlSettingsBinding.export.setVisibility(View.GONE);
 
-        // Recompute the gui scale when options are changed
-        MCOptionUtils.MCOptionListener optionListener = MCOptionUtils::getMcScale;
-        MCOptionUtils.addMCOptionListener(optionListener);
         binding.mainControlLayout.setModifiable(false);
 
         //Now, attach to the service. The game will only start when this happens, to make sure that we know the right state.
@@ -238,7 +237,11 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
                     binding.mainGameRenderView.refreshSize(value);
                     binding.hotbarView.refreshScaleFactor(value / 100f);
                 })
-                .setOnSeekbarStopTrackingTouch(value -> Settings.Manager.Companion.put("resolutionRatio", value).save())
+                .setOnSeekbarStopTrackingTouch(value -> {
+                    Settings.Manager.Companion.put("resolutionRatio", value).save();
+                    //当分辨率缩放的时候，需要刷新一下Hotbar的判定
+                    EventBus.getDefault().post(new RefreshHotbarEvent());
+                })
                 .buildDialog();
     }
 
@@ -610,7 +613,7 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
             this.binding.save.setOnClickListener(this);
             this.binding.saveAndExit.setOnClickListener(this);
             this.binding.selectDefault.setOnClickListener(this);
-            this.binding.export.setOnClickListener(this);
+            this.binding.exit.setOnClickListener(this);
         }
 
         @Override
@@ -623,7 +626,7 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
             else if (v == binding.save) controlLayout.openSaveDialog();
             else if (v == binding.saveAndExit) controlLayout.openSaveAndExitDialog(MainActivity.this);
             else if (v == binding.selectDefault) controlLayout.openSetDefaultDialog();
-            else if (v == binding.export) controlLayout.openExitDialog(MainActivity.this);
+            else if (v == binding.exit) controlLayout.openExitDialog(MainActivity.this);
         }
     }
 }

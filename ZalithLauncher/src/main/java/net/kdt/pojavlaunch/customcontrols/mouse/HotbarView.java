@@ -11,15 +11,19 @@ import android.view.ViewParent;
 
 import androidx.annotation.Nullable;
 
+import com.movtery.zalithlauncher.event.single.MCOptionChangeEvent;
+import com.movtery.zalithlauncher.event.single.RefreshHotbarEvent;
 import com.movtery.zalithlauncher.setting.AllSettings;
 
 import net.kdt.pojavlaunch.LwjglGlfwKeycode;
 import net.kdt.pojavlaunch.utils.MCOptionUtils;
 import net.kdt.pojavlaunch.utils.MathUtils;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 import org.lwjgl.glfw.CallbackBridge;
 
-public class HotbarView extends View implements MCOptionUtils.MCOptionListener, View.OnLayoutChangeListener, Runnable {
+public class HotbarView extends View implements View.OnLayoutChangeListener, Runnable {
     private final TapDetector mDoubleTapDetector = new TapDetector(2, TapDetector.DETECTION_METHOD_DOWN);
     private View mParentView;
     private static final int[] HOTBAR_KEYS = {
@@ -34,36 +38,29 @@ public class HotbarView extends View implements MCOptionUtils.MCOptionListener, 
 
     public HotbarView(Context context) {
         super(context);
-        initialize();
     }
 
     public HotbarView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        initialize();
     }
 
     public HotbarView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        initialize();
     }
 
     @SuppressWarnings("unused") // You suggested me this constructor, Android
     public HotbarView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        initialize();
     }
 
     public void refreshScaleFactor(float scaleFactor) {
         this.mScaleFactor = scaleFactor;
     }
 
-    private void initialize() {
-        MCOptionUtils.addMCOptionListener(this);
-    }
-
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
+        EventBus.getDefault().register(this);
         ViewParent parent = getParent();
         if(parent == null) return;
         if(parent instanceof View) {
@@ -72,6 +69,30 @@ public class HotbarView extends View implements MCOptionUtils.MCOptionListener, 
         }
         mGuiScale = MCOptionUtils.getMcScale();
         repositionView();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        EventBus.getDefault().unregister(this);
+    }
+
+    /**
+     * 在Hotbar刷新事件被监听到时，会刷新判定
+     * @param event 刷新事件
+     */
+    @Subscribe
+    public void event(RefreshHotbarEvent event) {
+        post(this);
+    }
+
+    /**
+     * 当options.txt文件变更时，会刷新判定，因为需要检查gui尺寸
+     * @param event 刷新事件
+     */
+    @Subscribe
+    public void event(MCOptionChangeEvent event) {
+        post(this);
     }
 
     private void repositionView() {
@@ -128,11 +149,6 @@ public class HotbarView extends View implements MCOptionUtils.MCOptionListener, 
 
     private int mcScale(int input) {
         return (int)((mGuiScale * input)/ mScaleFactor);
-    }
-
-    @Override
-    public void onOptionChanged() {
-        post(this);
     }
 
     @Override
