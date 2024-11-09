@@ -20,7 +20,7 @@ class SelfReferencingFuture(private val mFutureInterface: FutureInterface) {
         return future
     }
 
-     @JvmName(" Any.wait")
+    @JvmName(" Any.wait")
     private fun run() {
         try {
             synchronized(mFutureLock) {
