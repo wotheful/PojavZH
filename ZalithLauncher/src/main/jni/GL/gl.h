@@ -24,8 +24,8 @@
  */
 
 
-#ifndef __gl_h_
-#define __gl_h_
+#ifndef gl_h_
+#define gl_h_
 
 /**********************************************************************
  * Begin system-specific stuff.
