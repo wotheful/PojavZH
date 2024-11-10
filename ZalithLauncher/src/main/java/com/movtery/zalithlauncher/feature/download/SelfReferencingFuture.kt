@@ -1,5 +1,3 @@
-@file:JvmName("notify")
-@file:JvmName("wait")
 package com.movtery.zalithlauncher.feature.download
 
 import com.movtery.zalithlauncher.feature.log.Logging.i
