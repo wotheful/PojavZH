@@ -47,5 +47,5 @@ jobs:
       - name: Upload Debug ${{matrix.arch}}
         uses: actions/upload-artifact@main
         with:
-          name: PojavZenithHorizon(Debug) ${{matrix.arch}}
-          path: app_pojav_zh/build/outputs/apk/debug/*
+          name: ZalithLauncher(Debug) ${{matrix.arch}}
+          path: ZalithLauncher/build/outputs/apk/debug/*
