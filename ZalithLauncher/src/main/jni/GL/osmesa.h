@@ -55,7 +55,7 @@ extern "C" {
 #endif
 
 
-#include <GL/gl.h>
+#include <GL/glcorearb.h>
 
 
 #define OSMESA_MAJOR_VERSION 11
