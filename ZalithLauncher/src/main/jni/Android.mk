@@ -36,8 +36,8 @@ LOCAL_SRC_FILES := \
 
 ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
 #LOCAL_CFLAGS += -DADRENO_POSSIBLE
-LOCAL_CFLAGS += -O3 -fPIC -DPIC -flto=thin -fwhole-program-vtables -mllvm -polly -pthread -Wall -Weverything -pedantic -std=gnu2x
-LOCAL_LDLAGS += -flto=thin
+LOCAL_CFLAGS += -O3 -fPIC -DPIC -flto=thin -fwhole-program-vtables -mllvm -polly -pthread -Wall -Weverything -pedantic -std=c2x -DLLVM_USE_LINKER=lld -DBUILD_SHARED_LIBS
+LOCAL_LDLAGS += --lto=thin
 LOCAL_LDLIBS += -lEGL -lGLESv3
 endif
 include $(BUILD_SHARED_LIBRARY)
@@ -47,8 +47,8 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := linkerhook
 LOCAL_SRC_FILES := driver_helper/hook.c
 LOCAL_LDFLAGS := -z global
-LOCAL_CFLAGS += -O2 -fPIC -DPIC -flto=thin -fwhole-program-vtables -mllvm -polly -pthread -Wall -Weverything -pedantic -std=gnu2x
-LOCAL_LDLAGS += -flto=thin
+LOCAL_CFLAGS += -O2 -fPIC -DPIC -flto=thin -fwhole-program-vtables -mllvm -polly -pthread -Wall -Weverything -pedantic -std=c2x -DBUILD_SHARED_LIBS -DLLVM_USE_LINKER=lld
+LOCAL_LDLAGS += --lto=thin
 include $(BUILD_SHARED_LIBRARY)
 #endif
 
@@ -60,16 +60,16 @@ LOCAL_MODULE := istdio
 LOCAL_SHARED_LIBRARIES := bytehook
 LOCAL_SRC_FILES := \
     stdio_is.c
-LOCAL_CFLAGS += -O2 -fPIC -DPIC -flto=thin -fwhole-program-vtables -mllvm -polly -pthread -Wall -Weverything -pedantic -std=gnu2x
-LOCAL_LDLAGS += -flto=thin
+LOCAL_CFLAGS += -O2 -fPIC -DPIC -flto=thin -fwhole-program-vtables -mllvm -polly -pthread -Wall -Weverything -pedantic -std=c2x -DBUILD_SHARED_LIBS -DLLVM_USE_LINKER=lld
+LOCAL_LDLAGS += --lto=thin
 include $(BUILD_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := pojavexec_awt
 LOCAL_SRC_FILES := \
     awt_bridge.c
-LOCAL_CFLAGS += -O2 -fPIC -DPIC -flto=thin -fwhole-program-vtables -mllvm -polly -pthread -Wno-int-conversion -Wall -Weverything -pedantic -std=gnu2x
-LOCAL_LDLAGS += -flto=thin
+LOCAL_CFLAGS += -O2 -fPIC -DPIC -flto=thin -fwhole-program-vtables -mllvm -polly -pthread -Wno-int-conversion -Wall -Weverything -pedantic -std=c2x -DLLVM_USE_LINKER=lld -DBUILD_SHARED_LIBS
+LOCAL_LDLAGS += --lto=thin
 include $(BUILD_SHARED_LIBRARY)
 
 # Helper to get current thread
@@ -91,6 +91,6 @@ LOCAL_MODULE := awt_xawt
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)
 LOCAL_SHARED_LIBRARIES := awt_headless
 LOCAL_SRC_FILES := xawt_fake.c
-LOCAL_CFLAGS += -O2 -fPIC -DPIC -flto=thin -fwhole-program-vtables -mllvm -polly -pthread -pedantic
-LOCAL_LDLAGS += -flto=thin
+LOCAL_CFLAGS += -O2 -fPIC -DPIC -flto=thin -fwhole-program-vtables -mllvm -polly -pthread -pedantic -DLLVM_USE_LINKER=lld -DBUILD_SHARED_LIBS
+LOCAL_LDLAGS += --lto=thin
 include $(BUILD_SHARED_LIBRARY)
