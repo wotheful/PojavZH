@@ -45,6 +45,8 @@ EGLConfig config;
 struct PotatoBridge potatoBridge;
 
 
+void* gbuffer;
+
 EXTERNAL_API void pojavTerminate() {
     printf("EGLBridge: Terminating\n");
 
