@@ -27,6 +27,8 @@ static volatile jobject logListener = NULL;
 static int latestlog_fd = -1;
 static _Atomic bool exit_tripped = false;
 
+JNIEXPORT void JNICALL
+Java_net_kdt_pojavlaunch_Logger_begin(JNIEnv *env, __attribute((unused)) jclass clazz, jstring logPath);
 
 static bool recordBuffer(char* buf, ssize_t len) {
     if(strstr(buf, "Session ID is")) return false;
@@ -38,8 +40,8 @@ static bool recordBuffer(char* buf, ssize_t len) {
 }
 
 JNIEXPORT jint JNI_OnLoad(JavaVM* vm, __attribute((unused)) void* reserved) {
-    stdiois_jvm = vm;
     JNIEnv *env;
+    stdiois_jvm = vm;
     (*vm)->GetEnv(vm, (void**)&env, JNI_VERSION_1_6);
     jclass eventLogListener = (*env)->FindClass(env, "net/kdt/pojavlaunch/Logger$eventLogListener");
     logger_onEventLogged = (*env)->GetMethodID(env, eventLogListener, "onEventLogged", "(Ljava/lang/String;)V");
@@ -47,10 +49,10 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, __attribute((unused)) void* reserved) {
 }
 
 static void *logger_thread() {
+    ssize_t  rsize;
     JNIEnv *env;
     jstring writeString;
     (*stdiois_jvm)->AttachCurrentThread(stdiois_jvm, &env, NULL);
-    ssize_t  rsize;
     char buf[2050];
     while((rsize = read(pfd[0], buf, sizeof(buf)-1)) > 0) {
         bool shouldRecordString = recordBuffer(buf, rsize); //record with newline int latestlog
@@ -69,13 +71,12 @@ static void *logger_thread() {
 }
 JNIEXPORT void JNICALL
 Java_net_kdt_pojavlaunch_Logger_begin(JNIEnv *env, __attribute((unused)) jclass clazz, jstring logPath) {
+    jclass ioeClass = (*env)->FindClass(env, "java/io/IOException");
     if(latestlog_fd != -1) {
         int localfd = latestlog_fd;
         latestlog_fd = -1;
         close(localfd);
     }
-    jclass ioeClass = (*env)->FindClass(env, "java/io/IOException");
-
 
     setvbuf(stdout, 0, _IOLBF, 0); // make stdout line-buffered
     setvbuf(stderr, 0, _IONBF, 0); // make stderr unbuffered
@@ -96,7 +97,7 @@ Java_net_kdt_pojavlaunch_Logger_begin(JNIEnv *env, __attribute((unused)) jclass 
     (*env)->ReleaseStringUTFChars(env, logPath, logFilePath);
 
     /* spawn the logging thread */
-    int result = pthread_create(&logger, 0, logger_thread, 0);
+    int result = pthread_create(&logger, 0, void* logger_thread(void), 0);
     if(result != 0) {
         close(latestlog_fd);
         (*env)->ThrowNew(env, ioeClass, strerror(result));
