@@ -97,7 +97,7 @@ Java_net_kdt_pojavlaunch_Logger_begin(JNIEnv *env, __attribute((unused)) jclass 
     (*env)->ReleaseStringUTFChars(env, logPath, logFilePath);
 
     /* spawn the logging thread */
-    int result = pthread_create(&logger, 0, void* logger_thread(void), 0);
+    int result = pthread_create(&logger, 0, logger_thread(void), 0);
     if(result != 0) {
         close(latestlog_fd);
         (*env)->ThrowNew(env, ioeClass, strerror(result));
