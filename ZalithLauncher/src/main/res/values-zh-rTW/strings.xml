@@ -44,7 +44,6 @@
     <string name="generic_input_too_small">填寫的數值過小，至少需為 %s</string>
     <string name="generic_input_too_big">填寫的數值過大，最多只能為 %s</string>
     <string name="generic_copied">已複製</string>
-    <string name="generic_image_preview">查看圖片</string>
     <!-- Error -->
     <string name="error_fatal">Zalith Launcher 意外地當機了</string>
     <string name="error_no_version">沒有版本！</string>
@@ -55,6 +54,12 @@
     <string name="option_log_out">日誌輸出</string>
     <string name="option_send_custom_key">發送自訂鍵碼</string>
     <string name="option_edit_controls">編輯控制佈局</string>
+    <string name="option_hotbar">快捷欄判定框</string>
+    <string name="option_hotbar_type">快捷欄判定模式</string>
+    <string name="option_hotbar_type_auto">自適應（可能不精確）</string>
+    <string name="option_hotbar_type_manually">手動調整</string>
+    <string name="option_hotbar_width">判定框寬度</string>
+    <string name="option_hotbar_height">判定框高度</string>
     <string name="customctrl_editor_exit_title">是否離開？</string>
     <string name="customctrl_editor_exit_msg">你是否確認退出？</string>
     <string name="customctrl_editor_exit">退出編輯器</string>
@@ -231,6 +236,7 @@
     <string name="profile_manager_shortcuts_instance_path">實例路徑資料夾</string>
     <string name="profile_manager_shortcuts_resource_path">資源包資料夾</string>
     <string name="profile_manager_shortcuts_world_path">遊戲存檔資料夾</string>
+    <string name="profile_manager_shortcuts_shader_path">光影包資料夾</string>
     <string name="profile_manager_shortcuts_logs_path">日誌資料夾</string>
     <string name="profile_manager_shortcuts_crash_report_path">崩潰報告資料夾</string>
     <string name="profile_manager_edit">編輯實例</string>
@@ -247,7 +253,6 @@
     <string name="account_microsoft_xerr_unauthorized">你的微軟帳號登入資訊貌似已過期，這種情況常出現在帳號密碼被修改之後，請移除當前帳號並重新登入你的帳號，以重置你的登入資訊。</string>
     <string name="account_local_account">離線帳號</string>
     <string name="account_local_account_empty">使用者名稱不能為空！</string>
-    <string name="account_local_account_exists">使用者名稱與現有的帳戶衝突，請重新填寫一個新的名稱！</string>
     <string name="account_local_account_invalid">正常的使用者名稱僅支持英文字母（大小寫皆可）、數字以及底線作為使用者名稱，長度不允許少於 3 個字元，超過 16 個字元。\n正確的使用者名稱範例：Name、Name_、Name123\n錯誤的使用者名稱範例：Name@、N ame、name_name_name_name\n但如果你使用了相關的 Mod 或者插件能夠解除這一機制，那麼你可以繼續使用這個名稱，否則請重新命名！</string>
     <string name="account_login_local_name">使用者名稱</string>
     <string name="account_login_start">開始登入！</string>
@@ -469,6 +474,7 @@
     <string name="download_classify_modpack">下載整合包</string>
     <string name="download_classify_resource_pack">下載資源包</string>
     <string name="download_classify_world">下載世界</string>
+    <string name="download_classify_shader_pack">下載光影包</string>
     <string name="download_ui_install_local">從本地安裝</string>
     <string name="download_ui_search">搜尋名稱</string>
     <string name="download_ui_mc_version">MC 版本</string>
@@ -558,6 +564,9 @@
     <string name="splash_screen_installing">啟動器正在解壓縮這些內容，解壓縮完成後將自動進入主界面，請耐心等待。</string>
     <string name="splash_screen_lwjgl">輕量級 Java 遊戲庫，Minecraft 依賴它運行遊戲。</string>
     <string name="splash_screen_cacio">為 OpenJDK 提供可攜式的 GUI 後端。</string>
+    <string name="splash_screen_authlib_injector">透過運行時修改 authlib 以實現遊戲外登錄。</string>
+    <string name="splash_screen_pro_grade">該庫實現了自訂 Java 安全管理器和帶有拒絕規則的安全政策。</string>
+    <string name="splash_screen_forge_installer">幫助自動安裝 Forge 和 OptiFine。</string>
     <string name="splash_screen_jre8">Java 8 環境，Minecraft 1.16- 依賴 Java 8。</string>
     <string name="splash_screen_jre17">Java 17 環境，Minecraft 1.17+ 依賴 Java 17。</string>
     <string name="splash_screen_jre21">Java 21 環境，Minecraft 1.20.5+ 依賴 Java 21。</string>

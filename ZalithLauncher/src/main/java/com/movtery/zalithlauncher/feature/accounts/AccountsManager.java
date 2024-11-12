@@ -5,14 +5,17 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
 import com.movtery.zalithlauncher.R;
 import com.movtery.zalithlauncher.context.ContextExecutor;
 import com.movtery.zalithlauncher.event.single.AccountUpdateEvent;
 import com.movtery.zalithlauncher.feature.log.Logging;
+import com.movtery.zalithlauncher.setting.AllSettings;
+import com.movtery.zalithlauncher.setting.Settings;
 import com.movtery.zalithlauncher.utils.PathAndUrlManager;
 import com.movtery.zalithlauncher.utils.ZHTools;
 
-import net.kdt.pojavlaunch.PojavProfile;
 import net.kdt.pojavlaunch.Tools;
 import net.kdt.pojavlaunch.authenticator.listener.DoneListener;
 import net.kdt.pojavlaunch.authenticator.listener.ErrorListener;
@@ -79,7 +82,7 @@ public class AccountsManager {
 
             reload();
 
-            if (getAllAccount().isEmpty()) PojavProfile.setCurrentProfile(ContextExecutor.getApplication(), account.username);
+            if (getAllAccount().isEmpty()) setCurrentAccount(account);
             else EventBus.getDefault().post(new AccountUpdateEvent());
         };
 
@@ -109,7 +112,7 @@ public class AccountsManager {
             }
         }
 
-        if (minecraftAccount.isMicrosoft) {
+        if (AccountUtils.isMicrosoftAccount(minecraftAccount)) {
             if (force || ZHTools.getCurrentTimeMillis() > minecraftAccount.expiresAt) {
                 AccountUtils.microsoftLogin(minecraftAccount);
             }
@@ -134,15 +137,14 @@ public class AccountsManager {
             }
         }
         Logging.i("AccountsManager", "Reload complete.");
-//        System.out.println(accounts);
     }
 
     public MinecraftAccount getCurrentAccount() {
-        MinecraftAccount account = PojavProfile.getCurrentProfileContent(ContextExecutor.getApplication(), null);
+        MinecraftAccount account = MinecraftAccount.loadFromUniqueUUID(AllSettings.getCurrentAccount());
         if (account == null) {
             if (getAllAccount().isEmpty()) return null;
             MinecraftAccount account1 = getAllAccount().get(0);
-            PojavProfile.setCurrentProfile(ContextExecutor.getApplication(), account1.username);
+            setCurrentAccount(account1);
             return account1;
         }
         return account;
@@ -154,11 +156,16 @@ public class AccountsManager {
 
     public boolean haveMicrosoftAccount() {
         for (MinecraftAccount account : accounts) {
-            if (account.isMicrosoft) {
+            if (AccountUtils.isMicrosoftAccount(account)) {
                 return true;
             }
         }
         return false;
+    }
+
+    public void setCurrentAccount(@NonNull MinecraftAccount account) {
+        Settings.Manager.put("currentAccount", account.getUniqueUUID()).save();
+        EventBus.getDefault().post(new AccountUpdateEvent());
     }
 
     public ProgressListener getProgressListener() {

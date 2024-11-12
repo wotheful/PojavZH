@@ -24,6 +24,7 @@ class AccountUtils {
             // Perform login only if needed
             MicrosoftBackgroundLogin(true, account.msaRefreshToken)
                 .performLogin(
+                    account,
                     accountsManager.progressListener,
                     accountsManager.doneListener,
                     accountsManager.errorListener
@@ -34,7 +35,7 @@ class AccountUtils {
         fun otherLogin(context: Context, account: MinecraftAccount) {
             val errorListener = AccountsManager.getInstance().errorListener
 
-            OtherLoginApi.setBaseUrl(account.baseUrl)
+            OtherLoginApi.setBaseUrl(account.otherBaseUrl)
             Task.runTask {
                 OtherLoginApi.refresh(context, account, false, object : OtherLoginApi.Listener {
                     override fun onSuccess(authResult: AuthResult) {
@@ -51,7 +52,12 @@ class AccountUtils {
 
         @JvmStatic
         fun isOtherLoginAccount(account: MinecraftAccount): Boolean {
-            return !Objects.isNull(account.baseUrl) && account.baseUrl != "0"
+            return !Objects.isNull(account.otherBaseUrl) && account.otherBaseUrl != "0"
+        }
+
+        @JvmStatic
+        fun isMicrosoftAccount(account: MinecraftAccount): Boolean {
+            return account.accountType == "Microsoft"
         }
 
         @JvmStatic

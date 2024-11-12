@@ -205,16 +205,20 @@ public class LauncherActivity extends BaseActivity {
     @Subscribe()
     public void event(MicrosoftLoginEvent event) {
         new MicrosoftBackgroundLogin(false, event.getUri().getQueryParameter("code")).performLogin(
-                accountsManager.getProgressListener(), accountsManager.getDoneListener(), accountsManager.getErrorListener());
+                null,
+                accountsManager.getProgressListener(),
+                accountsManager.getDoneListener(),
+                accountsManager.getErrorListener()
+        );
     }
 
     @Subscribe()
     public void event(OtherLoginEvent event) {
         try {
             event.getAccount().save();
-            Logging.i("McAccountSpinner", "Saved the account : " + event.getAccount().username);
+            Logging.i("Account", "Saved the account : " + event.getAccount().username);
         } catch (IOException e) {
-            Logging.e("McAccountSpinner", "Failed to save the account : " + e);
+            Logging.e("Account", "Failed to save the account : " + e);
         }
         accountsManager.getDoneListener().onLoginDone(event.getAccount());
     }
@@ -227,9 +231,9 @@ public class LauncherActivity extends BaseActivity {
         localAccount.accountType = "Local";
         try {
             localAccount.save();
-            Logging.i("McAccountSpinner", "Saved the account : " + localAccount.username);
+            Logging.i("Account", "Saved the account : " + localAccount.username);
         } catch (IOException e) {
-            Logging.e("McAccountSpinner", "Failed to save the account : " + e);
+            Logging.e("Account", "Failed to save the account : " + e);
         }
 
         accountsManager.getDoneListener().onLoginDone(localAccount);
@@ -375,7 +379,7 @@ public class LauncherActivity extends BaseActivity {
 
         binding.noticeLayout.findViewById(R.id.notice_got_button).setOnClickListener(v -> {
             setNotice(false);
-            Settings.Manager.Companion.put("noticeDefault", false)
+            Settings.Manager.put("noticeDefault", false)
                     .save();
         });
         new DraggableViewWrapper(binding.noticeLayout, new DraggableViewWrapper.AttributesFetcher() {
@@ -457,7 +461,7 @@ public class LauncherActivity extends BaseActivity {
             if (AllSettings.getNoticeDefault() ||
                     (noticeInfo.numbering != AllSettings.getNoticeNumbering())) {
                 TaskExecutors.runInUIThread(() -> setNotice(true));
-                Settings.Manager.Companion.put("noticeDefault", true)
+                Settings.Manager.put("noticeDefault", true)
                         .put("noticeNumbering", noticeInfo.numbering)
                         .save();
             }
@@ -551,9 +555,7 @@ public class LauncherActivity extends BaseActivity {
     }
 
     private void handleNoNotificationPermission() {
-        Settings.Manager.Companion
-                .put("skipNotificationPermissionCheck", true)
-                .save();
+        Settings.Manager.put("skipNotificationPermissionCheck", true).save();
         Toast.makeText(this, R.string.notification_permission_toast, Toast.LENGTH_LONG).show();
     }
 

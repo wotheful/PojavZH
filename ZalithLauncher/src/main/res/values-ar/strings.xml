@@ -44,7 +44,6 @@
     <string name="generic_input_too_small">القيمة المدخلة صغيرة جدًا، يجب أن تكون على الأقل %s</string>
     <string name="generic_input_too_big">القيمة المدخلة كبيرة جدًا، يجب أن تكون على الأكثر %s</string>
     <string name="generic_copied">تم النسخ</string>
-    <string name="generic_image_preview">عرض الصورة</string>
     <!-- Error -->
     <string name="error_fatal">حدث انهيار غير متوقع في Zalith Launcher</string>
     <string name="error_no_version">لا توجد نسخة!</string>
@@ -55,6 +54,12 @@
     <string name="option_log_out">تسجيل الخروج</string>
     <string name="option_send_custom_key">إرسال رمز المفتاح المخصص</string>
     <string name="option_edit_controls">تحرير تخطيط التحكم</string>
+    <string name="option_hotbar">إطار تحديد شريط الأدوات</string>
+    <string name="option_hotbar_type">وضع تحديد شريط الأدوات</string>
+    <string name="option_hotbar_type_auto">تلقائي (قد لا يكون دقيقًا)</string>
+    <string name="option_hotbar_type_manually">تعديل يدوي</string>
+    <string name="option_hotbar_width">عرض إطار التحديد</string>
+    <string name="option_hotbar_height">ارتفاع إطار التحديد</string>
     <string name="customctrl_editor_exit_title">هل تريد الخروج؟</string>
     <string name="customctrl_editor_exit_msg">هل أنت متأكد من الخروج؟</string>
     <string name="customctrl_editor_exit">الخروج من المحرر</string>
@@ -231,6 +236,7 @@
     <string name="profile_manager_shortcuts_instance_path">مجلد مسار المثيل</string>
     <string name="profile_manager_shortcuts_resource_path">مجلد حزم الموارد</string>
     <string name="profile_manager_shortcuts_world_path">مجلد ملفات اللعبة</string>
+    <string name="profile_manager_shortcuts_shader_path">مجلد حزمة الظلال</string>
     <string name="profile_manager_shortcuts_logs_path">مجلد السجلات</string>
     <string name="profile_manager_shortcuts_crash_report_path">مجلد تقارير الانهيار</string>
     <string name="profile_manager_edit">تعديل المثيل</string>
@@ -247,7 +253,6 @@
     <string name="account_microsoft_xerr_unauthorized">يبدو أن معلومات تسجيل الدخول إلى حساب مايكروسوفت الخاص بك قد انتهت، هذا الأمر شائع عند تغيير كلمة مرور الحساب، يرجى إزالة الحساب الحالي وإعادة تسجيل الدخول لإعادة تعيين معلومات تسجيل الدخول الخاصة بك.</string>
     <string name="account_local_account">حساب في وضع عدم الاتصال</string>
     <string name="account_local_account_empty">اسم المستخدم لا يمكن أن يكون فارغًا!</string>
-    <string name="account_local_account_exists">اسم المستخدم يتعارض مع حساب موجود، يرجى إعادة كتابة اسم جديد!</string>
     <string name="account_local_account_invalid">اسم المستخدم الصالح يدعم فقط الحروف الإنجليزية (غير حساس لحالة الحروف)، الأرقام، والشرطات السفلية. يجب أن تكون الطول بين 3 و 16 حرفًا.\nأمثلة على أسماء المستخدمين الصحيحة: Name، Name_، Name123\nأمثلة على أسماء المستخدمين غير الصحيحة: Name@، N ame، name_name_name_name\nولكن إذا كنت تستخدم المودات أو الإضافات ذات الصلة التي يمكنها تجاوز هذه الآلية، يمكنك الاستمرار في استخدام هذا الاسم، وإلا يرجى إعادة التسمية!</string>
     <string name="account_login_local_name">اسم المستخدم</string>
     <string name="account_login_start">بدء تسجيل الدخول!</string>
@@ -465,10 +470,11 @@
     <string name="game_tip">اللعبة قيد التشغيل، يمكنك فتح إخراج السجل من خلال القائمة لمراقبة حالة تشغيل اللعبة</string>
     <string name="game_tip_version">الإصدار الحالي للعبة المُشغّلة:</string>
     <!-- Download -->
-    <string name="download_classify_mod">تنزيل المود</string>
-    <string name="download_classify_modpack">تنزيل حزمة المودات</string>
+    <string name="download_classify_mod">تنزيل مود</string>
+    <string name="download_classify_modpack">تنزيل حزمة مود</string>
     <string name="download_classify_resource_pack">تنزيل حزمة الموارد</string>
     <string name="download_classify_world">تنزيل العالم</string>
+    <string name="download_classify_shader_pack">تنزيل حزمة الظلال</string>
     <string name="download_ui_install_local">التثبيت من محلي</string>
     <string name="download_ui_search">بحث عن الاسم</string>
     <string name="download_ui_mc_version">إصدار MC</string>
@@ -558,6 +564,9 @@
     <string name="splash_screen_installing">يقوم المُشغّل حاليًا بفك ضغط هذه المحتويات، سيتم الدخول إلى الواجهة الرئيسية تلقائيًا بعد الانتهاء من فك الضغط، يرجى الانتظار بصبر.</string>
     <string name="splash_screen_lwjgl">مكتبة الألعاب الخفيفة الخاصة بـ Java، يعتمد Minecraft عليها لتشغيل اللعبة.</string>
     <string name="splash_screen_cacio">يوفر نظام GUI قابل للنقل لـ OpenJDK.</string>
+    <string name="splash_screen_authlib_injector">يتم تعديل authlib عبر وقت التشغيل لتمكين تسجيل الدخول خارج اللعبة.</string>
+    <string name="splash_screen_pro_grade">تقوم هذه المكتبة بتنفيذ مدير أمان Java مخصص وسياسة أمان تحتوي على قواعد الرفض.</string>
+    <string name="splash_screen_forge_installer">يساعد في التثبيت التلقائي لـ Forge و OptiFine.</string>
     <string name="splash_screen_jre8">بيئة Java 8، يعتمد Minecraft 1.16- على Java 8.</string>
     <string name="splash_screen_jre17">بيئة Java 17، يعتمد Minecraft 1.17+ على Java 17.</string>
     <string name="splash_screen_jre21">بيئة Java 21، يعتمد Minecraft 1.20.5+ على Java 21.</string>

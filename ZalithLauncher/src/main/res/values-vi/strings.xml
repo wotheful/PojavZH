@@ -44,7 +44,6 @@
     <string name="generic_input_too_small">Giá trị đã nhập quá nhỏ, cần ít nhất là %s</string>
     <string name="generic_input_too_big">Giá trị đã nhập quá lớn, tối đa chỉ là %s</string>
     <string name="generic_copied">Đã sao chép</string>
-    <string name="generic_image_preview">Xem hình ảnh</string>
     <!-- Error -->
     <string name="error_fatal">Zalith Launcher đã gặp sự cố nghiêm trọng</string>
     <string name="error_no_version">Không có phiên bản!</string>
@@ -55,6 +54,12 @@
     <string name="option_log_out">Ghi log ra</string>
     <string name="option_send_custom_key">Gửi mã phím tùy chỉnh</string>
     <string name="option_edit_controls">Chỉnh sửa bố cục điều khiển</string>
+    <string name="option_hotbar">Hộp kiểm tra thanh công cụ</string>
+    <string name="option_hotbar_type">Chế độ kiểm tra thanh công cụ</string>
+    <string name="option_hotbar_type_auto">Tự động (có thể không chính xác)</string>
+    <string name="option_hotbar_type_manually">Điều chỉnh thủ công</string>
+    <string name="option_hotbar_width">Chiều rộng hộp kiểm tra</string>
+    <string name="option_hotbar_height">Chiều cao hộp kiểm tra</string>
     <string name="customctrl_editor_exit_title">Bạn có muốn rời đi?</string>
     <string name="customctrl_editor_exit_msg">Bạn có chắc chắn muốn thoát?</string>
     <string name="customctrl_editor_exit">Thoát trình soạn thảo</string>
@@ -231,6 +236,7 @@
     <string name="profile_manager_shortcuts_instance_path">Thư mục đường dẫn thể hiện</string>
     <string name="profile_manager_shortcuts_resource_path">Thư mục gói tài nguyên</string>
     <string name="profile_manager_shortcuts_world_path">Thư mục lưu trữ trò chơi</string>
+    <string name="profile_manager_shortcuts_shader_path">Thư mục gói shader</string>
     <string name="profile_manager_shortcuts_logs_path">Thư mục nhật ký</string>
     <string name="profile_manager_shortcuts_crash_report_path">Thư mục báo cáo sự cố</string>
     <string name="profile_manager_edit">Chỉnh sửa thể hiện</string>
@@ -247,7 +253,6 @@
     <string name="account_microsoft_xerr_unauthorized">Thông tin đăng nhập tài khoản Microsoft của bạn có vẻ đã hết hạn, tình huống này thường xảy ra khi mật khẩu tài khoản bị thay đổi. Vui lòng xóa tài khoản hiện tại và đăng nhập lại để đặt lại thông tin đăng nhập của bạn.</string>
     <string name="account_local_account">Tài khoản ngoại tuyến</string>
     <string name="account_local_account_empty">Tên người dùng không được để trống!</string>
-    <string name="account_local_account_exists">Tên người dùng đã bị trùng với tài khoản hiện có, vui lòng nhập một tên mới!</string>
     <string name="account_local_account_invalid">Tên người dùng hợp lệ chỉ hỗ trợ chữ cái tiếng Anh (không phân biệt chữ hoa chữ thường), số và dấu gạch dưới. Độ dài không được ít hơn 3 ký tự và không quá 16 ký tự.\nVí dụ tên người dùng hợp lệ: Name, Name_, Name123\nVí dụ tên người dùng không hợp lệ: Name@, N ame, name_name_name_name\nTuy nhiên, nếu bạn sử dụng các Mod hoặc plugin liên quan có thể vượt qua hạn chế này, bạn có thể tiếp tục sử dụng tên này. Nếu không, vui lòng đổi tên!</string>
     <string name="account_login_local_name">Tên người dùng</string>
     <string name="account_login_start">Bắt đầu đăng nhập!</string>
@@ -465,10 +470,11 @@
     <string name="game_tip">Trò chơi đang chạy, có thể mở nhật ký đầu ra qua menu để xem tình trạng trò chơi</string>
     <string name="game_tip_version">Phiên bản trò chơi đang khởi động:</string>
     <!-- Download -->
-    <string name="download_classify_mod">Tải Mod</string>
-    <string name="download_classify_modpack">Tải Modpack</string>
-    <string name="download_classify_resource_pack">Tải Gói Tài Nguyên</string>
-    <string name="download_classify_world">Tải Thế Giới</string>
+    <string name="download_classify_mod">Tải về Mod</string>
+    <string name="download_classify_modpack">Tải về Modpack</string>
+    <string name="download_classify_resource_pack">Tải về gói tài nguyên</string>
+    <string name="download_classify_world">Tải về thế giới</string>
+    <string name="download_classify_shader_pack">Tải về gói shader</string>
     <string name="download_ui_install_local">Cài đặt từ địa phương</string>
     <string name="download_ui_search">Tìm Kiếm Tên</string>
     <string name="download_ui_mc_version">Phiên Bản MC</string>
@@ -558,6 +564,9 @@
     <string name="splash_screen_installing">Trình khởi chạy đang giải nén những nội dung này, sau khi giải nén xong sẽ tự động vào giao diện chính, vui lòng chờ đợi.</string>
     <string name="splash_screen_lwjgl">Thư viện trò chơi Java nhẹ, Minecraft phụ thuộc vào nó để chạy trò chơi.</string>
     <string name="splash_screen_cacio">Cung cấp backend GUI di động cho OpenJDK.</string>
+    <string name="splash_screen_authlib_injector">Tiêm authlib qua thời gian chạy để cho phép đăng nhập ngoài trò chơi.</string>
+    <string name="splash_screen_pro_grade">Thư viện này triển khai một trình quản lý bảo mật Java tùy chỉnh và một chính sách bảo mật với các quy tắc từ chối.</string>
+    <string name="splash_screen_forge_installer">Giúp cài đặt Forge và OptiFine tự động.</string>
     <string name="splash_screen_jre8">Môi trường Java 8, Minecraft 1.16- phụ thuộc vào Java 8.</string>
     <string name="splash_screen_jre17">Môi trường Java 17, Minecraft 1.17+ phụ thuộc vào Java 17.</string>
     <string name="splash_screen_jre21">Môi trường Java 21, Minecraft 1.20.5+ phụ thuộc vào Java 21.</string>

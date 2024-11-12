@@ -25,18 +25,21 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.movtery.zalithlauncher.R;
 import com.movtery.zalithlauncher.context.ContextExecutor;
-import com.movtery.zalithlauncher.databinding.ActivityBasemainBinding;
+import com.movtery.zalithlauncher.databinding.ActivityGameBinding;
 import com.movtery.zalithlauncher.databinding.ViewControlSettingsBinding;
 import com.movtery.zalithlauncher.databinding.ViewGameSettingsBinding;
 import com.movtery.zalithlauncher.event.single.RefreshHotbarEvent;
+import com.movtery.zalithlauncher.event.value.HotbarChangeEvent;
 import com.movtery.zalithlauncher.feature.ProfileLanguageSelector;
 import com.movtery.zalithlauncher.feature.background.BackgroundManager;
 import com.movtery.zalithlauncher.feature.background.BackgroundType;
@@ -53,12 +56,16 @@ import com.movtery.zalithlauncher.ui.dialog.SeekbarDialog;
 import com.movtery.zalithlauncher.ui.dialog.SelectControlsDialog;
 import com.movtery.zalithlauncher.ui.dialog.TipDialog;
 import com.movtery.zalithlauncher.ui.fragment.settings.VideoSettingsFragment;
+import com.movtery.zalithlauncher.ui.subassembly.adapter.ObjectSpinnerAdapter;
+import com.movtery.zalithlauncher.ui.subassembly.hotbar.HotbarType;
+import com.movtery.zalithlauncher.ui.subassembly.hotbar.HotbarUtils;
 import com.movtery.zalithlauncher.ui.subassembly.view.GameMenuViewWrapper;
 import com.movtery.zalithlauncher.utils.PathAndUrlManager;
 import com.movtery.zalithlauncher.utils.ZHTools;
 import com.movtery.zalithlauncher.utils.anim.AnimUtils;
 import com.movtery.zalithlauncher.utils.file.FileTools;
 import com.movtery.zalithlauncher.utils.stringutils.StringUtils;
+import com.skydoves.powerspinner.OnSpinnerItemSelectedListener;
 
 import net.kdt.pojavlaunch.customcontrols.ControlButtonMenuListener;
 import net.kdt.pojavlaunch.customcontrols.ControlData;
@@ -89,7 +96,7 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
     volatile public static boolean isInputStackCall;
 
     @SuppressLint("StaticFieldLeak")
-    private static ActivityBasemainBinding binding = null;
+    private static ActivityGameBinding binding = null;
     private GameMenuViewWrapper mGameMenuWrapper;
     private GyroControl mGyroControl = null;
     private KeyboardDialog keyboardDialog;
@@ -141,7 +148,7 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
     }
 
     protected void initLayout() {
-        binding = ActivityBasemainBinding.inflate(getLayoutInflater());
+        binding = ActivityGameBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         mGameMenuWrapper = new GameMenuViewWrapper(this, v -> onClickedMenu());
@@ -154,6 +161,7 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
 
         binding.mainControlLayout.setMenuListener(this);
 
+        binding.mainDrawerOptions.setScrimColor(Color.TRANSPARENT);
         binding.mainDrawerOptions.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
         try {
@@ -187,10 +195,12 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
 
             // Menu
             mGameSettingsBinding = ViewGameSettingsBinding.inflate(getLayoutInflater());
-            new MenuSettingsClickListener(mGameSettingsBinding);
+            MenuSettingsInitListener menuSettingsInitListener = new MenuSettingsInitListener(mGameSettingsBinding);
 
             binding.mainNavigationView.removeAllViews();
             binding.mainNavigationView.addView(mGameSettingsBinding.getRoot());
+
+            binding.mainDrawerOptions.addDrawerListener(menuSettingsInitListener);
             binding.mainDrawerOptions.closeDrawers();
 
             final String finalVersion = version;
@@ -238,7 +248,7 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
                     binding.hotbarView.refreshScaleFactor(value / 100f);
                 })
                 .setOnSeekbarStopTrackingTouch(value -> {
-                    Settings.Manager.Companion.put("resolutionRatio", value).save();
+                    Settings.Manager.put("resolutionRatio", value).save();
                     //当分辨率缩放的时候，需要刷新一下Hotbar的判定
                     EventBus.getDefault().post(new RefreshHotbarEvent());
                 })
@@ -424,8 +434,9 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
 
     public void openMouseSettings() {
         new MouseSettingsDialog(this, (mouseSpeed, mouseScale) -> {
-            Settings.Manager.Companion.put("mousespeed", mouseSpeed).save();
-            Settings.Manager.Companion.put("mousescale", mouseScale).save();
+            Settings.Manager
+                    .put("mousespeed", mouseSpeed)
+                    .put("mousescale", mouseScale).save();
             binding.mainTouchpad.updateMouseScale();
         }, () -> binding.mainTouchpad.updateMouseDrawable()).show();
     }
@@ -441,7 +452,7 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
                 .setMax(300)
                 .setValue((int) (AllSettings.getGyroSensitivity() * 100))
                 .setSuffix("%")
-                .setOnSeekbarStopTrackingTouch(value -> Settings.Manager.Companion.put("gyroSensitivity", value).save())
+                .setOnSeekbarStopTrackingTouch(value -> Settings.Manager.put("gyroSensitivity", value).save())
                 .buildDialog();
     }
 
@@ -570,10 +581,10 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
         else return super.dispatchTrackballEvent(ev);
     }
 
-    private class MenuSettingsClickListener implements View.OnClickListener {
+    private class MenuSettingsInitListener implements View.OnClickListener, OnSpinnerItemSelectedListener<HotbarType>, DrawerLayout.DrawerListener {
         private final ViewGameSettingsBinding binding;
 
-        public MenuSettingsClickListener(ViewGameSettingsBinding binding) {
+        public MenuSettingsInitListener(ViewGameSettingsBinding binding) {
             this.binding = binding;
             this.binding.forceClose.setOnClickListener(this);
             this.binding.logOutput.setOnClickListener(this);
@@ -583,6 +594,60 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
             this.binding.gyroSensitivity.setOnClickListener(this);
             this.binding.replacementCustomcontrol.setOnClickListener(this);
             this.binding.editControl.setOnClickListener(this);
+            this.binding.hotbarHeightRemove.setOnClickListener(this);
+            this.binding.hotbarHeightAdd.setOnClickListener(this);
+            this.binding.hotbarWidthRemove.setOnClickListener(this);
+            this.binding.hotbarWidthAdd.setOnClickListener(this);
+
+            ObjectSpinnerAdapter<HotbarType> hotbarTypeAdapter = new ObjectSpinnerAdapter<>(
+                    this.binding.hotbarType,
+                    hotbarType -> getString(hotbarType.getNameId())
+            );
+            hotbarTypeAdapter.setItems(HotbarType.getEntries());
+            this.binding.hotbarType.setSpinnerAdapter(hotbarTypeAdapter);
+            this.binding.hotbarType.setOnSpinnerItemSelectedListener(this);
+            this.binding.hotbarType.selectItemByIndex(HotbarUtils.getCurrentTypeIndex());
+
+            binding.hotbarWidth.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    binding.hotbarWidthValue.setText(String.valueOf(progress));
+                    EventBus.getDefault().post(new HotbarChangeEvent(progress, binding.hotbarHeight.getProgress()));
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+                    Settings.Manager.put("hotbarWidth", seekBar.getProgress()).save();
+                }
+            });
+
+            binding.hotbarHeight.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    binding.hotbarHeightValue.setText(String.valueOf(progress));
+                    EventBus.getDefault().post(new HotbarChangeEvent(binding.hotbarWidth.getProgress(), progress));
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+                    Settings.Manager.put("hotbarHeight", seekBar.getProgress()).save();
+                }
+            });
+
+            binding.hotbarWidth.setMax(currentDisplayMetrics.widthPixels / 2);
+            binding.hotbarWidth.setMin(40);
+            binding.hotbarHeight.setMax(currentDisplayMetrics.heightPixels / 2);
+            binding.hotbarHeight.setMin(20);
+
+            refreshHotbarProgress();
         }
 
         @Override
@@ -595,6 +660,59 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
             else if (v == binding.gyroSensitivity) adjustGyroSensitivityLive();
             else if (v == binding.replacementCustomcontrol) replacementCustomControls();
             else if (v == binding.editControl) openCustomControls();
+            else if (v == binding.hotbarWidthRemove) adjustSeekbar(binding.hotbarWidth, -1);
+            else if (v == binding.hotbarWidthAdd) adjustSeekbar(binding.hotbarWidth, 1);
+            else if (v == binding.hotbarHeightRemove) adjustSeekbar(binding.hotbarHeight, -1);
+            else if (v == binding.hotbarHeightAdd) adjustSeekbar(binding.hotbarHeight, 1);
+        }
+
+        /**
+         * 调整滑动条的值
+         * @param seekBar 滑动条
+         * @param v 需要调整的值的大小
+         */
+        private void adjustSeekbar(SeekBar seekBar, int v) {
+            seekBar.setProgress(seekBar.getProgress() + v);
+        }
+
+        private void refreshHotbarProgress() {
+            binding.hotbarWidth.setProgress(AllSettings.getHotbarWidth());
+            binding.hotbarHeight.setProgress(AllSettings.getHotbarHeight());
+        }
+
+        @Override
+        public void onItemSelected(int i, @Nullable HotbarType t, int i1, HotbarType t1) {
+            if (t1 == HotbarType.AUTO) {
+                binding.hotbarWidthLayout.setVisibility(View.GONE);
+                binding.hotbarHeightLayout.setVisibility(View.GONE);
+            } else if (t1 == HotbarType.MANUALLY) {
+                binding.hotbarWidthLayout.setVisibility(View.VISIBLE);
+                binding.hotbarHeightLayout.setVisibility(View.VISIBLE);
+
+                refreshHotbarProgress();
+            }
+
+            Settings.Manager.put("hotbarType", t1.getValueName()).save();
+            EventBus.getDefault().post(new RefreshHotbarEvent());
+        }
+
+        @Override
+        public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
+        }
+
+        @Override
+        public void onDrawerOpened(@NonNull View drawerView) {
+        }
+
+        @Override
+        public void onDrawerClosed(@NonNull View drawerView) {
+        }
+
+        @Override
+        public void onDrawerStateChanged(int newState) {
+            //需要在菜单状态改变的时候，关闭Hotbar类型的Spinner，这个库并没有自动关闭的功能，所以需要这么做
+            //关掉！关掉！一定要关掉！
+            binding.hotbarType.dismiss();
         }
     }
 

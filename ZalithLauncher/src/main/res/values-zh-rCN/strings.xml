@@ -44,7 +44,6 @@
     <string name="generic_input_too_small">填写的值过小，至少需要为 %s</string>
     <string name="generic_input_too_big">填写的值过大，最大只能为 %s</string>
     <string name="generic_copied">已复制</string>
-    <string name="generic_image_preview">查看图片</string>
 
     <!-- Error -->
     <string name="error_fatal">Zalith Launcher 意外地崩溃了</string>
@@ -57,6 +56,12 @@
     <string name="option_log_out">日志输出</string>
     <string name="option_send_custom_key">发送自定义键码</string>
     <string name="option_edit_controls">编辑控制布局</string>
+    <string name="option_hotbar">快捷栏判定框</string>
+    <string name="option_hotbar_type">快捷栏判定模式</string>
+    <string name="option_hotbar_type_auto">自适应 (可能不精准)</string>
+    <string name="option_hotbar_type_manually">手动调整</string>
+    <string name="option_hotbar_width">判定框宽度</string>
+    <string name="option_hotbar_height">判定框高度</string>
     <string name="customctrl_editor_exit_title">是否离开？</string>
     <string name="customctrl_editor_exit_msg">你是否确认退出？</string>
     <string name="customctrl_editor_exit">退出编辑器</string>
@@ -245,6 +250,7 @@
     <string name="profile_manager_shortcuts_instance_path">实例路径文件夹</string>
     <string name="profile_manager_shortcuts_resource_path">资源包文件夹</string>
     <string name="profile_manager_shortcuts_world_path">游戏存档文件夹</string>
+    <string name="profile_manager_shortcuts_shader_path">光影包文件夹</string>
     <string name="profile_manager_shortcuts_logs_path">日志文件夹</string>
     <string name="profile_manager_shortcuts_crash_report_path">崩溃报告文件夹</string>
     <string name="profile_manager_edit">编辑实例</string>
@@ -262,7 +268,6 @@
     <string name="account_microsoft_xerr_unauthorized">你的微软账号登录信息貌似已经过期，这种情况常出现在账户密码被修改之后，请移除当前帐号并重新登录你的账号，以重置的你的登录信息。</string>
     <string name="account_local_account">离线账号</string>
     <string name="account_local_account_empty">用户名不能为空！</string>
-    <string name="account_local_account_exists">用户名与现有的账户冲突，请重新填写一个新的名称！</string>
     <string name="account_local_account_invalid">正常的用户名称仅支持英文字母（大小写均可）、数字以及下划线作为用户名，长度不允许少于 3 字符，超过 16 字符\n正确的用户名举例：Name、Name_、Name123\n错误的用户名举例：Name@、N ame、name_name_name_name\n但如果你使用了相关 Mod 或者插件能够解除这一机制，那么你可以继续使用这个名字，否则请重新命名！</string>
     <string name="account_login_local_name">用户名</string>
     <string name="account_login_start">开始登录！</string>
@@ -501,6 +506,7 @@
     <string name="download_classify_modpack">下载整合包</string>
     <string name="download_classify_resource_pack">下载资源包</string>
     <string name="download_classify_world">下载世界</string>
+    <string name="download_classify_shader_pack">下载光影包</string>
     <string name="download_ui_install_local">从本地安装</string>
     <string name="download_ui_search">搜索名称</string>
     <string name="download_ui_mc_version">MC 版本</string>
@@ -596,6 +602,9 @@
     <string name="splash_screen_installing">启动器正在解压这些内容，解压完成后将自动进入主界面，请耐心等待。</string>
     <string name="splash_screen_lwjgl">轻量级 Java 游戏库，Minecraft 依赖它运行游戏。</string>
     <string name="splash_screen_cacio">为 OpenJDK 提供可移植的 GUI 后端。</string>
+    <string name="splash_screen_authlib_injector">通过运行时修改 authlib 实现游戏外登录。</string>
+    <string name="splash_screen_pro_grade">该库实现了自定义 Java 安全管理器和带拒绝规则的安全策略。</string>
+    <string name="splash_screen_forge_installer">帮助自动安装 Forge 与 OptiFine。</string>
     <string name="splash_screen_jre8">Java 8 环境，Minecraft 1.16- 依赖 Java 8。</string>
     <string name="splash_screen_jre17">Java 17 环境，Minecraft 1.17+ 依赖 Java 17。</string>
     <string name="splash_screen_jre21">Java 21 环境，Minecraft 1.20.5+ 依赖 Java 21。</string>

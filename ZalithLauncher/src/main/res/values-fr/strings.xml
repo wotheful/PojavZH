@@ -44,7 +44,6 @@
     <string name="generic_input_too_small">La valeur saisie est trop petite, elle doit être au moins %s</string>
     <string name="generic_input_too_big">La valeur saisie est trop grande, elle ne peut être que %s</string>
     <string name="generic_copied">Copié</string>
-    <string name="generic_image_preview">Voir l\'image</string>
     <!-- Error -->
     <string name="error_fatal">Zalith Launcher a rencontré une erreur fatale</string>
     <string name="error_no_version">Aucune version disponible !</string>
@@ -55,6 +54,12 @@
     <string name="option_log_out">Journaliser</string>
     <string name="option_send_custom_key">Envoyer une touche personnalisée</string>
     <string name="option_edit_controls">Modifier la disposition des contrôles</string>
+    <string name="option_hotbar">Boîte de détection du hotbar</string>
+    <string name="option_hotbar_type">Mode de détection du hotbar</string>
+    <string name="option_hotbar_type_auto">Adaptatif (peut être inexact)</string>
+    <string name="option_hotbar_type_manually">Ajustement manuel</string>
+    <string name="option_hotbar_width">Largeur de la boîte de détection</string>
+    <string name="option_hotbar_height">Hauteur de la boîte de détection</string>
     <string name="customctrl_editor_exit_title">Quitter ?</string>
     <string name="customctrl_editor_exit_msg">Êtes-vous sûr de vouloir quitter ?</string>
     <string name="customctrl_editor_exit">Quitter l\'éditeur</string>
@@ -231,6 +236,7 @@
     <string name="profile_manager_shortcuts_instance_path">Dossier du chemin d\'instance</string>
     <string name="profile_manager_shortcuts_resource_path">Dossier des packs de ressources</string>
     <string name="profile_manager_shortcuts_world_path">Dossier des sauvegardes de jeu</string>
+    <string name="profile_manager_shortcuts_shader_path">Dossier du pack de shaders</string>
     <string name="profile_manager_shortcuts_logs_path">Dossier des journaux</string>
     <string name="profile_manager_shortcuts_crash_report_path">Dossier des rapports de crash</string>
     <string name="profile_manager_edit">Modifier l\'instance</string>
@@ -247,7 +253,6 @@
     <string name="account_microsoft_xerr_unauthorized">Vos informations de connexion à votre compte Microsoft semblent avoir expiré, ce qui se produit souvent après la modification du mot de passe du compte. Veuillez supprimer le compte actuel et vous reconnecter pour réinitialiser vos informations de connexion.</string>
     <string name="account_local_account">Compte hors ligne</string>
     <string name="account_local_account_empty">Le nom d\'utilisateur ne peut pas être vide !</string>
-    <string name="account_local_account_exists">Le nom d\'utilisateur est en conflit avec un compte existant, veuillez en saisir un nouveau !</string>
     <string name="account_local_account_invalid">Un nom d\'utilisateur valide ne prend en charge que les lettres anglaises (en minuscules ou majuscules), les chiffres et les underscores. La longueur ne doit pas être inférieure à 3 caractères et ne doit pas dépasser 16 caractères.\nExemples de noms d\'utilisateurs corrects : Name, Name_, Name123\nExemples de noms d\'utilisateurs incorrects : Name@, N ame, name_name_name_name\nCependant, si vous utilisez des mods ou des plugins pertinents qui peuvent contourner cette restriction, vous pouvez continuer à utiliser ce nom. Sinon, veuillez le renommer !</string>
     <string name="account_login_local_name">Nom d\'utilisateur</string>
     <string name="account_login_start">Commencer la connexion !</string>
@@ -467,8 +472,9 @@
     <!-- Download -->
     <string name="download_classify_mod">Télécharger le Mod</string>
     <string name="download_classify_modpack">Télécharger le Modpack</string>
-    <string name="download_classify_resource_pack">Télécharger le Pack de ressources</string>
-    <string name="download_classify_world">Télécharger le Monde</string>
+    <string name="download_classify_resource_pack">Télécharger le pack de ressources</string>
+    <string name="download_classify_world">Télécharger le monde</string>
+    <string name="download_classify_shader_pack">Télécharger le pack de shaders</string>
     <string name="download_ui_install_local">Installer à partir de local</string>
     <string name="download_ui_search">Rechercher par nom</string>
     <string name="download_ui_mc_version">Version MC</string>
@@ -558,6 +564,9 @@
     <string name="splash_screen_installing">Le lanceur est en train de décompresser ces éléments, l\'interface principale s\'ouvrira automatiquement une fois la décompression terminée, veuillez patienter.</string>
     <string name="splash_screen_lwjgl">Bibliothèque Java légère pour les jeux, Minecraft en dépend pour exécuter le jeu.</string>
     <string name="splash_screen_cacio">Fournit un backend GUI portable pour OpenJDK.</string>
+    <string name="splash_screen_authlib_injector">Injecte authlib via l\'exécution pour permettre la connexion en dehors du jeu.</string>
+    <string name="splash_screen_pro_grade">Cette bibliothèque implémente un gestionnaire de sécurité Java personnalisé et une politique de sécurité avec des règles de refus.</string>
+    <string name="splash_screen_forge_installer">Aide à l\'installation automatique de Forge et OptiFine.</string>
     <string name="splash_screen_jre8">Environnement Java 8, Minecraft 1.16- dépend de Java 8.</string>
     <string name="splash_screen_jre17">Environnement Java 17, Minecraft 1.17+ dépend de Java 17.</string>
     <string name="splash_screen_jre21">Environnement Java 21, Minecraft 1.20.5+ dépend de Java 21.</string>

@@ -44,7 +44,6 @@
     <string name="generic_input_too_small">Введенное значение слишком маленькое, минимум %s</string>
     <string name="generic_input_too_big">Введенное значение слишком большое, максимум %s</string>
     <string name="generic_copied">Скопировано</string>
-    <string name="generic_image_preview">Просмотр изображения</string>
     <!-- Error -->
     <string name="error_fatal">Zalith Launcher неожиданно завершил работу</string>
     <string name="error_no_version">Версия не найдена!</string>
@@ -55,6 +54,12 @@
     <string name="option_log_out">Выход из системы</string>
     <string name="option_send_custom_key">Отправить пользовательский код клавиши</string>
     <string name="option_edit_controls">Редактировать раскладку управления</string>
+    <string name="option_hotbar">Коробка обнаружения панели быстрого доступа</string>
+    <string name="option_hotbar_type">Режим обнаружения панели быстрого доступа</string>
+    <string name="option_hotbar_type_auto">Адаптивный (может быть неточным)</string>
+    <string name="option_hotbar_type_manually">Ручная настройка</string>
+    <string name="option_hotbar_width">Ширина коробки обнаружения</string>
+    <string name="option_hotbar_height">Высота коробки обнаружения</string>
     <string name="customctrl_editor_exit_title">Выйти?</string>
     <string name="customctrl_editor_exit_msg">Вы уверены, что хотите выйти?</string>
     <string name="customctrl_editor_exit">Выйти из редактора</string>
@@ -231,6 +236,7 @@
     <string name="profile_manager_shortcuts_instance_path">Папка с экземплярами</string>
     <string name="profile_manager_shortcuts_resource_path">Папка с ресурс-паками</string>
     <string name="profile_manager_shortcuts_world_path">Папка с сохранениями игры</string>
+    <string name="profile_manager_shortcuts_shader_path">Папка с пакетом шейдеров</string>
     <string name="profile_manager_shortcuts_logs_path">Папка с логами</string>
     <string name="profile_manager_shortcuts_crash_report_path">Папка с отчетами о сбоях</string>
     <string name="profile_manager_edit">Редактировать экземпляр</string>
@@ -247,7 +253,6 @@
     <string name="account_microsoft_xerr_unauthorized">Ваша информация для входа в аккаунт Microsoft, похоже, устарела. Это часто происходит, когда пароль аккаунта был изменён. Пожалуйста, удалите текущий аккаунт и войдите в свой аккаунт снова, чтобы сбросить вашу информацию для входа.</string>
     <string name="account_local_account">Локальный аккаунт</string>
     <string name="account_local_account_empty">Имя пользователя не может быть пустым!</string>
-    <string name="account_local_account_exists">Имя пользователя конфликтует с существующими аккаунтами, пожалуйста, введите новое имя!</string>
     <string name="account_local_account_invalid">Допустимое имя пользователя поддерживает только английские буквы (регистр не важен), цифры и подчеркивания. Длина имени не должна быть меньше 3 символов и больше 16 символов.\nПримеры правильных имен пользователей: Name, Name_, Name123\nПримеры неправильных имен пользователей: Name@, N ame, name_name_name_name\nОднако, если вы используете соответствующие моды или плагины, которые могут обойти это ограничение, вы можете продолжать использовать это имя. В противном случае переименуйте его!</string>
     <string name="account_login_local_name">Имя пользователя</string>
     <string name="account_login_start">Начать вход!</string>
@@ -469,6 +474,7 @@
     <string name="download_classify_modpack">Скачать модпак</string>
     <string name="download_classify_resource_pack">Скачать ресурсный пакет</string>
     <string name="download_classify_world">Скачать мир</string>
+    <string name="download_classify_shader_pack">Скачать пакет шейдеров</string>
     <string name="download_ui_install_local">Установить из локального</string>
     <string name="download_ui_search">Поиск по названию</string>
     <string name="download_ui_mc_version">Версия MC</string>
@@ -558,6 +564,9 @@
     <string name="splash_screen_installing">Лаунчер распаковывает эти компоненты. После завершения распаковки вы автоматически перейдете на главный экран, пожалуйста, подождите.</string>
     <string name="splash_screen_lwjgl">Легковесная Java игра библиотека, на которую зависит Minecraft для работы.</string>
     <string name="splash_screen_cacio">Предоставляет переносимый GUI-бэкенд для OpenJDK.</string>
+    <string name="splash_screen_authlib_injector">Инжектирует authlib во время выполнения, чтобы разрешить вход в систему вне игры.</string>
+    <string name="splash_screen_pro_grade">Эта библиотека реализует пользовательский менеджер безопасности Java и политику безопасности с правилами отказа.</string>
+    <string name="splash_screen_forge_installer">Помогает в автоматической установке Forge и OptiFine.</string>
     <string name="splash_screen_jre8">Среда Java 8, Minecraft 1.16- зависит от Java 8.</string>
     <string name="splash_screen_jre17">Среда Java 17, Minecraft 1.17+ зависит от Java 17.</string>
     <string name="splash_screen_jre21">Среда Java 21, Minecraft 1.20.5+ зависит от Java 21.</string>

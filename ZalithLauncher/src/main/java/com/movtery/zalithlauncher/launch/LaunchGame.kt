@@ -3,7 +3,6 @@ package com.movtery.zalithlauncher.launch
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import com.movtery.zalithlauncher.R
-import com.movtery.zalithlauncher.feature.accounts.AccountUtils
 import com.movtery.zalithlauncher.feature.accounts.AccountsManager
 import com.movtery.zalithlauncher.feature.log.Logging
 import com.movtery.zalithlauncher.setting.AllSettings
@@ -19,7 +18,6 @@ import net.kdt.pojavlaunch.multirt.MultiRTUtils
 import net.kdt.pojavlaunch.plugins.FFmpegPlugin
 import net.kdt.pojavlaunch.services.GameService.LocalBinder
 import net.kdt.pojavlaunch.utils.JREUtils
-import net.kdt.pojavlaunch.utils.OldVersionsUtils
 import net.kdt.pojavlaunch.value.MinecraftAccount
 import net.kdt.pojavlaunch.value.launcherprofiles.LauncherProfiles
 import net.kdt.pojavlaunch.value.launcherprofiles.MinecraftProfile
@@ -69,11 +67,6 @@ class LaunchGame {
                 return if (javaRuntime.startsWith(prefix)) javaRuntime.removePrefix(prefix)
                 else javaRuntime
             }
-            fun getLoginType(): String {
-                return if (account.isMicrosoft) "Microsoft"
-                else if (AccountUtils.isOtherLoginAccount(account)) "Other"
-                else "Local"
-            }
 
             Logger.appendToLog("--------- Start launching the game")
             Logger.appendToLog("Info: Launcher version: ${ZHTools.getVersionName()} (${ZHTools.getVersionCode()})")
@@ -83,7 +76,7 @@ class LaunchGame {
             Logger.appendToLog("Info: Selected Minecraft version: $gameVersion")
             Logger.appendToLog("Info: Custom Java arguments: $javaArguments")
             Logger.appendToLog("Info: Java Runtime: ${formatJavaRuntimeString()}")
-            Logger.appendToLog("Info: Account: ${account.username} (${getLoginType()})")
+            Logger.appendToLog("Info: Account: ${account.username} (${account.accountType})")
         }
 
         @Throws(Throwable::class)
@@ -110,7 +103,6 @@ class LaunchGame {
 
             //预处理
             Tools.disableSplash(gameDirPath)
-            OldVersionsUtils.selectOpenGlVersion(versionInfo)
             val launchClassPath = Tools.generateLaunchClassPath(versionInfo, versionId)
 
             val launchArgs = LaunchArgs(

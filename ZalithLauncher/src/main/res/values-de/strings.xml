@@ -44,7 +44,6 @@
     <string name="generic_input_too_small">Der Wert ist zu klein, mindestens %s</string>
     <string name="generic_input_too_big">Der Wert ist zu groß, maximal %s</string>
     <string name="generic_copied">Kopiert</string>
-    <string name="generic_image_preview">Bild anzeigen</string>
     <!-- Error -->
     <string name="error_fatal">Zalith Launcher ist unerwartet abgestürzt</string>
     <string name="error_no_version">Keine Version vorhanden!</string>
@@ -55,6 +54,12 @@
     <string name="option_log_out">Protokoll ausgeben</string>
     <string name="option_send_custom_key">Benutzerdefinierten Tastenbefehl senden</string>
     <string name="option_edit_controls">Steuerungseinstellungen</string>
+    <string name="option_hotbar">Hotbar Erkennungsbox</string>
+    <string name="option_hotbar_type">Hotbar Erkennungsmodus</string>
+    <string name="option_hotbar_type_auto">Adaptiv (kann ungenau sein)</string>
+    <string name="option_hotbar_type_manually">Manuelle Anpassung</string>
+    <string name="option_hotbar_width">Erkennungsbox Breite</string>
+    <string name="option_hotbar_height">Erkennungsbox Höhe</string>
     <string name="customctrl_editor_exit_title">Soll verlassen werden?</string>
     <string name="customctrl_editor_exit_msg">Möchtest du wirklich beenden?</string>
     <string name="customctrl_editor_exit">Editor beenden</string>
@@ -231,6 +236,7 @@
     <string name="profile_manager_shortcuts_instance_path">Instanz-Ordnerpfad</string>
     <string name="profile_manager_shortcuts_resource_path">Ressourcenpaket-Ordner</string>
     <string name="profile_manager_shortcuts_world_path">Spielstand-Ordner</string>
+    <string name="profile_manager_shortcuts_shader_path">Shader-Pack-Ordner</string>
     <string name="profile_manager_shortcuts_logs_path">Protokoll-Ordner</string>
     <string name="profile_manager_shortcuts_crash_report_path">Absturzbericht-Ordner</string>
     <string name="profile_manager_edit">Instanz bearbeiten</string>
@@ -247,7 +253,6 @@
     <string name="account_microsoft_xerr_unauthorized">Deine Microsoft-Konto-Anmeldeinformationen scheinen abgelaufen zu sein. Dies passiert oft, nachdem das Kontopasswort geändert wurde. Bitte entferne das aktuelle Konto und melde dich erneut an, um deine Anmeldeinformationen zurückzusetzen.</string>
     <string name="account_local_account">Offline-Konto</string>
     <string name="account_local_account_empty">Der Benutzername darf nicht leer sein!</string>
-    <string name="account_local_account_exists">Der Benutzername steht in Konflikt mit einem bestehenden Konto. Bitte gib einen neuen Namen ein!</string>
     <string name="account_local_account_invalid">Ein gültiger Benutzername unterstützt nur englische Buchstaben (Groß- und Kleinschreibung sind erlaubt), Zahlen und Unterstriche. Die Länge darf nicht weniger als 3 Zeichen und nicht mehr als 16 Zeichen betragen.\nBeispiele für korrekte Benutzernamen: Name, Name_, Name123\nBeispiele für falsche Benutzernamen: Name@, N ame, name_name_name_name\nWenn du jedoch relevante Mods oder Plugins verwendest, die diese Einschränkung umgehen können, kannst du diesen Namen weiter verwenden. Andernfalls benenne ihn bitte um!</string>
     <string name="account_login_local_name">Benutzername</string>
     <string name="account_login_start">Anmeldung starten!</string>
@@ -469,6 +474,7 @@
     <string name="download_classify_modpack">Modpack herunterladen</string>
     <string name="download_classify_resource_pack">Ressourcenpaket herunterladen</string>
     <string name="download_classify_world">Welt herunterladen</string>
+    <string name="download_classify_shader_pack">Shader-Paket herunterladen</string>
     <string name="download_ui_install_local">Von lokal installieren</string>
     <string name="download_ui_search">Name suchen</string>
     <string name="download_ui_mc_version">MC Version</string>
@@ -558,6 +564,9 @@
     <string name="splash_screen_installing">Der Launcher entpackt diese Inhalte. Nach dem Entpacken gelangen Sie automatisch zur Hauptoberfläche. Bitte haben Sie einen Moment Geduld.</string>
     <string name="splash_screen_lwjgl">Lightweight Java Game Library, die Minecraft zum Ausführen des Spiels benötigt.</string>
     <string name="splash_screen_cacio">Bietet einen portablen GUI-Backend für OpenJDK.</string>
+    <string name="splash_screen_authlib_injector">Ändert authlib zur Laufzeit, um eine Anmeldung außerhalb des Spiels zu ermöglichen.</string>
+    <string name="splash_screen_pro_grade">Diese Bibliothek implementiert einen benutzerdefinierten Java-Sicherheitsmanager und eine Sicherheitsrichtlinie mit Ablehnungsregeln.</string>
+    <string name="splash_screen_forge_installer">Hilft bei der automatischen Installation von Forge und OptiFine.</string>
     <string name="splash_screen_jre8">Java 8-Umgebung, Minecraft 1.16- benötigt Java 8.</string>
     <string name="splash_screen_jre17">Java 17-Umgebung, Minecraft 1.17+ benötigt Java 17.</string>
     <string name="splash_screen_jre21">Java 21-Umgebung, Minecraft 1.20.5+ benötigt Java 21.</string>
