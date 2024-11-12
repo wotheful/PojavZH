@@ -6,13 +6,13 @@
 #ifndef __POTATOBRIDGE_H
 #define __POTATOBRIDGE_H
 
+#include <EGL/egl.h>
+
 #define RENDERER_GL4ES 1
 #define RENDERER_VK_ZINK 2
 #define RENDERER_VIRGL 3
 #define RENDERER_VULKAN 4
 
-
-#include <EGL/egl.h>
 
 struct PotatoBridge {
     void* eglContext;    // EGLContext
