@@ -3,8 +3,8 @@
 // Definitions specific to the renderer
 //
 
-#ifndef __POTATOBRIDGE_H
-#define __POTATOBRIDGE_H
+#ifndef __POTATOBRIDGE_H_
+#define __POTATOBRIDGE_H_
 
 #include <EGL/egl.h>
 
@@ -25,6 +25,6 @@ struct PotatoBridge {
 extern struct PotatoBridge potatoBridge;
 extern EGLConfig config;
 
-#endif // __POTATOBRIDGE_H
+#endif // __POTATOBRIDGE_H_
 
 
