@@ -2,8 +2,8 @@
 // Created by maks on 18.10.2023.
 //
 
-#ifndef POJAVLAUNCHER_BRIDGE_TBL_H
-#define POJAVLAUNCHER_BRIDGE_TBL_H
+#ifndef __POJAVLAUNCHER_BRIDGE_TBL_H_
+#define __POJAVLAUNCHER_BRIDGE_TBL_H_
 
 #include <ctxbridges/common.h>
 #include <ctxbridges/gl_bridge.h>
@@ -13,10 +13,10 @@ typedef basic_render_window_t* (*br_init_context_t)(basic_render_window_t* share
 typedef void (*br_make_current_t)(basic_render_window_t* bundle);
 typedef basic_render_window_t* (*br_get_current_t)();
 
-bool (*br_init)() = NULL;
-br_init_context_t br_init_context = NULL;
-br_make_current_t br_make_current = NULL;
-br_get_current_t br_get_current = NULL;
+static bool (*br_init)() = NULL;
+static br_init_context_t br_init_context = NULL;
+static br_make_current_t br_make_current = NULL;
+static br_get_current_t br_get_current = NULL;
 void (*br_swap_buffers)() = NULL;
 void (*br_setup_window)() = NULL;
 void (*br_swap_interval)(int swapInterval) = NULL;
@@ -42,4 +42,4 @@ void set_gl_bridge_tbl() {
     br_swap_interval = gl_swap_interval;
 }
 
-#endif //POJAVLAUNCHER_BRIDGE_TBL_H
+#endif //__POJAVLAUNCHER_BRIDGE_TBL_H_
