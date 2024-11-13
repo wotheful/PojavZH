@@ -8,12 +8,15 @@ HERE_PATH := $(LOCAL_PATH)
 
 LOCAL_PATH := $(HERE_PATH)
 
+$(call import-module,prefab/bytehook)
+LOCAL_PATH := $(HERE_PATH)
 
 include $(CLEAR_VARS)
 # Link GLESv2 for test
 LOCAL_LDLIBS := -ldl -llog -landroid
 # -lGLESv2
 LOCAL_MODULE := pojavexec
+LOCAL_SHARED_LIBRARIES := bytehook
 # LOCAL_CFLAGS += -DDEBUG
 # -DGLES_TEST
 LOCAL_SRC_FILES := \
@@ -32,6 +35,7 @@ LOCAL_SRC_FILES := \
     input_bridge_v3.c \
     jre_launcher.c \
     utils.c \
+    stdio_is.c \
     driver_helper/nsbypass.c
 
 ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
@@ -51,18 +55,6 @@ LOCAL_CFLAGS += -O2 -fPIC -DPIC -flto=thin -fwhole-program-vtables -mllvm -polly
 LOCAL_LDLAGS += --lto=thin
 include $(BUILD_SHARED_LIBRARY)
 #endif
-
-$(call import-module,prefab/bytehook)
-LOCAL_PATH := $(HERE_PATH)
-
-include $(CLEAR_VARS)
-LOCAL_MODULE := istdio
-LOCAL_SHARED_LIBRARIES := bytehook
-LOCAL_SRC_FILES := \
-    stdio_is.c
-LOCAL_CFLAGS += -O2 -fPIC -DPIC -flto=thin -fwhole-program-vtables -mllvm -polly -pthread -Wall -Weverything -pedantic -std=c2x -DBUILD_SHARED_LIBS -DLLVM_USE_LINKER=lld -funified-lto
-LOCAL_LDLAGS += --lto=thin
-include $(BUILD_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := pojavexec_awt

@@ -341,7 +341,7 @@ public class JREUtils {
         Logger.appendToLog("Java Exit code: " + exitCode);
         if (exitCode != 0) {
             File crashReportPath = new File(gameDirectory, "crash-reports");
-            ErrorActivity.showExitMessage(activity, exitCode, crashReportPath.getAbsolutePath());
+            ErrorActivity.showExitMessage(activity, exitCode, false, crashReportPath.getAbsolutePath());
         }
         EventBus.getDefault().post(new JvmExitEvent(exitCode));
     }
@@ -593,6 +593,5 @@ public class JREUtils {
     static {
         System.loadLibrary("pojavexec");
         System.loadLibrary("pojavexec_awt");
-        System.loadLibrary("istdio");
     }
 }
