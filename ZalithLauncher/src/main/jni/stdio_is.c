@@ -45,7 +45,6 @@ static void *logger_thread() {
     JavaVM* dvm = pojav_environ->dalvikJavaVMPtr;
     (*dvm)->AttachCurrentThread(dvm, &env, NULL);
 
-    ssize_t  rsize;
     char buf[2050];
 
     while ((rsize = read(pfd[0], buf, sizeof(buf)-1)) > 0)
