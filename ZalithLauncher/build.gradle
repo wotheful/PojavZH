@@ -73,13 +73,13 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix '.debug'
+            applicationIdSuffix '.ap'
             minifyEnabled false
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.customDebug
-            resValue 'string', 'application_package', 'com.movtery.zalithlauncher.debug'
-            resValue 'string', 'storageProviderAuthorities', 'com.movtery.zalithlauncher.scoped.gamefolder.debug'
+            resValue 'string', 'application_package', 'com.movtery.zalithlauncher.ap'
+            resValue 'string', 'storageProviderAuthorities', 'com.movtery.zalithlauncher.scoped.gamefolder.ap'
         }
         proguard {
             initWith debug
