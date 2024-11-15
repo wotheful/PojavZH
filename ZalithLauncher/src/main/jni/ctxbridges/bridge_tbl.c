@@ -9,8 +9,3 @@
 typedef basic_render_window_t* (*br_init_context_t)(basic_render_window_t* share);
 typedef void (*br_make_current_t)(basic_render_window_t* bundle);
 typedef basic_render_window_t* (*br_get_current_t)();
-
-bool (*br_init)() = NULL;
-br_init_context_t br_init_context = NULL;
-br_make_current_t br_make_current = NULL;
-br_get_current_t br_get_current = NULL;
