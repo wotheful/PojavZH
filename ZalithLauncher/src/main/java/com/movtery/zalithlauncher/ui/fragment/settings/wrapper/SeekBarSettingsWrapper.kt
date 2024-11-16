@@ -5,8 +5,8 @@ import android.content.Context
 import android.text.InputType
 import android.view.View
 import android.widget.EditText
-import androidx.widget.SeekBar
-import androidx.widget.SeekBar.OnSeekBarChangeListener
+import androidx.leanback.widget.SeekBar
+import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.movtery.zalithlauncher.R
