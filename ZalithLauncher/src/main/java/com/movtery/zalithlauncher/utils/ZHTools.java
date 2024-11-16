@@ -176,7 +176,7 @@ public final class ZHTools {
 
     public static boolean checkDate(int month, int day) {
         LocalDate currentDate = LocalDate.now();
-        return currentDate.getMonthValue() == month && currentDate.getDayOfMonth() == day;
+        return currentDate.getMonthOfYear() == month && currentDate.getDayOfMonth() == day;
     }
 
     public static boolean areaChecks(String area) {
@@ -225,7 +225,7 @@ public final class ZHTools {
         }
 
         int[] eglAttributes = new int[]{
-                EGL14.EGL_RENDERABLE_TYPE, EGL14.EGL_OPENGL_ES3_BIT,
+                EGL14.EGL_RENDERABLE_TYPE, EGL14.EGL_OPENGL_ES2_BIT,
                 EGL14.EGL_NONE
         };
 
