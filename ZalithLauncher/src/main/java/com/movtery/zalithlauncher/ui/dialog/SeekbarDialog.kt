@@ -32,6 +32,7 @@ class SeekbarDialog(
         }
 
         binding.seekbar.apply {
+            min = this@SeekbarDialog.min
             max = this@SeekbarDialog.max
 
             progress = value
