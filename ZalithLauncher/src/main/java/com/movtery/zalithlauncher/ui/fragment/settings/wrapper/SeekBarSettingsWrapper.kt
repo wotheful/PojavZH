@@ -5,9 +5,10 @@ import android.content.Context
 import android.text.InputType
 import android.view.View
 import android.widget.EditText
-import androidx.leanback.widget.SeekBar
+import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
+import android.os.Build
 import androidx.core.content.ContextCompat
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.feature.log.Logging.e
@@ -99,12 +100,15 @@ class SeekBarSettingsWrapper(
                     return@setConfirmListener false
                 }
 
-                if (value < seekbarView.min) {
+                if(Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
+                  if (value < seekbarView.min) {
                     val minValue =
                         String.format("%s %s", seekbarView.min, suffix)
                     editBox.error = context.getString(R.string.generic_input_too_small, minValue)
                     return@setConfirmListener false
+                  }
                 }
+                  
                 if (value > seekbarView.max) {
                     val maxValue =
                         String.format("%s %s", seekbarView.max, suffix)
