@@ -197,6 +197,9 @@ int pojavInitOpenGL() {
         pojav_environ->config_renderer = RENDERER_VK_ZINK;
         load_vulkan();
         setenv("GALLIUM_DRIVER", "zink", 1);
+        setenv("MESA_GL_VERSION_OVERRIDE", "4.6", 1);
+        setenv("MESA_GLSL_VERSION_OVERRIDE", "460", 1);
+        setenv("mesa_glthread", "true", 1);
         set_osm_bridge_tbl();
     }
 
