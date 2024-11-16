@@ -226,6 +226,7 @@ dependencies {
     implementation 'org.commonmark:commonmark:0.24.0'
     implementation 'com.google.android.material:material:1.13.0-alpha07'
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
+    implementation 'joda-time:joda-time:2.13.0'
 
     implementation 'com.getkeepsafe.taptargetview:taptargetview:1.15.0'
     implementation 'io.github.petterpx:floatingx:2.2.6'
