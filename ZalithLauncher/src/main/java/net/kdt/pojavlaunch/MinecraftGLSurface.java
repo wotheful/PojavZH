@@ -19,8 +19,10 @@ import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.os.Build;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 import com.movtery.zalithlauncher.feature.log.Logging;
 import com.movtery.zalithlauncher.setting.AllSettings;
@@ -99,6 +101,7 @@ public class MinecraftGLSurface extends View implements GrabListener {
         refreshSize();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void setUpPointerCapture(AbstractTouchpad touchpad) {
         if(mPointerCapture != null) mPointerCapture.detach();
         mPointerCapture = new AndroidPointerCapture(touchpad, this, mScaleFactor);
@@ -111,7 +114,7 @@ public class MinecraftGLSurface extends View implements GrabListener {
      *                 when the cursor is not grabbed
      */
     public void start(boolean isAlreadyRunning, AbstractTouchpad touchpad){
-        setUpPointerCapture(touchpad);
+        if(MainActivity.isAndroid8OrHigher()) setUpPointerCapture(touchpad);
         mInGUIProcessor.setAbstractTouchpad(touchpad);
         if(AllSettings.getAlternateSurface()){
             SurfaceView surfaceView = new SurfaceView(getContext());
