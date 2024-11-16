@@ -155,7 +155,7 @@ void* load_turnip_vulkan() {
 }
 #endif
 
-void set_vulkan_ptr(void* ptr) {
+static void set_vulkan_ptr(void* ptr) {
     char envval[64];
     sprintf(envval, "%"PRIxPTR, (uintptr_t)ptr);
     setenv("VULKAN_PTR", envval, 1);
