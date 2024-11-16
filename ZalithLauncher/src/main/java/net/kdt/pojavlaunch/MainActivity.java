@@ -239,7 +239,6 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
         new SeekbarDialog.Builder(this)
                 .setTitle(R.string.setting_resolution_scaler_title)
                 .setMessage(R.string.setting_resolution_scaler_desc)
-                .setMin(25)
                 .setMax(300)
                 .setSuffix("%")
                 .setValue(AllSettings.getResolutionRatio())
@@ -449,7 +448,6 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
         }
         new SeekbarDialog.Builder(this)
                 .setTitle(R.string.setting_gyro_sensitivity_title)
-                .setMin(25)
                 .setMax(300)
                 .setValue((int) (AllSettings.getGyroSensitivity() * 100))
                 .setSuffix("%")
