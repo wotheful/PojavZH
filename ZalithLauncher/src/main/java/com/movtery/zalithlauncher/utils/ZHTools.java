@@ -41,7 +41,7 @@ import net.kdt.pojavlaunch.Tools;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.time.LocalDate;
+import org.joda.time.LocalDate;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
@@ -225,7 +225,7 @@ public final class ZHTools {
         }
 
         int[] eglAttributes = new int[]{
-                EGL14.EGL_RENDERABLE_TYPE, EGL14.EGL_OPENGL_ES2_BIT,
+                EGL14.EGL_RENDERABLE_TYPE, EGL14.EGL_OPENGL_ES3_BIT,
                 EGL14.EGL_NONE
         };
 
