@@ -54,6 +54,8 @@ static const jboolean const_cpwildcard = JNI_TRUE;
 static const jint const_ergo_class = 0; // DEFAULT_POLICY
 static struct sigaction old_sa[NSIG];
 
+int sigaction(int signum, const struct sigaction *act,struct sigaction *oldact);
+
 void (*__old_sa)(int signal, siginfo_t *info, void *reserved);
 int (*sigaction_p) (int signum,
               const struct sigaction *_Nullable restrict act,
