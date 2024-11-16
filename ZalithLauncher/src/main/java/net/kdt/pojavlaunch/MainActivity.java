@@ -642,9 +642,7 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
             });
 
             binding.hotbarWidth.setMax(currentDisplayMetrics.widthPixels / 2);
-            binding.hotbarWidth.setMin(40);
             binding.hotbarHeight.setMax(currentDisplayMetrics.heightPixels / 2);
-            binding.hotbarHeight.setMin(20);
 
             refreshHotbarProgress();
         }
