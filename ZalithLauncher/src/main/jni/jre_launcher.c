@@ -32,8 +32,6 @@
 #include <unistd.h>
 // Boardwalk: missing include
 #include <string.h>
-#include <signal.h>
-// 修复在Android7上undefined symbol: sigaction的问题
 
 #include "log.h"
 #include "utils.h"
