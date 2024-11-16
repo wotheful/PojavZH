@@ -128,11 +128,6 @@ class SeekbarDialog(
             return this
         }
 
-        fun setMin(min: Int): Builder {
-            this.min = min
-            return this
-        }
-
         fun setMax(max: Int): Builder {
             this.max = max
             return this
