@@ -747,4 +747,9 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
             else if (v == binding.exit) controlLayout.openExitDialog(MainActivity.this);
         }
     }
+
+    public static boolean isAndroid8OrHigher() {
+        return Build.VERSION.SDK_INT >= 26;
+    }
+
 }
