@@ -61,7 +61,7 @@ android {
 
     defaultConfig {
         applicationId "com.movtery.zalithlauncher"
-        minSdkVersion 29
+        minSdkVersion 30
         targetSdkVersion 35
         versionCode 136500
         versionName "1.3.6.5"
@@ -73,13 +73,13 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix '.ap'
+            applicationIdSuffix '.debug'
             minifyEnabled false
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.customDebug
-            resValue 'string', 'application_package', 'com.movtery.zalithlauncher.ap'
-            resValue 'string', 'storageProviderAuthorities', 'com.movtery.zalithlauncher.scoped.gamefolder.ap'
+            resValue 'string', 'application_package', 'com.movtery.zalithlauncher.debug'
+            resValue 'string', 'storageProviderAuthorities', 'com.movtery.zalithlauncher.scoped.gamefolder.debug'
         }
         proguard {
             initWith debug
