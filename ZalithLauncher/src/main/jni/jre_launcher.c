@@ -51,8 +51,8 @@ static const char** const_jargs = NULL;
 __attribute__((unused)) static const char** const_appclasspath = NULL;
 static const jboolean const_javaw = JNI_FALSE;
 static const jboolean const_cpwildcard = JNI_TRUE;
-static const jint const_ergo_class = 0; // DEFAULT_POLICY
-static struct sigaction old_sa[NSIG];
+const jint const_ergo_class = 0; // DEFAULT_POLICY
+struct sigaction old_sa[NSIG];
 
 void (*__old_sa)(int signal, siginfo_t *info, void *reserved);
 int (*sigaction_p) (int signum,
@@ -94,19 +94,19 @@ struct {
 
 _Noreturn extern void nominal_exit(int code, bool is_signal);
 
-_Noreturn static void* abort_waiter_thread(void* extraArg) {
+_Noreturn void* abort_waiter_thread(void* extraArg) {
     pthread_sigmask(SIG_BLOCK, &abort_waiter_data.tracked_sigset, NULL);
     int signal;
     read(abort_waiter_data.pipe[0], &signal, sizeof(int));
     nominal_exit(signal, true);
 }
 
-_Noreturn static void abort_waiter_handler(int signal) {
+_Noreturn void abort_waiter_handler(int signal) {
     write(abort_waiter_data.pipe[1], &signal, sizeof(int));
     while(1) {}
 }
 
-static void abort_waiter_setup() {
+void abort_waiter_setup() {
     const static int tracked_signals[] = {SIGABRT};
     const static int ntracked = (sizeof(tracked_signals) / sizeof(tracked_signals[0]));
     struct sigaction sigactions[ntracked];
@@ -142,7 +142,7 @@ static void abort_waiter_setup() {
     }
 }
 
-static jint launchJVM(int margc, char** margv) {
+jint launchJVM(int margc, char** margv) {
    void* libjli = dlopen("libjli.so", RTLD_LAZY | RTLD_GLOBAL);
    // Boardwalk: silence
    // LOGD("JLI lib = %x", (int)libjli);
