@@ -12,5 +12,3 @@ struct PotatoBridge {
     // void* eglSurfaceRead;
     // void* eglSurfaceDraw;
 };
-
-static EGLConfig config;
