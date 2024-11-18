@@ -161,7 +161,7 @@ static void set_vulkan_ptr(void* ptr) {
     setenv("VULKAN_PTR", envval, 1);
 }
 
-void load_vulkan() {
+static void load_vulkan() {
     if(getenv("POJAV_ZINK_PREFER_SYSTEM_DRIVER") == NULL &&
         android_get_device_api_level() >= 28) { // the loader does not support below that
 #ifdef ADRENO_POSSIBLE
@@ -179,7 +179,7 @@ void load_vulkan() {
     set_vulkan_ptr(vulkan_ptr);
 }
 
-int pojavInitOpenGL() {
+static int pojavInitOpenGL() {
     const char *forceVsync = getenv("FORCE_VSYNC");
     if (!strcmp(forceVsync, "true"))
         pojav_environ->force_vsync = true;
