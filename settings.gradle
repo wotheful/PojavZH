@@ -15,7 +15,6 @@ dependencyResolutionManagement {
 }
 
 rootProject.name='Zalith Launcher'
-include ':jre_lwjgl3glfw'
 include ':ZalithLauncher'
 
 include ':forge_installer'

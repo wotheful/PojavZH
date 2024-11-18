@@ -74,19 +74,9 @@ static void gl_init_gl4es_internals() {
 }
 
 gl_render_window_t* gl_init_context(gl_render_window_t *share) {
+    EGLint egl_attributes[] = { EGL_BLUE_SIZE, 8, EGL_GREEN_SIZE, 8, EGL_RED_SIZE, 8, EGL_ALPHA_SIZE, 8, EGL_DEPTH_SIZE, 24, EGL_ALPHA_MASK_SIZE, 8, EGL_SURFACE_TYPE, EGL_WINDOW_BIT|EGL_PBUFFER_BIT, EGL_CONFORMANT, EGL_OPENGL_ES3_BIT, EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT, EGL_NONE };
     gl_render_window_t* bundle = malloc(sizeof(gl_render_window_t));
     memset(bundle, 0, sizeof(gl_render_window_t));
-    EGLint egl_attributes[] = { EGL_BLUE_SIZE, 8,
-                    EGL_GREEN_SIZE, 8,
-                    EGL_RED_SIZE, 8,
-                    EGL_ALPHA_SIZE, 8,
-                    EGL_DEPTH_SIZE, 24,
-                    EGL_SURFACE_TYPE,
-                    EGL_WINDOW_BIT|EGL_PBUFFER_BIT,
-                    EGL_RENDERABLE_TYPE,
-                    EGL_OPENGL_ES2_BIT,
-                    EGL_NONE
-                    };
     EGLint num_configs = 0;
 
     if (eglChooseConfig_p(g_EglDisplay, egl_attributes, NULL, 0, &num_configs) != EGL_TRUE)
@@ -112,7 +102,7 @@ gl_render_window_t* gl_init_context(gl_render_window_t *share) {
         EGLBoolean bindResult;
         printf("EGLBridge: Binding to OpenGL ES\n");
         bindResult = eglBindAPI_p(EGL_OPENGL_ES_API);
-        if (!bindResult) printf("EGLBridge: bind failed: %p\n", eglGetError_p());
+        if (!bindResult) printf("EGLBridge: bind failed: %d\n", eglGetError_p());
     }
 
     int libgl_es = strtol(getenv("LIBGL_ES"), NULL, 0);
@@ -145,10 +135,10 @@ void gl_swap_surface(gl_render_window_t* bundle) {
         ANativeWindow_acquire(bundle->nativeSurface);
         ANativeWindow_setBuffersGeometry(bundle->nativeSurface, 0, 0, bundle->format);
         bundle->surface = eglCreateWindowSurface_p(g_EglDisplay, bundle->config, bundle->nativeSurface, NULL);
-    } else {
-        __android_log_print(ANDROID_LOG_ERROR, g_LogTag, "No new native surface, switching to 1x1 pbuffer");
+    }else{
+        const EGLint pbuffer_attrs[] = {EGL_WIDTH, 4 , EGL_HEIGHT, 4, EGL_NONE};
+        __android_log_print(ANDROID_LOG_ERROR, g_LogTag, "No new native surface, switching to 4x4 pbuffer");
         bundle->nativeSurface = NULL;
-        const EGLint pbuffer_attrs[] = {EGL_WIDTH, 1 , EGL_HEIGHT, 1, EGL_NONE};
         bundle->surface = eglCreatePbufferSurface_p(g_EglDisplay, bundle->config, pbuffer_attrs);
     }
 }

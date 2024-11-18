@@ -41,16 +41,38 @@
 // #define TRY_SIG2JVM
 
 // PojavLancher: fixme: are these wrong?
+#define TRY_SIG2JVM
 #define FULL_VERSION "1.8.0-internal"
 #define DOT_VERSION "1.8"
 
-static const char* const_progname = "java";
-static const char* const_launcher = "openjdk";
+__attribute__((unused)) static const char* const_progname = "java";
+__attribute__((unused)) static const char* const_launcher = "openjdk";
 static const char** const_jargs = NULL;
-static const char** const_appclasspath = NULL;
+__attribute__((unused)) static const char** const_appclasspath = NULL;
 static const jboolean const_javaw = JNI_FALSE;
 static const jboolean const_cpwildcard = JNI_TRUE;
-static const jint const_ergo_class = 0; // DEFAULT_POLICY
+const jint const_ergo_class = 0; // DEFAULT_POLICY
+struct sigaction old_sa[NSIG];
+
+void (*__old_sa)(int signal, siginfo_t *info, void *reserved);
+int (*sigaction_p) (int signum,
+              const struct sigaction *_Nullable restrict act,
+              struct sigaction *_Nullable restrict oldact);
+int (*JVM_handle_linux_signal)(int signo, siginfo_t* siginfo, void* ucontext, int abort_if_unrecognized);
+
+void android_sigaction(int signal, siginfo_t *info, void *reserved) {
+  if (JVM_handle_linux_signal == NULL) { // should not happen, but still
+      __old_sa = old_sa[signal].sa_sigaction;
+      __old_sa(signal,info,reserved);
+      exit(1);
+  } else {
+      // Based on https://github.com/PojavLauncherTeam/openjdk-multiarch-jdk8u/blob/aarch64-shenandoah-jdk8u272-b10/hotspot/src/os/linux/vm/os_linux.cpp#L4688-4693
+      int orig_errno = errno;  // Preserve errno value over signal handler.
+      JVM_handle_linux_signal(signal, info, reserved, true);
+      errno = orig_errno;
+  }
+}
+typedef jint JNI_CreateJavaVM_func(JavaVM **pvm, void **penv, void *args);
 
 typedef jint JLI_Launch_func(int argc, char ** argv, /* main argc, argc */
         int jargc, const char** jargv,          /* java args */
@@ -72,19 +94,19 @@ struct {
 
 _Noreturn extern void nominal_exit(int code, bool is_signal);
 
-_Noreturn static void* abort_waiter_thread(void* extraArg) {
+_Noreturn void* abort_waiter_thread(void* extraArg) {
     pthread_sigmask(SIG_BLOCK, &abort_waiter_data.tracked_sigset, NULL);
     int signal;
     read(abort_waiter_data.pipe[0], &signal, sizeof(int));
     nominal_exit(signal, true);
 }
 
-_Noreturn static void abort_waiter_handler(int signal) {
+_Noreturn void abort_waiter_handler(int signal) {
     write(abort_waiter_data.pipe[1], &signal, sizeof(int));
     while(1) {}
 }
 
-static void abort_waiter_setup() {
+void abort_waiter_setup() {
     const static int tracked_signals[] = {SIGABRT};
     const static int ntracked = (sizeof(tracked_signals) / sizeof(tracked_signals[0]));
     struct sigaction sigactions[ntracked];
@@ -120,21 +142,8 @@ static void abort_waiter_setup() {
     }
 }
 
-static jint launchJVM(int margc, char** margv) {
+jint launchJVM(int margc, char** margv) {
    void* libjli = dlopen("libjli.so", RTLD_LAZY | RTLD_GLOBAL);
-   struct sigaction clean_sa;
-   memset(&clean_sa, 0, sizeof (struct sigaction));
-
-   for (int sigid = SIGHUP; sigid < NSIG; sigid++)
-   {
-       if (sigid == SIGSEGV)
-           clean_sa.sa_handler = SIG_IGN;
-       else clean_sa.sa_handler = SIG_DFL;
-
-       sigaction(sigid, &clean_sa, NULL);
-   }
-
-   abort_waiter_setup();
    // Boardwalk: silence
    // LOGD("JLI lib = %x", (int)libjli);
    if (NULL == libjli)
@@ -169,7 +178,41 @@ static jint launchJVM(int margc, char** margv) {
 }
 
 JNIEXPORT jint JNICALL Java_com_oracle_dalvik_VMLauncher_launchJVM(JNIEnv *env, jclass clazz, jobjectArray argsArray) {
-    jint res = 0;
+#ifdef TRY_SIG2JVM
+  void* libjsig = dlopen("libjsig.so", RTLD_LAZY | RTLD_GLOBAL);
+  if (NULL == libjsig) {
+      LOGE("JSig lib = NULL: %s", dlerror());
+      return -1;
+  }
+  sigaction_p = (void*) dlsym(libjsig, "sigaction");
+
+  void* libjvm = dlopen("libjvm.so", RTLD_LAZY | RTLD_GLOBAL);
+  if (NULL == libjvm) {
+      LOGE("JVM lib = NULL: %s", dlerror());
+      return -1;
+  }
+  JVM_handle_linux_signal = dlsym(libjvm, "JVM_handle_linux_signal");
+#endif
+   jint res = 0;
+   // int i;
+   //Prepare the signal trapper
+   struct sigaction catcher;
+   memset(&catcher,0,sizeof(sigaction));
+   catcher.sa_sigaction = android_sigaction;
+   catcher.sa_flags = SA_SIGINFO|SA_RESTART;
+   // SA_RESETHAND;
+#define CATCHSIG(X) sigaction_p(X, &catcher, &old_sa[X])
+    CATCHSIG(SIGILL);
+    CATCHSIG(SIGABRT);
+    CATCHSIG(SIGBUS);
+    CATCHSIG(SIGFPE);
+#ifdef TRY_SIG2JVM
+    CATCHSIG(SIGSEGV);
+#endif
+    CATCHSIG(SIGSTKFLT);
+    CATCHSIG(SIGPIPE);
+    CATCHSIG(SIGXFSZ);
+   //Signal trapper ready
 
     // Save dalvik JNIEnv pointer for JVM launch thread
     pojav_environ->dalvikJNIEnvPtr_ANDROID = env;
