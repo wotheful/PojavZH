@@ -51,8 +51,8 @@ static const char** const_jargs = NULL;
 __attribute__((unused)) static const char** const_appclasspath = NULL;
 static const jboolean const_javaw = JNI_FALSE;
 static const jboolean const_cpwildcard = JNI_TRUE;
-const jint const_ergo_class = 0; // DEFAULT_POLICY
-struct sigaction old_sa[NSIG];
+static const jint const_ergo_class = 0; // DEFAULT_POLICY
+static struct sigaction old_sa[NSIG];
 
 void (*__old_sa)(int signal, siginfo_t *info, void *reserved);
 int (*sigaction_p) (int signum,
