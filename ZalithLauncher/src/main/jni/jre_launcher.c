@@ -60,7 +60,7 @@ int (*sigaction_p) (int signum,
               struct sigaction *_Nullable restrict oldact);
 int (*JVM_handle_linux_signal)(int signo, siginfo_t* siginfo, void* ucontext, int abort_if_unrecognized);
 
-void android_sigaction(int signal, siginfo_t *info, void *reserved) {
+static void android_sigaction(int signal, siginfo_t *info, void *reserved) {
   if (JVM_handle_linux_signal == NULL) { // should not happen, but still
       __old_sa = old_sa[signal].sa_sigaction;
       __old_sa(signal,info,reserved);
@@ -106,7 +106,7 @@ _Noreturn void abort_waiter_handler(int signal) {
     while(1) {}
 }
 
-void abort_waiter_setup() {
+static void abort_waiter_setup() {
     const static int tracked_signals[] = {SIGABRT};
     const static int ntracked = (sizeof(tracked_signals) / sizeof(tracked_signals[0]));
     struct sigaction sigactions[ntracked];
