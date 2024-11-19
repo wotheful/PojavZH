@@ -32,11 +32,9 @@
 #define EVENT_TYPE_SCROLL 1007
 #define EVENT_TYPE_WINDOW_SIZE 1008
 
-jint (*orig_ProcessImpl_forkAndExec)(JNIEnv *env, jobject process, jint mode, jbyteArray helperpath, jbyteArray prog, jbyteArray argBlock, jint argc, jbyteArray envBlock, jint envc, jbyteArray dir, jintArray std_fds, jboolean redirectErrorStream);
+static jint (*orig_ProcessImpl_forkAndExec)(JNIEnv *env, jobject process, jint mode, jbyteArray helperpath, jbyteArray prog, jbyteArray argBlock, jint argc, jbyteArray envBlock, jint envc, jbyteArray dir, jintArray std_fds, jboolean redirectErrorStream);
 
-static void registerFunctions(JNIEnv *env);
-
-jint JNI_OnLoad(JavaVM* vm, __attribute__((unused)) void* reserved) {
+static jint JNI_OnLoad(JavaVM* vm, __attribute__((unused)) void* reserved) {
     if (pojav_environ->dalvikJavaVMPtr == NULL) {
         __android_log_print(ANDROID_LOG_INFO, "Native", "Saving DVM environ...");
         //Save dalvik global JavaVM pointer
@@ -94,11 +92,11 @@ ADD_CALLBACK_WWIN(WindowSize)
 
 #undef ADD_CALLBACK_WWIN
 
-void handleFramebufferSizeJava(long window, int w, int h) {
+static void handleFramebufferSizeJava(long window, int w, int h) {
     (*pojav_environ->runtimeJNIEnvPtr_JRE)->CallStaticVoidMethod(pojav_environ->runtimeJNIEnvPtr_JRE, pojav_environ->vmGlfwClass, pojav_environ->method_internalWindowSizeChanged, (long)window, w, h);
 }
 
-void pojavPumpEvents(void* window) {
+static void pojavPumpEvents(void* window) {
     if(pojav_environ->shouldUpdateMouse) {
         pojav_environ->GLFW_invoke_CursorPos(window, floor(pojav_environ->cursorX),
                                              floor(pojav_environ->cursorY));
@@ -144,7 +142,7 @@ void pojavPumpEvents(void* window) {
 }
 
 /** Prepare the library for sending out callbacks to all windows */
-void pojavStartPumping() {
+static void pojavStartPumping() {
     size_t counter = atomic_load_explicit(&pojav_environ->eventCounter, memory_order_acquire);
     size_t index = pojav_environ->outEventIndex;
 
@@ -165,7 +163,7 @@ void pojavStartPumping() {
 }
 
 /** Prepare the library for the next round of new events */
-void pojavStopPumping() {
+static void pojavStopPumping() {
     pojav_environ->outEventIndex = pojav_environ->outTargetIndex;
 
     // New events may have arrived while pumping, so remove only the difference before the start and end of execution
@@ -207,7 +205,7 @@ Java_org_lwjgl_glfw_GLFW_glfwSetCursorPos(__attribute__((unused)) JNIEnv *env, _
 
 
 
-void sendData(int type, int i1, int i2, int i3, int i4) {
+static void sendData(int type, int i1, int i2, int i3, int i4) {
     GLFWInputEvent *event = &pojav_environ->events[pojav_environ->inEventIndex];
     event->type = type;
     event->i1 = i1;
@@ -251,7 +249,7 @@ hooked_ProcessImpl_forkAndExec(JNIEnv *env, jobject process, jint mode, jbyteArr
     return 0;
 }
 
-void hookExec() {
+static void hookExec() {
     jclass cls;
     orig_ProcessImpl_forkAndExec = dlsym(RTLD_DEFAULT, "Java_java_lang_UNIXProcess_forkAndExec");
     if (!orig_ProcessImpl_forkAndExec) {
@@ -345,11 +343,11 @@ void installEMUIIteratorMititgation() {
     }
 }
 
-void critical_set_stackqueue(jboolean use_input_stack_queue) {
+static void critical_set_stackqueue(jboolean use_input_stack_queue) {
     pojav_environ->isUseStackQueueCall = (int) use_input_stack_queue;
 }
 
-void noncritical_set_stackqueue(__attribute__((unused)) JNIEnv *env, __attribute__((unused)) jclass clazz, jboolean use_input_stack_queue) {
+static void noncritical_set_stackqueue(__attribute__((unused)) JNIEnv *env, __attribute__((unused)) jclass clazz, jboolean use_input_stack_queue) {
     critical_set_stackqueue(use_input_stack_queue);
 }
 
@@ -442,7 +440,7 @@ JNIEXPORT void JNICALL Java_org_lwjgl_glfw_CallbackBridge_nativeSendCursorEnter(
 }
 */
 
-void critical_send_cursor_pos(jfloat x, jfloat y) {
+static void critical_send_cursor_pos(jfloat x, jfloat y) {
 #ifdef DEBUG
     LOGD("Sending cursor position \n");
 #endif
@@ -491,11 +489,11 @@ void critical_send_key(jint key, jint scancode, jint action, jint mods) {
         }
     }
 }
-void noncritical_send_key(__attribute__((unused)) JNIEnv* env, __attribute__((unused)) jclass clazz, jint key, jint scancode, jint action, jint mods) {
+static void noncritical_send_key(__attribute__((unused)) JNIEnv* env, __attribute__((unused)) jclass clazz, jint key, jint scancode, jint action, jint mods) {
     critical_send_key(key, scancode, action, mods);
 }
 
-void critical_send_mouse_button(jint button, jint action, jint mods) {
+static void critical_send_mouse_button(jint button, jint action, jint mods) {
     if (pojav_environ->GLFW_invoke_MouseButton && pojav_environ->isInputReady) {
         pojav_environ->mouseDownBuffer[max(0, button)] = (jbyte) action;
         if (pojav_environ->isUseStackQueueCall) {
@@ -506,11 +504,11 @@ void critical_send_mouse_button(jint button, jint action, jint mods) {
     }
 }
 
-void noncritical_send_mouse_button(__attribute__((unused)) JNIEnv* env, __attribute__((unused)) jclass clazz, jint button, jint action, jint mods) {
+static void noncritical_send_mouse_button(__attribute__((unused)) JNIEnv* env, __attribute__((unused)) jclass clazz, jint button, jint action, jint mods) {
     critical_send_mouse_button(button, action, mods);
 }
 
-void critical_send_screen_size(jint width, jint height) {
+static void critical_send_screen_size(jint width, jint height) {
     pojav_environ->savedWidth = width;
     pojav_environ->savedHeight = height;
     if (pojav_environ->isInputReady) {
@@ -532,11 +530,11 @@ void critical_send_screen_size(jint width, jint height) {
     }
 }
 
-void noncritical_send_screen_size(__attribute__((unused)) JNIEnv* env, __attribute__((unused)) jclass clazz, jint width, jint height) {
+static void noncritical_send_screen_size(__attribute__((unused)) JNIEnv* env, __attribute__((unused)) jclass clazz, jint width, jint height) {
     critical_send_screen_size(width, height);
 }
 
-void critical_send_scroll(jdouble xoffset, jdouble yoffset) {
+static void critical_send_scroll(jdouble xoffset, jdouble yoffset) {
     if (pojav_environ->GLFW_invoke_Scroll && pojav_environ->isInputReady) {
         if (pojav_environ->isUseStackQueueCall) {
             sendData(EVENT_TYPE_SCROLL, (int)xoffset, (int)yoffset, 0, 0);
@@ -546,7 +544,7 @@ void critical_send_scroll(jdouble xoffset, jdouble yoffset) {
     }
 }
 
-void noncritical_send_scroll(__attribute__((unused)) JNIEnv* env, __attribute__((unused)) jclass clazz, jdouble xoffset, jdouble yoffset) {
+static void noncritical_send_scroll(__attribute__((unused)) JNIEnv* env, __attribute__((unused)) jclass clazz, jdouble xoffset, jdouble yoffset) {
     critical_send_scroll(xoffset, yoffset);
 }
 
