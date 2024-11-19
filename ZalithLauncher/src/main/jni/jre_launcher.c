@@ -54,11 +54,11 @@ static const jboolean const_cpwildcard = JNI_TRUE;
 static const jint const_ergo_class = 0; // DEFAULT_POLICY
 static struct sigaction old_sa[NSIG];
 
-void (*__old_sa)(int signal, siginfo_t *info, void *reserved);
-int (*sigaction_p) (int signum,
+static void (*__old_sa)(int signal, siginfo_t *info, void *reserved);
+static int (*sigaction_p) (int signum,
               const struct sigaction *_Nullable restrict act,
               struct sigaction *_Nullable restrict oldact);
-int (*JVM_handle_linux_signal)(int signo, siginfo_t* siginfo, void* ucontext, int abort_if_unrecognized);
+static int (*JVM_handle_linux_signal)(int signo, siginfo_t* siginfo, void* ucontext, int abort_if_unrecognized);
 
 static void android_sigaction(int signal, siginfo_t *info, void *reserved) {
   if (JVM_handle_linux_signal == NULL) { // should not happen, but still
@@ -142,7 +142,7 @@ static void abort_waiter_setup() {
     }
 }
 
-jint launchJVM(int margc, char** margv) {
+static jint launchJVM(int margc, char** margv) {
    void* libjli = dlopen("libjli.so", RTLD_LAZY | RTLD_GLOBAL);
    // Boardwalk: silence
    // LOGD("JLI lib = %x", (int)libjli);
