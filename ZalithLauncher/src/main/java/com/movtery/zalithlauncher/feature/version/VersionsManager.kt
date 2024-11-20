@@ -36,8 +36,11 @@ object VersionsManager {
     /**
      * 检查版本是否已经存在
      */
-    fun isVersionExists(versionName: String): Boolean {
-        return File(ProfilePathHome.versionsHome, versionName).exists()
+    fun isVersionExists(versionName: String, checkJson: Boolean = false): Boolean {
+        val folder = File(ProfilePathHome.versionsHome, versionName)
+        //保证版本文件夹存在的同时，也应保证其版本json文件存在
+        return if (checkJson) File(folder, "${folder.name}.json").exists()
+        else folder.exists()
     }
 
     /**
@@ -187,7 +190,7 @@ object VersionsManager {
                 //与原始名称一致
                 if (string == version.getVersionName()) return@setConfirmListener true
 
-                if (isVersionExists(string)) {
+                if (isVersionExists(string, true)) {
                     editText.error = context.getString(R.string.version_install_exists)
                     return@setConfirmListener false
                 }
@@ -214,6 +217,10 @@ object VersionsManager {
         val versionFolder = version.getVersionPath()
         val renameFolder = File(ProfilePathHome.versionsHome, name)
 
+        //不管重命名之后的文件夹是什么，只要这个文件夹存在，那么就必须删除
+        //否则将出现问题
+        FileUtils.deleteQuietly(renameFolder)
+
         val originalName = versionFolder.name
 
         FileTools.renameFile(versionFolder, renameFolder)
@@ -239,7 +246,11 @@ object VersionsManager {
 
     private fun getVersion(name: String?): Version? {
         name?.let { versionName ->
-            versions.forEach { if (it.getVersionName() == versionName) return it }
+            versions.forEach { version ->
+                if (version.getVersionName() == versionName) {
+                    return version.takeIf { it.isValid() }
+                }
+            }
         }
         return null
     }
