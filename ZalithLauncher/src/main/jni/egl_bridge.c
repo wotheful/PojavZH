@@ -45,6 +45,8 @@ EGLConfig config;
 struct PotatoBridge potatoBridge;
 
 
+void* gbuffer;
+
 EXTERNAL_API void pojavTerminate() {
     printf("EGLBridge: Terminating\n");
 
@@ -159,7 +161,7 @@ static void set_vulkan_ptr(void* ptr) {
     setenv("VULKAN_PTR", envval, 1);
 }
 
-void load_vulkan() {
+static void load_vulkan() {
     if(getenv("POJAV_ZINK_PREFER_SYSTEM_DRIVER") == NULL &&
         android_get_device_api_level() >= 28) { // the loader does not support below that
 #ifdef ADRENO_POSSIBLE
@@ -177,7 +179,7 @@ void load_vulkan() {
     set_vulkan_ptr(vulkan_ptr);
 }
 
-int pojavInitOpenGL() {
+static int pojavInitOpenGL() {
     const char *forceVsync = getenv("FORCE_VSYNC");
     if (!strcmp(forceVsync, "true"))
         pojav_environ->force_vsync = true;
@@ -195,6 +197,9 @@ int pojavInitOpenGL() {
         pojav_environ->config_renderer = RENDERER_VK_ZINK;
         load_vulkan();
         setenv("GALLIUM_DRIVER", "zink", 1);
+        setenv("MESA_GL_VERSION_OVERRIDE", "4.6", 1);
+        setenv("MESA_GLSL_VERSION_OVERRIDE", "460", 1);
+        setenv("mesa_glthread", "true", 1);
         set_osm_bridge_tbl();
     }
 
@@ -322,3 +327,14 @@ EXTERNAL_API void pojavSwapInterval(int interval) {
 
 }
 
+JNIEXPORT JNICALL jlong
+Java_org_lwjgl_opengl_GL_getGraphicsBufferAddr(JNIEnv *env, jobject thiz) {
+    return (jlong) &gbuffer;
+}
+JNIEXPORT JNICALL jintArray
+Java_org_lwjgl_opengl_GL_getNativeWidthHeight(JNIEnv *env, jobject thiz) {
+    jintArray ret = (*env)->NewIntArray(env,2);
+    jint arr[] = {pojav_environ->savedWidth, pojav_environ->savedHeight};
+    (*env)->SetIntArrayRegion(env,ret,0,2,arr);
+    return ret;
+}

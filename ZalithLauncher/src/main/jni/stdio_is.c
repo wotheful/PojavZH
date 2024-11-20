@@ -38,13 +38,13 @@ static bool recordBuffer(char* buf, ssize_t len) {
 }
 
 static void *logger_thread() {
+    ssize_t  rsize;
     JNIEnv *env;
     jstring writeString;
 
     JavaVM* dvm = pojav_environ->dalvikJavaVMPtr;
     (*dvm)->AttachCurrentThread(dvm, &env, NULL);
 
-    ssize_t  rsize;
     char buf[2050];
 
     while ((rsize = read(pfd[0], buf, sizeof(buf)-1)) > 0)
@@ -82,7 +82,6 @@ Java_net_kdt_pojavlaunch_Logger_begin(JNIEnv *env, __attribute((unused)) jclass 
     }
 
     jclass ioeClass = (*env)->FindClass(env, "java/io/IOException");
-
 
     setvbuf(stdout, 0, _IOLBF, 0); // make stdout line-buffered
     setvbuf(stderr, 0, _IONBF, 0); // make stderr unbuffered
