@@ -18,7 +18,6 @@ import com.movtery.zalithlauncher.feature.mod.modpack.install.ModPackUtils
 import com.movtery.zalithlauncher.feature.version.GameInstaller
 import com.movtery.zalithlauncher.feature.version.VersionConfig
 import com.movtery.zalithlauncher.feature.version.VersionFolderChecker
-import com.movtery.zalithlauncher.feature.version.VersionInfo
 import com.movtery.zalithlauncher.feature.version.VersionsManager
 import com.movtery.zalithlauncher.task.Task
 import com.movtery.zalithlauncher.task.TaskExecutors
@@ -91,29 +90,14 @@ abstract class AbstractPlatformHelper(val api: ApiHandler) {
 
                                 infoItem.iconUrl?.let { DownloadUtils.downloadFile(it, VersionsManager.getVersionIconFile(string)) }
 
-                                val minecraftVersion = modloader.minecraftVersion
-
                                 modloader.getDownloadTask()?.let { downloadTask ->
-                                    VersionFolderChecker.checkVersionsFolder(forceCheck = true, identifier = string)
+                                    //开始安装ModLoader，可能会创建新的版本文件夹，所以在这一步开始打个标记
+                                    VersionFolderChecker.markVersionsFolder(string, modloader.modLoader.loaderName, modloader.modLoaderVersion)
 
-                                    VersionInfo(
-                                        minecraftVersion,
-                                        arrayOf(
-                                            VersionInfo.LoaderInfo(
-                                                modloader.modLoader.loaderName,
-                                                modloader.modLoaderVersion
-                                            )
-                                        )
-                                    ).save(versionPath)
-
-                                    Logging.i("Install Version", "Installing ModLoader: ${modloader.modLoader.loaderName}")
+                                    Logging.i("Install Version", "Installing ModLoader: ${modloader.modLoaderVersion}")
                                     downloadTask.run()?.let { file ->
                                         return@runTask Pair(modloader, file)
                                     }
-                                }
-
-                                if (string != minecraftVersion) {
-                                    VersionInfo(minecraftVersion, emptyArray()).save(versionPath)
                                 }
 
                                 return@runTask null
