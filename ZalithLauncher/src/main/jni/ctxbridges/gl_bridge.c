@@ -19,7 +19,7 @@ static const char* g_LogTag = "GLBridge";
 static __thread gl_render_window_t* currentBundle;
 static EGLDisplay g_EglDisplay;
 
-static bool gl_init(void);
+bool gl_init(void);
 
 bool gl_init(void) {
     dlsym_EGL();
