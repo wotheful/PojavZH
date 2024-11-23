@@ -35,6 +35,10 @@
 static jint (*orig_ProcessImpl_forkAndExec)(JNIEnv *env, jobject process, jint mode, jbyteArray helperpath, jbyteArray prog, jbyteArray argBlock, jint argc, jbyteArray envBlock, jint envc, jbyteArray dir, jintArray std_fds, jboolean redirectErrorStream);
 static void registerFunctions(JNIEnv *env);
 
+static void pojavPumpEvents(void* window);
+static void pojavStopPumping(void);
+static void pojavStartPumping(void);
+
 jint JNI_OnLoad(JavaVM* vm, __attribute__((unused)) void* reserved) {
     if (pojav_environ->dalvikJavaVMPtr == NULL) {
         __android_log_print(ANDROID_LOG_INFO, "Native", "Saving DVM environ...");
@@ -93,7 +97,7 @@ ADD_CALLBACK_WWIN(WindowSize)
 
 #undef ADD_CALLBACK_WWIN
 
-void handleFramebufferSizeJava(long window, int w, int h) {
+static void handleFramebufferSizeJava(long window, int w, int h) {
     (*pojav_environ->runtimeJNIEnvPtr_JRE)->CallStaticVoidMethod(pojav_environ->runtimeJNIEnvPtr_JRE, pojav_environ->vmGlfwClass, pojav_environ->method_internalWindowSizeChanged, (long)window, w, h);
 }
 
@@ -143,7 +147,7 @@ void pojavPumpEvents(void* window) {
 }
 
 /** Prepare the library for sending out callbacks to all windows */
-void pojavStartPumping() {
+void pojavStartPumping(void) {
     size_t counter = atomic_load_explicit(&pojav_environ->eventCounter, memory_order_acquire);
     size_t index = pojav_environ->outEventIndex;
 
@@ -164,7 +168,7 @@ void pojavStartPumping() {
 }
 
 /** Prepare the library for the next round of new events */
-void pojavStopPumping() {
+void pojavStopPumping(void) {
     pojav_environ->outEventIndex = pojav_environ->outTargetIndex;
 
     // New events may have arrived while pumping, so remove only the difference before the start and end of execution
