@@ -42,8 +42,6 @@
 #define ABI_COMPAT __attribute__((unused))
 
 static void pojavTerminate(void);
-static void pojavTerminate(void);
-static int pojavInit(void);
 
 EGLConfig config;
 struct PotatoBridge potatoBridge;
