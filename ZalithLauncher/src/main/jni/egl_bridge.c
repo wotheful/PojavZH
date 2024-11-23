@@ -45,7 +45,7 @@ static void pojavTerminate(void);
 static void pojavTerminate(void);
 static int pojavInit(void);
 
-static EGLConfig config;
+EGLConfig config;
 struct PotatoBridge potatoBridge;
 
 
