@@ -13,11 +13,11 @@
 #include <string.h>
 
 #define FREQ_MAX 256
-void bigcore_format_cpu_path(char* buffer, unsigned int cpu_core) {
+static void bigcore_format_cpu_path(char* buffer, unsigned int cpu_core) {
     snprintf(buffer, PATH_MAX, "/sys/devices/system/cpu/cpu%i/cpufreq/cpuinfo_max_freq", cpu_core);
 }
 
-void bigcore_set_affinity() {
+static void bigcore_set_affinity() {
     char path_buffer[PATH_MAX];
     char freq_buffer[FREQ_MAX];
     char* discard;
@@ -25,9 +25,10 @@ void bigcore_set_affinity() {
     unsigned long max_freq = 0;
     unsigned int corecnt = 0;
     unsigned int big_core_id = 0;
+    cpu_set_t bigcore_affinity_set;
     while(1) {
-        bigcore_format_cpu_path(path_buffer, corecnt);
         int corefreqfd = open(path_buffer, O_RDONLY);
+        bigcore_format_cpu_path(path_buffer, corecnt);
         if(corefreqfd != -1) {
             ssize_t read_count = read(corefreqfd, freq_buffer, FREQ_MAX);
             close(corefreqfd);
@@ -43,7 +44,6 @@ void bigcore_set_affinity() {
         corecnt++;
     }
     printf("bigcore: big CPU number is %u, frequency %lu Hz\n", big_core_id, max_freq);
-    cpu_set_t bigcore_affinity_set;
     CPU_ZERO(&bigcore_affinity_set);
     CPU_SET_S(big_core_id, CPU_SETSIZE, &bigcore_affinity_set);
     int result = sched_setaffinity(0, CPU_SETSIZE, &bigcore_affinity_set);
