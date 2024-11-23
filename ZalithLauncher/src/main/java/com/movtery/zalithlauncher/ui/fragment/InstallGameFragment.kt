@@ -1,5 +1,6 @@
 package com.movtery.zalithlauncher.ui.fragment
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -22,6 +23,7 @@ import com.movtery.zalithlauncher.feature.version.InstallTask
 import com.movtery.zalithlauncher.feature.version.InstallTaskItem
 import com.movtery.zalithlauncher.feature.version.VersionsManager
 import com.movtery.zalithlauncher.setting.AllSettings
+import com.movtery.zalithlauncher.task.TaskExecutors
 import com.movtery.zalithlauncher.ui.dialog.SelectRuntimeDialog
 import com.movtery.zalithlauncher.ui.dialog.TipDialog
 import com.movtery.zalithlauncher.utils.ZHTools
@@ -51,7 +53,6 @@ class InstallGameFragment : FragmentWithAnim(R.layout.fragment_install_game), Vi
         EventBus.getDefault().getStickyEvent(SelectInstallTaskEvent::class.java)?.let { event ->
             addonMap[event.addon] = Pair(event.selectedVersion, event.task)
             EventBus.getDefault().removeStickyEvent(event)
-            checkIncompatible()
         }
 
         return binding.root
@@ -83,13 +84,17 @@ class InstallGameFragment : FragmentWithAnim(R.layout.fragment_install_game), Vi
             install.setOnClickListener(clickListener)
             isolation.isChecked = AllSettings.versionIsolation
         }
+    }
 
+    override fun onResume() {
+        super.onResume()
         checkIncompatible()
     }
 
     /**
      * 检查不兼容的Addon，并禁止用户选择该Addon版本
      */
+    @SuppressLint("SetTextI18n")
     private fun checkIncompatible() {
         binding.apply {
             checkIncompatible(Addon.OPTIFINE, optifineLayout, optifineVersion, optifineInstall, optifineDelete, addonMap.size > 1)
@@ -99,6 +104,12 @@ class InstallGameFragment : FragmentWithAnim(R.layout.fragment_install_game), Vi
             checkIncompatible(Addon.FABRIC_API, fabricApiLayout, fabricApiVersion, fabricApiInstall, fabricApiDelete, true)
             checkIncompatible(Addon.QUILT, quiltLayout, quiltVersion, quiltInstall, quiltDelete)
             checkIncompatible(Addon.QSL, quiltApiLayout, quiltApiVersion, quiltApiInstall, quiltApiDelete, true)
+
+            val loaderName = addonMap.keys
+                .firstOrNull { it != Addon.OPTIFINE || addonMap.size == 1 }
+                ?.addonName.orEmpty()
+
+            nameEdit.setText("$mcVersion $loaderName".trim())
         }
     }
 
@@ -267,21 +278,21 @@ class InstallGameFragment : FragmentWithAnim(R.layout.fragment_install_game), Vi
                 Addon.FORGE -> {
                     taskMap[addon] = InstallTaskItem(taskPair.first, false, taskPair.second) {  activity, file ->
                         installInGUITask(activity, taskPair.first) { intent, argUtils ->
-                            argUtils.setForge(intent, file)
+                            argUtils.setForge(intent, file, customVersionName)
                         }
                     }
                 }
                 Addon.NEOFORGE -> {
                     taskMap[addon] = InstallTaskItem(taskPair.first, false, taskPair.second) {  activity, file ->
                         installInGUITask(activity, taskPair.first) { intent, argUtils ->
-                            argUtils.setNeoForge(intent, file)
+                            argUtils.setNeoForge(intent, file, customVersionName)
                         }
                     }
                 }
                 Addon.FABRIC -> {
                     taskMap[addon] = InstallTaskItem(taskPair.first, false, taskPair.second) {  activity, file ->
                         installInGUITask(activity, taskPair.first) { intent, argUtils ->
-                            argUtils.setFabric(intent, file)
+                            argUtils.setFabric(intent, file, customVersionName)
                         }
                     }
                 }
@@ -301,20 +312,23 @@ class InstallGameFragment : FragmentWithAnim(R.layout.fragment_install_game), Vi
      * 在JavaGUI内进行安装，作为EndTask，需要在UI线程内运行
      * @param activity **此处必须使用activity的上下文！不能调用Fragment的上下文！！因为调用到这里的时候，Fragment早就被销毁了！！！**
      */
+    @Throws(Throwable::class)
     private fun installInGUITask(activity: Activity, selectVersion: String, setArgs: (Intent, InstallArgsUtils) -> Unit) {
         val intent = Intent(activity, JavaGUILauncherActivity::class.java)
 
         val argUtils = InstallArgsUtils(mcVersion, selectVersion)
         setArgs(intent, argUtils)
 
-        SelectRuntimeDialog(activity).apply {
-            setListener { jreName: String? ->
-                intent.putExtra(JavaGUILauncherActivity.EXTRAS_JRE_NAME, jreName)
-                this.dismiss()
-                activity.startActivity(intent)
-            }
-            setTitleText(R.string.version_install_new)
-        }.show()
+        TaskExecutors.runInUIThread {
+            SelectRuntimeDialog(activity).apply {
+                setListener { jreName: String? ->
+                    intent.putExtra(JavaGUILauncherActivity.EXTRAS_JRE_NAME, jreName)
+                    this.dismiss()
+                    activity.startActivity(intent)
+                }
+                setTitleText(R.string.version_install_new)
+            }.show()
+        }
     }
 
     override fun slideIn(animPlayer: AnimPlayer) {

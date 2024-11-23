@@ -113,6 +113,7 @@
     <string name="mod_download_progress">Загрузка установщика для %s</string>
     <string name="mod_forge_searching">Поиск номера версии Forge</string>
     <string name="mod_neoforge_searching">Поиск номера версии NeoForge</string>
+    <string name="mod_forge_custom_version">Изменение имени версии</string>
     <string name="mod_failed_to_load_list">Не удалось загрузить список версий!</string>
     <string name="mod_optifine_progress">Загрузка %s</string>
     <!-- Controls -->
@@ -209,7 +210,7 @@
     <string name="version_install_optifine_and_forge">Некоторые версии OptiFine могут не работать на Forge, если возникнут сбои или проблемы совместимости, пожалуйста, рассмотрите возможность удаления OptiFine в первую очередь!</string>
     <string name="version_manager_shortcuts">Ярлыки</string>
     <string name="version_manager_shortcuts_mods">Управление модами</string>
-    <string name="version_manager_shortcuts_version_path">Папка пути версии</string>
+    <string name="version_manager_shortcuts_version_path">Папка пути игры</string>
     <string name="version_manager_shortcuts_resource_path">Папка пакета ресурсов</string>
     <string name="version_manager_shortcuts_world_path">Папка сохранений мира</string>
     <string name="version_manager_shortcuts_shader_path">Папка пакета шейдеров</string>
@@ -570,8 +571,7 @@
     <string name="splash_screen_cacio">Предоставляет переносимый GUI-бэкенд для OpenJDK.</string>
     <string name="splash_screen_authlib_injector">Инжектирует authlib во время выполнения, чтобы разрешить вход в систему вне игры.</string>
     <string name="splash_screen_pro_grade">Эта библиотека реализует пользовательский менеджер безопасности Java и политику безопасности с правилами отказа.</string>
-    <string name="splash_screen_optifine_installer">Помогает автоматически установить OptiFine.</string>
-    <string name="splash_screen_forge_install_bootstrapper">Помогает автоматически установить Forge.</string>
+    <string name="splash_screen_loader_installers">Помогает автоматически устанавливать Forge, Fabric и OptiFine.</string>
     <string name="splash_screen_jre8">Среда Java 8, Minecraft 1.16- зависит от Java 8.</string>
     <string name="splash_screen_jre17">Среда Java 17, Minecraft 1.17+ зависит от Java 17.</string>
     <string name="splash_screen_jre21">Среда Java 21, Minecraft 1.20.5+ зависит от Java 21.</string>
@@ -592,7 +592,7 @@
     <string name="about_VeraFirefly_desc">Предоставил техническую поддержку по рендерингу для лаунчера</string>
     <string name="about_LingMuQiuZhu_desc">Предоставил техническую поддержку для лаунчера</string>
     <string name="about_ShirosakiMio_desc">Предоставил техническую поддержку для лаунчера, исправил некоторые ошибки</string>
-    <string name="about_bangbang93_desc">Запускатель использует созданный им источник зеркала BMCLAPI, а также Forge Install Bootstrapper.</string>
+    <string name="about_bangbang93_desc">Запускатор использует зеркальный источник BMCLAPI, созданный ими</string>
     <string name="about_access_space">Доступ к пространству</string>
     <string name="about_access_link">Ссылка для доступа</string>
     <string name="about_version_name">Название версии программного обеспечения:</string>
