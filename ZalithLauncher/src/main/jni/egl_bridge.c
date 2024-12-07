@@ -223,11 +223,12 @@ static int pojavInitOpenGL(void) {
     {
         pojav_environ->config_renderer = RENDERER_VIRGL;
         setenv("GALLIUM_DRIVER", "virpipe", 1);
-        setenv("OSMESA_NO_FLUSH_FRONTBUFFER", "1", false);
         setenv("MESA_GL_VERSION_OVERRIDE", "4.3", 1);
         setenv("MESA_GLSL_VERSION_OVERRIDE", "430", 1);
-        if (!strcmp(getenv("OSMESA_NO_FLUSH_FRONTBUFFER"), "1"))
-            printf("VirGL: OSMesa buffer flush is DISABLED!\n");
+        setenv("mesa_glthread", "true", 1);
+        setenv("OSMESA_NO_FLUSH_FRONTBUFFER", "0", 1);
+        if (!strcmp(getenv("OSMESA_NO_FLUSH_FRONTBUFFER"), "0"))
+            printf("VirGL: OSMesa buffer flush is ENABLED!\n");
         loadSymbolsVirGL();
         virglInit();
         return 0;
