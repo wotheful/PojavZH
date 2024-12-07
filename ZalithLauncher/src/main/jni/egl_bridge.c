@@ -227,6 +227,7 @@ static int pojavInitOpenGL(void) {
         setenv("MESA_GL_VERSION_OVERRIDE", "4.6", 1);
         setenv("MESA_GLSL_VERSION_OVERRIDE", "460", 1);
         setenv("mesa_glthread", "true", 1);
+        setenv("OSMESA_NO_FLUSH_FRONTBUFFER", "0", 1);
         if (!strcmp(getenv("OSMESA_NO_FLUSH_FRONTBUFFER"), "1"))
             printf("VirGL: OSMesa buffer flush is DISABLED!\n");
         loadSymbolsVirGL();
