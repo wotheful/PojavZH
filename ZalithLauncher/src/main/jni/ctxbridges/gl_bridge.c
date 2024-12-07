@@ -38,7 +38,7 @@ bool gl_init(void) {
     return true;
 }
 
-gl_render_window_t* gl_get_current() {
+gl_render_window_t* gl_get_current(void) {
     return currentBundle;
 }
 
@@ -56,7 +56,7 @@ static void gl4esi_get_display_dimensions(int* width, int* height) {
 }
 
 static bool already_initialized = false;
-static void gl_init_gl4es_internals() {
+static void gl_init_gl4es_internals(void) {
     if (already_initialized) return;
     already_initialized = true;
 
@@ -145,8 +145,6 @@ static void gl_swap_surface(gl_render_window_t* bundle) {
 
 void gl_make_current(gl_render_window_t* bundle) {
 
-    gl_init_gl4es_internals();
-
     if (bundle == NULL)
     {
         if (eglMakeCurrent_p(g_EglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT))
@@ -181,6 +179,7 @@ void gl_make_current(gl_render_window_t* bundle) {
         __android_log_print(ANDROID_LOG_ERROR, g_LogTag, "eglMakeCurrent returned with error: %04x", eglGetError_p());
     }
 
+    return gl_init_gl4es_internals();
 }
 
 void gl_swap_buffers() {
