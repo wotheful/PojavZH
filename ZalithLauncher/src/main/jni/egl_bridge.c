@@ -45,9 +45,9 @@ EGLConfig config;
 struct PotatoBridge potatoBridge;
 
 
-void* gbuffer;
+static void* gbuffer;
 
-EXTERNAL_API void pojavTerminate() {
+EXTERNAL_API void pojavTerminate(void) {
     printf("EGLBridge: Terminating\n");
 
     switch (pojav_environ->config_renderer) {
@@ -161,7 +161,7 @@ static void set_vulkan_ptr(void* ptr) {
     setenv("VULKAN_PTR", envval, 1);
 }
 
-static void load_vulkan() {
+static void load_vulkan(void) {
     if(getenv("POJAV_ZINK_PREFER_SYSTEM_DRIVER") == NULL &&
         android_get_device_api_level() >= 28) { // the loader does not support below that
 #ifdef ADRENO_POSSIBLE
@@ -179,7 +179,7 @@ static void load_vulkan() {
     set_vulkan_ptr(vulkan_ptr);
 }
 
-static int pojavInitOpenGL() {
+static int pojavInitOpenGL(void) {
     const char *forceVsync = getenv("FORCE_VSYNC");
     if (!strcmp(forceVsync, "true"))
         pojav_environ->force_vsync = true;
@@ -238,7 +238,7 @@ static int pojavInitOpenGL() {
     return 0;
 }
 
-EXTERNAL_API int pojavInit() {
+EXTERNAL_API int pojavInit(void) {
     ANativeWindow_acquire(pojav_environ->pojavWindow);
     pojav_environ->savedWidth = ANativeWindow_getWidth(pojav_environ->pojavWindow);
     pojav_environ->savedHeight = ANativeWindow_getHeight(pojav_environ->pojavWindow);

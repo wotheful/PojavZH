@@ -114,6 +114,7 @@
     <string name="mod_download_progress">Downloading installer for %s</string>
     <string name="mod_forge_searching">Searching for Forge version number</string>
     <string name="mod_neoforge_searching">Searching for NeoForge version number</string>
+    <string name="mod_forge_custom_version">Modifying version name</string>
     <string name="mod_failed_to_load_list">Failed to load version list!</string>
     <string name="mod_optifine_progress">Downloading %s</string>
     <!-- Controls -->
@@ -215,7 +216,7 @@
     <string name="version_install_optifine_and_forge">Some versions of OptiFine may not work on Forge, and if you encounter crashes or compatibility issues, consider removing OptiFine first!</string>
     <string name="version_manager_shortcuts">Shortcuts</string>
     <string name="version_manager_shortcuts_mods">Mod Management</string>
-    <string name="version_manager_shortcuts_version_path">Version Path Folder</string>
+    <string name="version_manager_shortcuts_version_path">Game Path Folder</string>
     <string name="version_manager_shortcuts_resource_path">Resource Pack Folder</string>
     <string name="version_manager_shortcuts_world_path">World Save Folder</string>
     <string name="version_manager_shortcuts_shader_path">Shader Pack Folder</string>
@@ -230,6 +231,7 @@
     <string name="version_manager_invalid">This version is invalid</string>
     <!-- Profiles Path -->
     <string name="permissions_manage_external_storage">Zalith Launcher requires permission to manage all files on the device to use this feature properly. Please enable the permission!</string>
+    <string name="permissions_write_external_storage">Zalith Launcher requires storage management permission. If the permission is not enabled, it may cause issues such as game files failing to save or decompress properly. Please grant the permission to ensure proper functionality.</string>
     <string name="profiles_path_title">Game Path Management</string>
     <string name="profiles_path_default">Default Path</string>
     <string name="profiles_path_settings">Open Path Settings</string>
@@ -576,8 +578,7 @@
     <string name="splash_screen_cacio">Provides a portable GUI backend for OpenJDK.</string>
     <string name="splash_screen_authlib_injector">Injects authlib via runtime to enable login outside the game.</string>
     <string name="splash_screen_pro_grade">This library implements a custom Java security manager and a security policy with deny rules.</string>
-    <string name="splash_screen_optifine_installer">Helps automatically install OptiFine.</string>
-    <string name="splash_screen_forge_install_bootstrapper">Helps automatically install Forge.</string>
+    <string name="splash_screen_loader_installers">Helps automatically install Forge, Fabric, and OptiFine.</string>
     <string name="splash_screen_jre8">Java 8 environment, Minecraft 1.16- depends on Java 8.</string>
     <string name="splash_screen_jre17">Java 17 environment, Minecraft 1.17+ depends on Java 17.</string>
     <string name="splash_screen_jre21">Java 21 environment, Minecraft 1.20.5+ depends on Java 21.</string>
@@ -598,7 +599,7 @@
     <string name="about_VeraFirefly_desc">Provided technical support for rendering in the launcher</string>
     <string name="about_LingMuQiuZhu_desc">Provided technical support for the launcher</string>
     <string name="about_ShirosakiMio_desc">Provided technical support for the launcher and fixed some bugs</string>
-    <string name="about_bangbang93_desc">The launcher uses its created BMCLAPI mirror source, along with the Forge Install Bootstrapper.</string>
+    <string name="about_bangbang93_desc">The launcher uses the BMCLAPI mirror source created by them</string>
     <string name="about_access_space">Access Space</string>
     <string name="about_access_link">Access Link</string>
     <string name="about_version_name">Software Version Name:</string>

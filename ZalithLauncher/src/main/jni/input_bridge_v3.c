@@ -93,7 +93,7 @@ ADD_CALLBACK_WWIN(WindowSize)
 
 #undef ADD_CALLBACK_WWIN
 
-void handleFramebufferSizeJava(long window, int w, int h) {
+static void handleFramebufferSizeJava(long window, int w, int h) {
     (*pojav_environ->runtimeJNIEnvPtr_JRE)->CallStaticVoidMethod(pojav_environ->runtimeJNIEnvPtr_JRE, pojav_environ->vmGlfwClass, pojav_environ->method_internalWindowSizeChanged, (long)window, w, h);
 }
 
@@ -143,7 +143,7 @@ void pojavPumpEvents(void* window) {
 }
 
 /** Prepare the library for sending out callbacks to all windows */
-void pojavStartPumping() {
+void pojavStartPumping(void) {
     size_t counter = atomic_load_explicit(&pojav_environ->eventCounter, memory_order_acquire);
     size_t index = pojav_environ->outEventIndex;
 
@@ -164,7 +164,7 @@ void pojavStartPumping() {
 }
 
 /** Prepare the library for the next round of new events */
-void pojavStopPumping() {
+void pojavStopPumping(void) {
     pojav_environ->outEventIndex = pojav_environ->outTargetIndex;
 
     // New events may have arrived while pumping, so remove only the difference before the start and end of execution
@@ -473,14 +473,14 @@ static void critical_send_cursor_pos(jfloat x, jfloat y) {
     }
 }
 
-void noncritical_send_cursor_pos(__attribute__((unused)) JNIEnv* env, __attribute__((unused)) jclass clazz,  jfloat x, jfloat y) {
+static void noncritical_send_cursor_pos(__attribute__((unused)) JNIEnv* env, __attribute__((unused)) jclass clazz,  jfloat x, jfloat y) {
     critical_send_cursor_pos(x, y);
 }
 #define max(a,b) \
    ({ __typeof__ (a) _a = (a); \
        __typeof__ (b) _b = (b); \
      _a > _b ? _a : _b; })
-void critical_send_key(jint key, jint scancode, jint action, jint mods) {
+static void critical_send_key(jint key, jint scancode, jint action, jint mods) {
     if (pojav_environ->GLFW_invoke_Key && pojav_environ->isInputReady) {
         pojav_environ->keyDownBuffer[max(0, key-31)] = (jbyte) action;
         if (pojav_environ->isUseStackQueueCall) {
@@ -620,7 +620,7 @@ void dvm_testCriticalNative(void* arg0, void* arg1, void* arg2, void* arg3) {
     }
 }
 
-static bool tryCriticalNative(JNIEnv *env) {
+bool tryCriticalNative(JNIEnv *env) {
     static const JNINativeMethod testJNIMethod[] = {
             { "testCriticalNative", "(II)V", dvm_testCriticalNative}
     };

@@ -113,6 +113,7 @@
     <string name="mod_download_progress">Baixando instalador de %s</string>
     <string name="mod_forge_searching">Procurando número de versão do Forge</string>
     <string name="mod_neoforge_searching">Procurando número de versão do NeoForge</string>
+    <string name="mod_forge_custom_version">Modificando o nome da versão</string>
     <string name="mod_failed_to_load_list">Falha ao carregar lista de versões!</string>
     <string name="mod_optifine_progress">Baixando %s</string>
     <!-- Controls -->
@@ -209,7 +210,7 @@
     <string name="version_install_optifine_and_forge">Algumas versões do OptiFine podem não funcionar no Forge, se ocorrer uma falha ou problemas de compatibilidade, considere remover o OptiFine primeiro!</string>
     <string name="version_manager_shortcuts">Atalhos</string>
     <string name="version_manager_shortcuts_mods">Gerenciamento de Mods</string>
-    <string name="version_manager_shortcuts_version_path">Pasta do Caminho da Versão</string>
+    <string name="version_manager_shortcuts_version_path">Pasta do caminho do jogo</string>
     <string name="version_manager_shortcuts_resource_path">Pasta do pacote de recursos</string>
     <string name="version_manager_shortcuts_world_path">Pasta de salvamento de mundos</string>
     <string name="version_manager_shortcuts_shader_path">Pasta do pacote de shaders</string>
@@ -224,6 +225,7 @@
     <string name="version_manager_invalid">Esta versão é inválida</string>
     <!-- Profiles Path -->
     <string name="permissions_manage_external_storage">Zalith Launcher precisa da permissão para gerenciar todos os arquivos do dispositivo para usar esta funcionalidade corretamente, por favor, habilite a permissão!</string>
+    <string name="permissions_write_external_storage">O Zalith Launcher requer permissão de gerenciamento de armazenamento. Se a permissão não estiver ativada, podem ocorrer problemas como falha ao salvar ou descompactar os arquivos do jogo. Conceda a permissão para garantir o funcionamento correto.</string>
     <string name="profiles_path_title">Gerenciamento de Caminho do Jogo</string>
     <string name="profiles_path_default">Caminho Padrão</string>
     <string name="profiles_path_settings">Abrir configurações de caminho</string>
@@ -570,8 +572,7 @@
     <string name="splash_screen_cacio">Fornece um backend GUI portátil para o OpenJDK.</string>
     <string name="splash_screen_authlib_injector">Injeta authlib durante a execução para permitir o login fora do jogo.</string>
     <string name="splash_screen_pro_grade">Esta biblioteca implementa um gerenciador de segurança Java personalizado e uma política de segurança com regras de negação.</string>
-    <string name="splash_screen_optifine_installer">Ajuda a instalar o OptiFine automaticamente.</string>
-    <string name="splash_screen_forge_install_bootstrapper">Ajuda a instalar o Forge automaticamente.</string>
+    <string name="splash_screen_loader_installers">Ajuda a instalar automaticamente Forge, Fabric e OptiFine.</string>
     <string name="splash_screen_jre8">Ambiente Java 8, Minecraft 1.16- depende do Java 8.</string>
     <string name="splash_screen_jre17">Ambiente Java 17, Minecraft 1.17+ depende do Java 17.</string>
     <string name="splash_screen_jre21">Ambiente Java 21, Minecraft 1.20.5+ depende do Java 21.</string>
@@ -592,7 +593,7 @@
     <string name="about_VeraFirefly_desc">Forneceu suporte técnico em renderização para o lançador</string>
     <string name="about_LingMuQiuZhu_desc">Forneceu suporte técnico para o lançador</string>
     <string name="about_ShirosakiMio_desc">Forneceu suporte técnico para o lançador e corrigiu alguns bugs</string>
-    <string name="about_bangbang93_desc">O lançador usa sua fonte espelhada BMCLAPI criada, junto com o Forge Install Bootstrapper.</string>
+    <string name="about_bangbang93_desc">O launcher usa a fonte de espelho BMCLAPI criada por eles</string>
     <string name="about_access_space">Espaço de Acesso</string>
     <string name="about_access_link">Link de Acesso</string>
     <string name="about_version_name">Nome da versão do software:</string>

@@ -40,7 +40,7 @@ LOCAL_SRC_FILES := \
 
 ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
 LOCAL_CFLAGS += -DADRENO_POSSIBLE
-LOCAL_CFLAGS += -O3 -fPIC -DPIC -flto=thin -fwhole-program-vtables -mllvm -polly -pthread -Wall -Weverything -pedantic -std=c2x -DLLVM_USE_LINKER=lld -DBUILD_SHARED_LIBS
+LOCAL_CFLAGS += -Ofast -fPIC -DPIC -flto=thin -fwhole-program-vtables -mllvm -polly -pthread -Wall -Weverything -pedantic -std=c2x -DLLVM_USE_LINKER=lld -DBUILD_SHARED_LIBS
 LOCAL_LDLAGS += --lto=thin -flto=thin -Wl,-plugin-opt=-emulated-tls -fuse-ld=lld
 LOCAL_LDLIBS += -lEGL -lGLESv3
 endif
