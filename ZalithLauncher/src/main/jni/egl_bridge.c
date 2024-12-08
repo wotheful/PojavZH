@@ -197,9 +197,10 @@ static int pojavInitOpenGL(void) {
         pojav_environ->config_renderer = RENDERER_VK_ZINK;
         load_vulkan();
         setenv("GALLIUM_DRIVER", "zink", 1);
-        setenv("MESA_GL_VERSION_OVERRIDE", "4.6", 1);
+        setenv("MESA_GL_VERSION_OVERRIDE", "4.6COMPAT", 1);
         setenv("MESA_GLSL_VERSION_OVERRIDE", "460", 1);
         setenv("mesa_glthread", "true", 1);
+        setenv("vblank_mode", "0", 1);
         set_osm_bridge_tbl();
     }
 
@@ -223,10 +224,14 @@ static int pojavInitOpenGL(void) {
     {
         pojav_environ->config_renderer = RENDERER_VIRGL;
         setenv("GALLIUM_DRIVER", "virpipe", 1);
-        setenv("MESA_GL_VERSION_OVERRIDE", "4.3", 1);
-        setenv("MESA_GLSL_VERSION_OVERRIDE", "430", 1);
+        setenv("MESA_GL_VERSION_OVERRIDE", "4.6COMPAT", 1);
+        setenv("MESA_GLSL_VERSION_OVERRIDE", "460", 1);
         setenv("mesa_glthread", "true", 1);
         setenv("OSMESA_NO_FLUSH_FRONTBUFFER", "0", 1);
+        setenv("vblank_mode", "0", 1);
+        setenv("force_glsl_extensions_warn", "true", 1);
+        setenv("allow_higher_compat_version", "true", 1);
+        setenv("allow_glsl_extension_directive_midshader", "true", 1);
         if (!strcmp(getenv("OSMESA_NO_FLUSH_FRONTBUFFER"), "0"))
             printf("VirGL: OSMesa buffer flush is ENABLED!\n");
         loadSymbolsVirGL();
