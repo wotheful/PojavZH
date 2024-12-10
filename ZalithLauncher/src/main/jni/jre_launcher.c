@@ -54,13 +54,13 @@ static const jboolean const_cpwildcard = JNI_TRUE;
 static const jint const_ergo_class = 0; // DEFAULT_POLICY
 static struct sigaction old_sa[NSIG];
 
-static void (*__old_sa)(int signal, siginfo_t *info, void *reserved);
-static int (*sigaction_p) (int signum,
+void (*__old_sa)(int signal, siginfo_t *info, void *reserved);
+int (*sigaction_p) (int signum,
               const struct sigaction *_Nullable restrict act,
               struct sigaction *_Nullable restrict oldact);
-static int (*JVM_handle_linux_signal)(int signo, siginfo_t* siginfo, void* ucontext, int abort_if_unrecognized);
+int (*JVM_handle_linux_signal)(int signo, siginfo_t* siginfo, void* ucontext, int abort_if_unrecognized);
 
-static void android_sigaction(int signal, siginfo_t *info, void *reserved) {
+void android_sigaction(int signal, siginfo_t *info, void *reserved) {
   if (JVM_handle_linux_signal == NULL) { // should not happen, but still
       __old_sa = old_sa[signal].sa_sigaction;
       __old_sa(signal,info,reserved);
@@ -86,61 +86,6 @@ typedef jint JLI_Launch_func(int argc, char ** argv, /* main argc, argc */
         jboolean javaw,                         /* windows-only javaw */
         jint ergo                               /* ergonomics class policy */
 );
-
-struct {
-    sigset_t tracked_sigset;
-    int pipe[2];
-} abort_waiter_data;
-
-_Noreturn extern void nominal_exit(int code, bool is_signal);
-
-_Noreturn static void* abort_waiter_thread(void* extraArg) {
-    pthread_sigmask(SIG_BLOCK, &abort_waiter_data.tracked_sigset, NULL);
-    int signal;
-    read(abort_waiter_data.pipe[0], &signal, sizeof(int));
-    nominal_exit(signal, true);
-}
-
-_Noreturn static void abort_waiter_handler(int signal) {
-    write(abort_waiter_data.pipe[1], &signal, sizeof(int));
-    while(1) {}
-}
-
-static void abort_waiter_setup() {
-    const static int tracked_signals[] = {SIGABRT};
-    const static int ntracked = (sizeof(tracked_signals) / sizeof(tracked_signals[0]));
-    struct sigaction sigactions[ntracked];
-    sigemptyset(&abort_waiter_data.tracked_sigset);
-
-    for (size_t i = 0; i < ntracked; i++)
-    {
-        sigaddset(&abort_waiter_data.tracked_sigset, tracked_signals[i]);
-        sigactions[i].sa_handler = abort_waiter_handler;
-    }
-
-    if (pipe(abort_waiter_data.pipe) != 0)
-    {
-        printf("Failed to set up aborter pipe: %s\n", strerror(errno));
-        return;
-    }
-
-    pthread_t waiter_thread; int result;
-
-    if ((result = pthread_create(&waiter_thread, NULL, abort_waiter_thread, NULL)) != 0)
-    {
-        printf("Failed to start up waiter thread: %s", strerror(result));
-        for(int i = 0; i < 2; i++) close(abort_waiter_data.pipe[i]);
-        return;
-    }
-
-    for (size_t i = 0; i < ntracked; i++)
-    {
-        if (sigaction(tracked_signals[i], &sigactions[i], NULL) != 0)
-        {
-            printf("Failed to set signal hander for signal %i: %s", i, strerror(errno));
-        }
-    }
-}
 
 static jint launchJVM(int margc, char** margv) {
    void* libjli = dlopen("libjli.so", RTLD_LAZY | RTLD_GLOBAL);
