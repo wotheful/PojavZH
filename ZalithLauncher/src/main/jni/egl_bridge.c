@@ -45,7 +45,9 @@ EGLConfig config;
 struct PotatoBridge potatoBridge;
 
 
-EXTERNAL_API void pojavTerminate() {
+static void* gbuffer;
+
+EXTERNAL_API void pojavTerminate(void) {
     printf("EGLBridge: Terminating\n");
 
     switch (pojav_environ->config_renderer) {
@@ -159,7 +161,7 @@ static void set_vulkan_ptr(void* ptr) {
     setenv("VULKAN_PTR", envval, 1);
 }
 
-void load_vulkan() {
+static void load_vulkan(void) {
     if(getenv("POJAV_ZINK_PREFER_SYSTEM_DRIVER") == NULL &&
         android_get_device_api_level() >= 28) { // the loader does not support below that
 #ifdef ADRENO_POSSIBLE
@@ -177,7 +179,7 @@ void load_vulkan() {
     set_vulkan_ptr(vulkan_ptr);
 }
 
-int pojavInitOpenGL() {
+static int pojavInitOpenGL(void) {
     const char *forceVsync = getenv("FORCE_VSYNC");
     if (!strcmp(forceVsync, "true"))
         pojav_environ->force_vsync = true;
@@ -195,6 +197,10 @@ int pojavInitOpenGL() {
         pojav_environ->config_renderer = RENDERER_VK_ZINK;
         load_vulkan();
         setenv("GALLIUM_DRIVER", "zink", 1);
+        setenv("MESA_GL_VERSION_OVERRIDE", "4.6COMPAT", 1);
+        setenv("MESA_GLSL_VERSION_OVERRIDE", "460", 1);
+        setenv("mesa_glthread", "true", 1);
+        setenv("vblank_mode", "0", 1);
         set_osm_bridge_tbl();
     }
 
@@ -218,11 +224,18 @@ int pojavInitOpenGL() {
     {
         pojav_environ->config_renderer = RENDERER_VIRGL;
         setenv("GALLIUM_DRIVER", "virpipe", 1);
-        setenv("OSMESA_NO_FLUSH_FRONTBUFFER", "1", false);
-        setenv("MESA_GL_VERSION_OVERRIDE", "4.3", 1);
-        setenv("MESA_GLSL_VERSION_OVERRIDE", "430", 1);
-        if (!strcmp(getenv("OSMESA_NO_FLUSH_FRONTBUFFER"), "1"))
-            printf("VirGL: OSMesa buffer flush is DISABLED!\n");
+        setenv("MESA_GL_VERSION_OVERRIDE", "4.6COMPAT", 1);
+        setenv("MESA_GLSL_VERSION_OVERRIDE", "460", 1);
+        setenv("mesa_glthread", "true", 1);
+        setenv("OSMESA_NO_FLUSH_FRONTBUFFER", "0", 1);
+        setenv("vblank_mode", "0", 1);
+        setenv("force_glsl_extensions_warn", "true", 1);
+        setenv("allow_higher_compat_version", "true", 1);
+        setenv("allow_glsl_extension_directive_midshader", "true", 1);
+        setenv("MESA_SHADER_CACHE_MAX_SIZE", "512MB", 1);
+        setenv("MESA_NO_ERROR", "1", 1);
+        if (!strcmp(getenv("OSMESA_NO_FLUSH_FRONTBUFFER"), "0"))
+            printf("VirGL: OSMesa buffer flush is ENABLED!\n");
         loadSymbolsVirGL();
         virglInit();
         return 0;
@@ -233,7 +246,7 @@ int pojavInitOpenGL() {
     return 0;
 }
 
-EXTERNAL_API int pojavInit() {
+EXTERNAL_API int pojavInit(void) {
     ANativeWindow_acquire(pojav_environ->pojavWindow);
     pojav_environ->savedWidth = ANativeWindow_getWidth(pojav_environ->pojavWindow);
     pojav_environ->savedHeight = ANativeWindow_getHeight(pojav_environ->pojavWindow);
@@ -322,3 +335,14 @@ EXTERNAL_API void pojavSwapInterval(int interval) {
 
 }
 
+JNIEXPORT JNICALL jlong
+Java_org_lwjgl_opengl_GL_getGraphicsBufferAddr(JNIEnv *env, jobject thiz) {
+    return (jlong) &gbuffer;
+}
+JNIEXPORT JNICALL jintArray
+Java_org_lwjgl_opengl_GL_getNativeWidthHeight(JNIEnv *env, jobject thiz) {
+    jintArray ret = (*env)->NewIntArray(env,2);
+    jint arr[] = {pojav_environ->savedWidth, pojav_environ->savedHeight};
+    (*env)->SetIntArrayRegion(env,ret,0,2,arr);
+    return ret;
+}
