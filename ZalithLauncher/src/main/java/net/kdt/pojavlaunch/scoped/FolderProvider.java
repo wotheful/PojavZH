@@ -14,9 +14,10 @@ import android.webkit.MimeTypeMap;
 
 import androidx.annotation.Nullable;
 
+import com.movtery.zalithlauncher.InfoCenter;
 import com.movtery.zalithlauncher.R;
 import com.movtery.zalithlauncher.feature.log.Logging;
-import com.movtery.zalithlauncher.utils.PathAndUrlManager;
+import com.movtery.zalithlauncher.utils.path.PathManager;
 
 import org.apache.commons.io.FileUtils;
 
@@ -43,7 +44,7 @@ public class FolderProvider extends DocumentsProvider {
 
     private static final String ALL_MIME_TYPES = "*/*";
 
-    private static final File BASE_DIR = new File(PathAndUrlManager.DIR_GAME_HOME);
+    private static final File BASE_DIR = new File(PathManager.DIR_GAME_HOME);
 
     // The default columns to return information about a root if no specific
     // columns are requested in a query.
@@ -72,14 +73,13 @@ public class FolderProvider extends DocumentsProvider {
     @Override
     public Cursor queryRoots(String[] projection) {
         final MatrixCursor result = new MatrixCursor(projection != null ? projection : DEFAULT_ROOT_PROJECTION);
-        final String applicationName = getContext().getString(R.string.app_name);
 
         final MatrixCursor.RowBuilder row = result.newRow();
         row.add(Root.COLUMN_ROOT_ID, getDocIdForFile(BASE_DIR));
         row.add(Root.COLUMN_DOCUMENT_ID, getDocIdForFile(BASE_DIR));
         row.add(Root.COLUMN_SUMMARY, null);
         row.add(Root.COLUMN_FLAGS, Root.FLAG_SUPPORTS_CREATE | Root.FLAG_SUPPORTS_SEARCH | Root.FLAG_SUPPORTS_IS_CHILD);
-        row.add(Root.COLUMN_TITLE, applicationName);
+        row.add(Root.COLUMN_TITLE, InfoCenter.APP_NAME);
         row.add(Root.COLUMN_MIME_TYPES, ALL_MIME_TYPES);
         row.add(Root.COLUMN_AVAILABLE_BYTES, BASE_DIR.getFreeSpace());
         row.add(Root.COLUMN_ICON, R.mipmap.ic_launcher);
@@ -216,7 +216,7 @@ public class FolderProvider extends DocumentsProvider {
             // through the whole SD card).
             boolean isInsideHome;
             try {
-                isInsideHome = file.getCanonicalPath().startsWith(PathAndUrlManager.DIR_GAME_HOME);
+                isInsideHome = file.getCanonicalPath().startsWith(PathManager.DIR_GAME_HOME);
             } catch (IOException e) {
                 isInsideHome = true;
             }

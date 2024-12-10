@@ -32,6 +32,10 @@ class GameInstaller(
     fun installGame() {
         Logging.i("Minecraft Downloader", "Start downloading the version: $realVersion")
 
+        if (taskMap.isNotEmpty()) {
+            ProgressKeeper.submitProgress(ProgressLayout.INSTALL_RESOURCE, 0, R.string.download_install_download_file, 0, 0)
+        }
+
         val mcVersion = AsyncMinecraftDownloader.getListedVersion(realVersion)
         MinecraftDownloader().start(
             mcVersion,
@@ -42,13 +46,15 @@ class GameInstaller(
                     Task.runTask {
                         if (isolation) {
                             if (!targetVersionFolder.exists() && !targetVersionFolder.mkdirs()) throw IOException("Failed to create version folder!")
-                            VersionConfig(targetVersionFolder).saveWithThrowable() //保存版本隔离的特征文件
+                            VersionConfig.createIsolation(targetVersionFolder).saveWithThrowable() //保存版本配置文件（开启版本隔离）
                         }
 
                         if (taskMap.isNotEmpty()) EventBus.getDefault().postSticky(installModVersion)
                         else {
                             //如果附加附件是空的，则表明只需要安装原版，需要确保这个自定义的版本文件夹内必定有原版的.json文件
-                            if (VersionsManager.isVersionExists(realVersion)) {
+                            //需要检查是否自定义了版本名，如果真实版本与自定义用户名相同，则表示用户并没有修改版本名，当前安装的就是纯原版
+                            //如果没有自定义用户名，则不复制版本文件，毕竟原版文件，与目标文件现在是同一个文件！
+                            if (realVersion != customVersionName && VersionsManager.isVersionExists(realVersion)) {
                                 //找到原版的.json文件，在MinecraftDownloader开始时，已经下载了
                                 val vanillaJsonFile = File(vanillaVersionFolder, "${vanillaVersionFolder.name}.json")
                                 if (vanillaJsonFile.exists() && vanillaJsonFile.isFile) {
@@ -56,6 +62,8 @@ class GameInstaller(
                                     FileUtils.copyFile(vanillaJsonFile, File(targetVersionFolder, "$customVersionName.json"))
                                 }
                             }
+                            //ModLoader任务为空，接下来的无意义ModLoader任务将彻底跳过！
+                            return@runTask null
                         }
 
                         //将Mod与Modloader的任务分离出来，应该先安装Mod
@@ -103,6 +111,9 @@ class GameInstaller(
 
                 override fun onDownloadFailed(throwable: Throwable) {
                     Tools.showErrorRemote(throwable)
+                    if (taskMap.isNotEmpty()) {
+                        ProgressLayout.clearProgress(ProgressLayout.INSTALL_RESOURCE)
+                    }
                 }
             }
         )

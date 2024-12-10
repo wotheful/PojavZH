@@ -46,16 +46,18 @@
     <string name="generic_input_too_big">القيمة المدخلة كبيرة جدًا، يجب أن تكون على الأكثر %s</string>
     <string name="generic_copied">تم النسخ</string>
     <!-- Error -->
-    <string name="error_fatal">حدث انهيار غير متوقع في Zalith Launcher</string>
+    <string name="error_fatal">حدث انهيار غير متوقع في %s</string>
     <string name="error_no_version">لا توجد نسخة!</string>
     <string name="error_show_more">عرض التفاصيل</string>
     <string name="error_show_less">إغلاق التفاصيل</string>
     <!-- Launcher -->
+    <string name="option_category_debug">التصحيح</string>
+    <string name="option_category_control">التحكم</string>
+    <string name="option_category_hotbar">إطار تحديد شريط الأدوات</string>
     <string name="option_force_close">إغلاق إجباري</string>
     <string name="option_log_out">تسجيل الخروج</string>
     <string name="option_send_custom_key">إرسال رمز المفتاح المخصص</string>
     <string name="option_edit_controls">تحرير تخطيط التحكم</string>
-    <string name="option_hotbar">إطار تحديد شريط الأدوات</string>
     <string name="option_hotbar_type">وضع تحديد شريط الأدوات</string>
     <string name="option_hotbar_type_auto">تلقائي (قد لا يكون دقيقًا)</string>
     <string name="option_hotbar_type_manually">تعديل يدوي</string>
@@ -80,9 +82,8 @@
     <string name="notification_game_runs">اللعبة تعمل!</string>
     <string name="tasks_ongoing">المهام قيد التنفيذ، يرجى الانتظار</string>
     <string name="mc_download_failed">فشل تنزيل Minecraft! قد يكون هذا بسبب اتصال شبكة ضعيف أو وضع الملفات بشكل خاطئ</string>
-    <string name="toast_turn_on_gyro">يجب تفعيل التحكم بالجيروسكوب أولاً لاستخدامه!</string>
     <string name="microsoft_login_retry_later">لقد قمت بالكثير من المحاولات، يرجى المحاولة مرة أخرى لاحقًا</string>
-    <string name="storage_required">Zalith Launcher يتطلب الاتصال بالتخزين الخارجي، يرجى إعادة الاتصال وإعادة تشغيل البرنامج</string>
+    <string name="storage_required">%s يتطلب الاتصال بالتخزين الخارجي، يرجى إعادة الاتصال وإعادة تشغيل البرنامج</string>
     <string name="dialog_select_jar">اختيار ملف Jar</string>
     <string name="percent_format">%d%%</string>
     <string name="version_select_hint">اختيار الإصدار</string>
@@ -98,7 +99,7 @@
     <string name="notif_download_finished">اللعبة جاهزة للتشغيل</string>
     <string name="notif_download_finished_desc">انقر هنا لتشغيلها!</string>
     <string name="notification_permission_dialog_title">طلب الإذن</string>
-    <string name="notification_permission_dialog_text">Zalith Launcher يحتاج إلى إذن نشر الإشعارات لمنع إيقاف تنزيل ملفات اللعبة عندما تغادر التطبيق. بدون هذا الإذن، قد يقوم Android بإيقاف تقدم التنزيل عند وضع Zalith Launcher في الخلفية</string>
+    <string name="notification_permission_dialog_text">%s يحتاج إلى إذن نشر الإشعارات لمنع إيقاف تنزيل ملفات اللعبة عندما تغادر التطبيق. بدون هذا الإذن، قد يقوم Android بإيقاف تقدم التنزيل عند وضع %s في الخلفية</string>
     <string name="notification_permission_toast">يمكنك تغيير رأيك في أي وقت من خلال الدخول إلى \"إعدادات النظام\"</string>
     <string name="newdl_starting">قراءة بيانات اللعبة…</string>
     <string name="newdl_downloading_metadata">تنزيل بيانات اللعبة (%s)</string>
@@ -110,6 +111,7 @@
     <string name="log_view_label_log_output">إخراج السجل:</string>
     <string name="execute_jar_failed_to_read_file">فشل في قراءة ملف .jar</string>
     <string name="execute_jar_incompatible_runtime">تنفيذ وظيفة .jar غير متوافق مع Java %d</string>
+    <string name="open_link">سيتمكن من الوصول إلى هذا الرابط في المتصفح:</string>
     <string name="mod_download_progress">جاري تنزيل مثبت %s</string>
     <string name="mod_forge_searching">جاري البحث عن رقم إصدار Forge</string>
     <string name="mod_neoforge_searching">جاري البحث عن رقم إصدار NeoForge</string>
@@ -156,7 +158,6 @@
     <string name="controls_unsupported_layout_version">إصدار تخطيط التحكم غير مدعوم!</string>
     <string name="controls_create_new">إنشاء تخطيط تحكم جديد</string>
     <string name="controls_import_control">استيراد تخطيط التحكم</string>
-    <string name="controls_settings_title">إعدادات محرر تخطيط التحكم</string>
     <string name="controls_settings_button_snapping">ميزة التقاط الأزرار</string>
     <string name="controls_settings_button_snapping_distance">مسافة التقاط الأزرار</string>
     <string name="controls_info_file_name">اسم الملف:</string>
@@ -174,11 +175,6 @@
     <string name="controls_nothing">لا يوجد هنا أي تخطيطات تحكم، سيتم إنشاء تخطيط تحكم افتراضي جديد عند إعادة تشغيل التطبيق</string>
     <string name="replacement_customcontrol">استبدال تخطيط التحكم</string>
     <string name="custom_control_title">إدارة تخطيطات التحكم</string>
-    <string name="import_control">اسم تخطيط التحكم:</string>
-    <string name="import_control_invalid_file">الملف غير صالح أو تالف</string>
-    <string name="import_control_verifying_file">الملف قيد التحقق، يرجى المحاولة مرة أخرى لاحقًا…</string>
-    <string name="import_control_invalid_name">الاسم غير صالح أو الملف موجود بالفعل</string>
-    <string name="import_control_done">اكتمال الاستيراد</string>
     <string name="controller_button_start">بدء</string>
     <string name="controller_button_trigger_left">زر الزناد الأيسر</string>
     <string name="controller_button_trigger_right">زر الزناد الأيمن</string>
@@ -200,6 +196,7 @@
     <string name="version_manager_title">إدارة الإصدارات</string>
     <string name="version_no_versions">لا توجد إصدارات مثبتة</string>
     <string name="version_install_new">تثبيت إصدار جديد</string>
+    <string name="version_install_new_modloader">قم بتنصيب %s للإصدار الجديد</string>
     <string name="version_install_not_install">لا تثبيت</string>
     <string name="version_install_incompatible">غير متوافق مع %s</string>
     <string name="version_install_exists">هناك نسخة بالفعل بهذا الاسم!</string>
@@ -218,14 +215,18 @@
     <string name="version_manager_shortcuts_crash_report_path">مجلد تقارير الأعطال</string>
     <string name="version_manager_edit">تحرير الإصدار</string>
     <string name="version_manager_rename">إعادة تسمية الإصدار</string>
+    <string name="version_manager_copy">نسخ النسخة</string>
+    <string name="version_manager_copy_tip">نسخ الإصدار الحالي كإصدار جديد مع تفعيل عزل الإصدارات بشكل افتراضي. إذا تم تفعيل "نسخ جميع الملفات" في الأسفل، فسيتم نسخ جميع الملفات التي تم إنشاؤها بواسطة الإصدار الحالي (حزم الموارد، الملفات المحفوظة، إعدادات اللعبة، إلخ.) أيضًا.</string>
+    <string name="version_manager_copy_all">نسخ جميع الملفات</string>
     <string name="version_manager_delete">حذف الإصدار</string>
-    <string name="version_manager_delete_tip">إذا تم تمكين العزل بين الإصدارات، سيتم حذف بياناتك المهمة مثل سجلات اللعبة وحزم الموارد وMod وما إلى ذلك. تأكد من أخذ نسخة احتياطية قبل القيام بهذا الإجراء!</string>
+    <string name="version_manager_delete_tip">حذف الإصدار سيؤدي إلى حذف جميع الملفات في الدليل \"./versions/%s\" أيضًا، بما في ذلك موارد مهمة مثل حفظات الألعاب، حزم الموارد، المودولات، إلخ. حتى لو لم يتم تمكين عزل الإصدارات. لذلك، يرجى القيام بنسخ احتياطي قبل إجراء هذه العملية!</string>
     <string name="version_manager_delete_tip_invalid">الإصدار الحالي يفتقر إلى ملف JSON للإصدار، ولذلك يُعتبر إصدارًا غير صالح. لا يمكنك اختيار هذا الإصدار. اضغط على تأكيد لحذف هذا الإصدار الخاطئ.</string>
     <string name="version_manager_task_in_progress">المهمة قيد التنفيذ، وظيفة إدارة الإصدارات غير متاحة مؤقتًا</string>
     <string name="version_manager_invalid">هذه النسخة غير صالحة</string>
+    <string name="version_manager_no_installed_version">المُحَرّك لم يجد أي Minecraft مُثبّت!</string>
     <!-- Profiles Path -->
-    <string name="permissions_manage_external_storage">Zalith Launcher يحتاج إلى إمكانية التحكم في جميع ملفات الجهاز لاستخدام هذه الميزة بشكل صحيح، يرجى تمكين الإذن!</string>
-    <string name="permissions_write_external_storage">يتطلب Zalith Launcher إذن إدارة التخزين. إذا لم يتم تمكين الإذن، فقد يؤدي ذلك إلى مشاكل مثل فشل حفظ ملفات اللعبة أو فك ضغطها بشكل صحيح. يرجى منح الإذن لضمان عمل الوظائف بشكل صحيح.</string>
+    <string name="permissions_manage_external_storage">%s يحتاج إلى إمكانية التحكم في جميع ملفات الجهاز لاستخدام هذه الميزة بشكل صحيح، يرجى تمكين الإذن!</string>
+    <string name="permissions_write_external_storage">يتطلب %s إذن إدارة التخزين. إذا لم يتم تمكين الإذن، فقد يؤدي ذلك إلى مشاكل مثل فشل حفظ ملفات اللعبة أو فك ضغطها بشكل صحيح. يرجى منح الإذن لضمان عمل الوظائف بشكل صحيح.</string>
     <string name="profiles_path_title">إدارة مسارات اللعبة</string>
     <string name="profiles_path_default">المسار الافتراضي</string>
     <string name="profiles_path_settings">فتح إعدادات المسار</string>
@@ -255,9 +256,17 @@
     <string name="account_microsoft_xerr_unauthorized">يبدو أن معلومات تسجيل الدخول إلى حساب مايكروسوفت الخاص بك قد انتهت، هذا الأمر شائع عند تغيير كلمة مرور الحساب، يرجى إزالة الحساب الحالي وإعادة تسجيل الدخول لإعادة تعيين معلومات تسجيل الدخول الخاصة بك.</string>
     <string name="account_local_account">حساب في وضع عدم الاتصال</string>
     <string name="account_local_account_empty">اسم المستخدم لا يمكن أن يكون فارغًا!</string>
-    <string name="account_local_account_invalid">اسم المستخدم الصالح يدعم فقط الحروف الإنجليزية (غير حساس لحالة الحروف)، الأرقام، والشرطات السفلية. يجب أن تكون الطول بين 3 و 16 حرفًا.\nأمثلة على أسماء المستخدمين الصحيحة: Name، Name_، Name123\nأمثلة على أسماء المستخدمين غير الصحيحة: Name@، N ame، name_name_name_name\nولكن إذا كنت تستخدم المودات أو الإضافات ذات الصلة التي يمكنها تجاوز هذه الآلية، يمكنك الاستمرار في استخدام هذا الاسم، وإلا يرجى إعادة التسمية!</string>
+    <string name="account_local_account_invalid">الأسماء صحيحة للمستخدمين تدعم فقط الحروف الإنجليزية (كبيرة وصغيرة) والأرقام والخطوط السفلية. يجب أن يكون طولها بين 3 و 16 حرفا، وإلا فقد يفشل تشغيل اللعبة.\nأمثلة على الأسماء صحيحة: Name, Name_, Name123\nأمثلة على أسماء خاطئة: Name@, N ame, name_name_name_name\nلكن إذا كنت قد استخدمت مودز أو إضافات ذات صلة لتفويض هذا القيد، فيمكنك الاستمرار في استخدام هذا الاسم. وإلا، يرجى إعادة التسمية!</string>
     <string name="account_login_local_name">اسم المستخدم</string>
     <string name="account_login_start">بدء تسجيل الدخول!</string>
+    <string name="account_login_microsoft_progress">جاري تسجيل الدخول إلى حساب Microsoft: %s</string>
+    <string name="account_login_progress_access_token">جاري الحصول على رمز الوصول</string>
+    <string name="account_login_progress_xbl_token">جاري الحصول على رمز Xbox Live</string>
+    <string name="account_login_progress_xsts_token">جاري الحصول على رمز الأمان لخدمة Xbox</string>
+    <string name="account_login_progress_minecraft_token">جاري الحصول على رمز Minecraft</string>
+    <string name="account_login_progress_checking">جاري التحقق من الرمز</string>
+    <string name="account_login_no_network">غير متصل إلى الإنترنت، تم تخطي تسجيل الدخول!</string>
+    <string name="account_login_skip">فشل الدخول إلى الحساب، هل تريد تجاوز خطوة الدخول؟</string>
     <string name="account_no_microsoft_account">يرجى تسجيل الدخول إلى حساب Minecraft الأصلي على الأقل، لا نشجع المستخدمين على تشغيل Minecraft بدون حساب أصلي.</string>
     <string name="account_no_microsoft_account_local">يبدو أنك لم تسجل الدخول إلى حساب أصلي! حساب في وضع عدم الاتصال هو خيار بديل للاعبين لا يمكنهم الاتصال بالإنترنت، وليس للاعبين الذين ليس لديهم حساب أصلي.</string>
     <string name="account_no_microsoft_account_other">يبدو أنك لم تسجل الدخول إلى حساب أصلي! هل أنت متأكد من الاستمرار في استخدام تسجيل الدخول الخارجي بدون تسجيل الدخول إلى حساب أصلي؟</string>
@@ -286,13 +295,13 @@
     <string name="multirt_nojava8rt">تعذر العثور على Java 8، لاستخدام هذا الخيار، يجب عليك تثبيت Java 8</string>
     <string name="multirt_delete_runtime">حذف بيئة التشغيل</string>
     <!-- Custom Mouse & Background -->
-    <string name="mouse_settings_title">إعدادات الماوس الافتراضي</string>
     <string name="mouse_settings_speed_name">سرعة الماوس الافتراضي</string>
     <string name="mouse_settings_scale_name">مقياس الماوس الافتراضي</string>
     <string name="custom_mouse_add">إضافة ماوس افتراضي</string>
     <string name="custom_mouse_added">تم تعيين الماوس الافتراضي بنجاح:</string>
     <string name="custom_mouse_default">الماوس الافتراضي الافتراضي</string>
     <string name="custom_mouse_title">الماوس الافتراضي المخصص</string>
+    <string name="custom_mouse_dialog">يمكنك إضافة صور للماوس في (إعدادات المُطلق - %s - %s)</string>
     <string name="custom_mouse_desc">افتح واجهة إدارة الماوس الافتراضي، يمكنك إضافة الماوس الافتراضي الذي تفضله واستخدامه</string>
     <string name="custom_mouse_message_default">الماوس الافتراضي المحدد حاليًا هو الماوس الافتراضي الافتراضي، لا يدعم المشاركة، إعادة تسمية، حذف العمليات</string>
     <string name="custom_background_add">إضافة صورة خلفية</string>
@@ -343,7 +352,7 @@
     <string name="main_share_log_title">الرجاء تحديد نوع ملف السجل</string>
     <string name="main_share_launcher_log">ملف سجل المشغل</string>
     <string name="main_share_game_log">سجل تشغيل اللعبة الأخير</string>
-    <string name="main_play">بدء اللعبة</string>
+    <string name="main_launch">إطلاق اللعبة</string>
     <string name="setting_category_control">إعدادات التحكم</string>
     <string name="setting_category_virtual_mouse">الماوس الافتراضي</string>
     <string name="setting_category_gyro_controls">تحكم الجيروسكوب</string>
@@ -430,6 +439,8 @@
     <string name="setting_resource_image_cache_desc">عند التفعيل، سيقوم المشغل بتخزين صور غلاف الموارد ولقطات الشاشة مؤقتًا لتحميلها بشكل أسرع في المرة القادمة</string>
     <string name="setting_download_source_title">مصدر تنزيل اللعبة</string>
     <string name="setting_download_source_desc">اختيار مصدر تنزيل مرآة بدلاً من استخدام المصدر الرسمي</string>
+    <string name="setting_max_download_threads_title">عدد الحلقات الأقصى لتنزيل الملفات</string>
+    <string name="setting_max_download_threads_desc">عدد الحد الأقصى لتنزيلات متزامنة عند تنزيل عدة ملفات في وقت واحد، لكن الكثير من الخيوط سيؤدي إلى تباطؤ البداية. 64 خيط كافية!</string>
     <string name="setting_version_isolation_title">عزل الإصدار الافتراضي</string>
     <string name="setting_version_isolation_desc">عند تثبيت إصدار جديد، هل يجب اختيار العزل الافتراضي للإصدار؟</string>
     <string name="setting_set_game_language_title">ضبط لغة اللعبة تلقائيًا</string>
@@ -521,7 +532,7 @@
     <string name="download_install_unpack_world_error">تعذر التعرف على هيكل الملف، فشل فك الضغط التلقائي، يرجى معالجة الملف يدويًا!</string>
     <!-- ModPack -->
     <string name="select_modpack_local_tip">الرجاء تحديد ملف حزمة يدعمه المشغل للاستيراد!</string>
-    <string name="select_modpack_local_not_supported">هذا الملف غير مدعوم من قبل المشغل!</string>
+    <string name="select_modpack_local_not_supported">!هذه الحزمة غير مدعومة من قبل المشغل! المشغل يدعم فقط استيراد الحزمات في تنسيقات Modrinth, CurseForge, وMCBBS. يرجى التحقق من أن حزمة التعديلات الخاصة بك تمت طبقا للتنسيقات المحددة!</string>
     <string name="select_modpack_local_installing_files">جاري تثبيت ملفات اللعبة… (%d / %d)</string>
     <string name="modpack_download_downloading_metadata">جاري تنزيل بيانات حزمة الوحدات (%.2fMB / %.2fMB)</string>
     <string name="modpack_download_downloading_mods">جاري تنزيل الوحدات (%.2fMB / %.2fMB)</string>
@@ -565,23 +576,23 @@
     <string name="other_login_select_role_title">اختر شخصية</string>
     <string name="other_login_select_role_message">الحساب الحالي يحتوي على عدة شخصيات، يرجى اختيار الشخصية التي ترغب في استخدامها</string>
     <string name="other_login_registry_now">ليس لديك حساب؟ اضغط هنا للتسجيل!</string>
+    <string name="other_login_role_not_found">لم يتم العثور على دور مطابق لحسابك الحالي، يرجى التحقق من وجود هذا دور في الخادم الذي تستخدمه!</string>
     <!-- Splash -->
     <string name="splash_screen_desc">يحتاج المُشغّل إلى تثبيت هذه المحتويات لضمان تشغيل Minecraft بشكل صحيح. هذه المحتويات مضمنة بالفعل في التطبيق، ويجب فك ضغطها لاستخدامها بشكل صحيح. انقر على الزر أدناه لبدء فك الضغط وتحديث هذه المحتويات.</string>
     <string name="splash_screen_installing">يقوم المُشغّل حاليًا بفك ضغط هذه المحتويات، سيتم الدخول إلى الواجهة الرئيسية تلقائيًا بعد الانتهاء من فك الضغط، يرجى الانتظار بصبر.</string>
     <string name="splash_screen_lwjgl">مكتبة الألعاب الخفيفة الخاصة بـ Java، يعتمد Minecraft عليها لتشغيل اللعبة.</string>
     <string name="splash_screen_cacio">يوفر نظام GUI قابل للنقل لـ OpenJDK.</string>
     <string name="splash_screen_authlib_injector">يتم تعديل authlib عبر وقت التشغيل لتمكين تسجيل الدخول خارج اللعبة.</string>
-    <string name="splash_screen_pro_grade">تقوم هذه المكتبة بتنفيذ مدير أمان Java مخصص وسياسة أمان تحتوي على قواعد الرفض.</string>
-    <string name="splash_screen_loader_installers">يساعد على تثبيت Forge وFabric وOptiFine تلقائيًا.</string>
+    <string name="splash_screen_components">بعض المكونات التي يعتمد عليها المشغل.</string>
     <string name="splash_screen_jre8">بيئة Java 8، يعتمد Minecraft 1.16- على Java 8.</string>
     <string name="splash_screen_jre17">بيئة Java 17، يعتمد Minecraft 1.17+ على Java 17.</string>
     <string name="splash_screen_jre21">بيئة Java 21، يعتمد Minecraft 1.20.5+ على Java 21.</string>
     <string name="splash_screen_apply">موافقة وتثبيت</string>
     <!-- About -->
-    <string name="about_tab">حول Zalith Launcher</string>
-    <string name="about_dec1">زاليث لانشر هو مشغل ماينكرافت تم تطويره بناءً على بوجافلانشر، قادر على تشغيل ماينكرافت: إصدار Java على أجهزة أندرويد.</string>
-    <string name="about_dec2">يكرس زاليث لانشر جهوده لتحسين تجربة المستخدم، وإعادة تصميم واجهة التطبيق، وإضافة المزيد من الميزات العملية، بهدف تقليل حواجز اللعب قدر الإمكان، مما يسمح لمزيد من الناس بالاستمتاع بسهولة بمتعة ماينكرافت.</string>
-    <string name="about_dec3">زاليث لانشر مرخص بموجب رخصة GPL 3.0 مفتوحة المصدر، والتي لها طبيعة "فيروسية"; يجب أن يتم أيضًا فتح مصدر أي كود يستخدم أو يعدل أو يستمد من مكتبات أو برامج GPL تحت رخصة GPL. إذا كنت تنوي توزيع أو مشاركة هذا البرنامج، يرجى التأكد من الامتثال للأحكام ذات الصلة برخصة GPL 3.0 مفتوحة المصدر.</string>
+    <string name="about_tab">حول %s</string>
+    <string name="about_dec1">%s هو مشغل Minecraft يعتمد على PojavLauncher ويسمح بتشغيل Minecraft: Java Edition على أجهزة Android.</string>
+    <string name="about_dec2">%s يركز على تحسين تجربة المستخدم، وإعادة تصميم واجهة التطبيق، وإضافة المزيد من الميزات العملية بهدف تقليل عوائق اللعب وجعل المزيد من الأشخاص يستمتعون بمتعة Minecraft بسهولة.</string>
+    <string name="about_dec3">%s يستخدم رخصة المصدر المفتوح GPL 3.0، التي تعتبر "معدية". أي كود يستخدم أو يعدل أو يشتق من مكتبات أو برامج GPL يجب أن يعتمد أيضًا رخصة GPL للمصدر المفتوح. إذا كنت تنوي توزيع هذا البرنامج، يرجى الالتزام بأحكام رخصة المصدر المفتوح GPL 3.0.</string>
     <string name="about_contributors">المساهمون والتقديرات:</string>
     <string name="about_sponsors">شكر خاص للجهات الراعية:</string>
     <string name="about_sponsors_desc">هؤلاء هم جميع الرعاة الذين يدعمون التطوير، شكرًا جزيلًا لكم!</string>

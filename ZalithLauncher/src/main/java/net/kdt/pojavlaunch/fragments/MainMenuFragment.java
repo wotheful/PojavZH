@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 
 import com.movtery.anim.AnimPlayer;
 import com.movtery.anim.animations.Animations;
+import com.movtery.zalithlauncher.InfoCenter;
 import com.movtery.zalithlauncher.R;
 import com.movtery.zalithlauncher.databinding.FragmentLauncherBinding;
 import com.movtery.zalithlauncher.event.single.AccountUpdateEvent;
@@ -28,7 +29,7 @@ import com.movtery.zalithlauncher.ui.fragment.FragmentWithAnim;
 import com.movtery.zalithlauncher.ui.fragment.VersionManagerFragment;
 import com.movtery.zalithlauncher.ui.fragment.VersionsListFragment;
 import com.movtery.zalithlauncher.ui.subassembly.account.AccountViewWrapper;
-import com.movtery.zalithlauncher.utils.PathAndUrlManager;
+import com.movtery.zalithlauncher.utils.path.PathManager;
 import com.movtery.zalithlauncher.utils.ZHTools;
 import com.movtery.zalithlauncher.utils.anim.ViewAnimUtils;
 
@@ -37,6 +38,7 @@ import net.kdt.pojavlaunch.progresskeeper.ProgressKeeper;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 public class MainMenuFragment extends FragmentWithAnim {
     public static final String TAG = "MainMenuFragment";
@@ -51,18 +53,19 @@ public class MainMenuFragment extends FragmentWithAnim {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentLauncherBinding.inflate(getLayoutInflater());
-        accountViewWrapper = new AccountViewWrapper(this, binding.viewAccount.getRoot());
+        accountViewWrapper = new AccountViewWrapper(this, binding.viewAccount);
         accountViewWrapper.refreshAccountInfo();
         return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        binding.aboutButton.setText(InfoCenter.replaceName(requireActivity(), R.string.about_tab));
         binding.aboutButton.setOnClickListener(v -> ZHTools.swapFragmentWithAnim(this, AboutFragment.class, AboutFragment.TAG, null));
         binding.customControlButton.setOnClickListener(v -> ZHTools.swapFragmentWithAnim(this, ControlButtonFragment.class, ControlButtonFragment.TAG, null));
         binding.openMainDirButton.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
-            bundle.putString(FilesFragment.BUNDLE_LIST_PATH, PathAndUrlManager.DIR_GAME_HOME);
+            bundle.putString(FilesFragment.BUNDLE_LIST_PATH, PathManager.DIR_GAME_HOME);
             ZHTools.swapFragmentWithAnim(this, FilesFragment.class, FilesFragment.TAG, bundle);
         });
         binding.installJarButton.setOnClickListener(v -> runInstallerWithConfirmation(false));
@@ -118,7 +121,7 @@ public class MainMenuFragment extends FragmentWithAnim {
         });
     }
 
-    @Subscribe()
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void event(AccountUpdateEvent event) {
         if (accountViewWrapper != null) accountViewWrapper.refreshAccountInfo();
     }

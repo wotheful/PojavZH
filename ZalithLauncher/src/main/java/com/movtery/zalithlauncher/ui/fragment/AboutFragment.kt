@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.movtery.anim.AnimPlayer
 import com.movtery.anim.animations.Animations
+import com.movtery.zalithlauncher.InfoCenter
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.databinding.FragmentAboutBinding
 import com.movtery.zalithlauncher.feature.CheckSponsor
@@ -22,10 +23,9 @@ import com.movtery.zalithlauncher.ui.subassembly.about.AboutItemBean.AboutItemBu
 import com.movtery.zalithlauncher.ui.subassembly.about.AboutRecyclerAdapter
 import com.movtery.zalithlauncher.ui.subassembly.about.SponsorItemBean
 import com.movtery.zalithlauncher.ui.subassembly.about.SponsorRecyclerAdapter
-import com.movtery.zalithlauncher.utils.PathAndUrlManager
 import com.movtery.zalithlauncher.utils.ZHTools
+import com.movtery.zalithlauncher.utils.path.UrlManager
 import com.movtery.zalithlauncher.utils.stringutils.StringUtils
-import net.kdt.pojavlaunch.Tools
 
 class AboutFragment : FragmentWithAnim(R.layout.fragment_about) {
     companion object {
@@ -34,6 +34,7 @@ class AboutFragment : FragmentWithAnim(R.layout.fragment_about) {
 
     private lateinit var binding: FragmentAboutBinding
     private val mAboutData: MutableList<AboutItemBean> = ArrayList()
+    private var mSponsorAdapter: SponsorRecyclerAdapter? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,28 +49,41 @@ class AboutFragment : FragmentWithAnim(R.layout.fragment_about) {
         loadSponsorData()
         loadAboutData(requireContext().resources)
 
-        binding.appInfo.text = StringUtils.insertNewline(StringUtils.insertSpace(getString(R.string.about_version_name), ZHTools.getVersionName()),
-            StringUtils.insertSpace(getString(R.string.about_version_code), ZHTools.getVersionCode()),
-            StringUtils.insertSpace(getString(R.string.about_last_update_time), ZHTools.getLastUpdateTime(requireContext())),
-            StringUtils.insertSpace(getString(R.string.about_version_status), ZHTools.getVersionStatus(requireContext())))
-        binding.appInfo.setOnClickListener{ StringUtils.copyText("text", binding.appInfo.text.toString(), requireContext()) }
+        val context = requireActivity()
 
-        binding.returnButton.setOnClickListener { ZHTools.onBackPressed(requireActivity()) }
-        binding.githubButton.setOnClickListener { Tools.openURL(requireActivity(), PathAndUrlManager.URL_HOME) }
-        binding.licenseButton.setOnClickListener { Tools.openURL(requireActivity(), "https://www.gnu.org/licenses/gpl-3.0.html") }
-        binding.supportDevelopment.setOnClickListener {
-            TipDialog.Builder(requireActivity())
-                .setTitle(R.string.request_sponsorship_title)
-                .setMessage(R.string.request_sponsorship_message)
-                .setConfirm(R.string.about_button_support_development)
-                .setConfirmClickListener { Tools.openURL(requireActivity(), PathAndUrlManager.URL_SUPPORT) }
-                .buildDialog()
-        }
+        binding.apply {
+            dec1.text = InfoCenter.replaceName(context, R.string.about_dec1)
+            dec2.text = InfoCenter.replaceName(context, R.string.about_dec2)
+            dec3.text = InfoCenter.replaceName(context, R.string.about_dec3)
+            appInfo.text = StringUtils.insertNewline(StringUtils.insertSpace(getString(R.string.about_version_name), ZHTools.getVersionName()),
+                StringUtils.insertSpace(getString(R.string.about_version_code), ZHTools.getVersionCode()),
+                StringUtils.insertSpace(getString(R.string.about_last_update_time), ZHTools.getLastUpdateTime(requireContext())),
+                StringUtils.insertSpace(getString(R.string.about_version_status), ZHTools.getVersionStatus(requireContext())))
+            appInfo.setOnClickListener{ StringUtils.copyText("text", appInfo.text.toString(), requireContext()) }
 
-        val aboutAdapter = AboutRecyclerAdapter(this.mAboutData)
-        binding.aboutRecycler.apply {
-            layoutManager = LinearLayoutManager(requireContext())
-            adapter = aboutAdapter
+            returnButton.setOnClickListener { ZHTools.onBackPressed(requireActivity()) }
+            githubButton.setOnClickListener { ZHTools.openLink(requireActivity(), UrlManager.URL_HOME) }
+            licenseButton.setOnClickListener { ZHTools.openLink(requireActivity(), "https://www.gnu.org/licenses/gpl-3.0.html") }
+            supportDevelopment.setOnClickListener {
+                TipDialog.Builder(requireActivity())
+                    .setTitle(R.string.request_sponsorship_title)
+                    .setMessage(R.string.request_sponsorship_message)
+                    .setConfirm(R.string.about_button_support_development)
+                    .setConfirmClickListener { ZHTools.openLink(requireActivity(), UrlManager.URL_SUPPORT) }
+                    .buildDialog()
+            }
+
+            val aboutAdapter = AboutRecyclerAdapter(this@AboutFragment.mAboutData)
+            aboutRecycler.apply {
+                layoutManager = LinearLayoutManager(requireContext())
+                adapter = aboutAdapter
+            }
+            sponsorAll.setOnClickListener { _ ->
+                mSponsorAdapter?.let {
+                    it.updateItems(getSponsorData())
+                    sponsorAll.visibility = View.GONE
+                }
+            }
         }
     }
 
@@ -105,7 +119,7 @@ class AboutFragment : FragmentWithAnim(R.layout.fragment_about) {
                 AboutItemButtonBean(
                     requireActivity(),
                     getString(R.string.about_access_link),
-                    PathAndUrlManager.URL_MCMOD)
+                    UrlManager.URL_MCMOD)
             )
         )
         mAboutData.add(
@@ -159,7 +173,7 @@ class AboutFragment : FragmentWithAnim(R.layout.fragment_about) {
     }
 
     private fun loadSponsorData() {
-        check(requireContext(), object : CheckSponsor.CheckListener {
+        check(object : CheckSponsor.CheckListener {
             override fun onFailure() { setSponsorVisible(false) }
             override fun onSuccessful(data: List<SponsorItemBean>?) { setSponsorVisible(true) }
         })
@@ -167,13 +181,14 @@ class AboutFragment : FragmentWithAnim(R.layout.fragment_about) {
 
     private fun setSponsorVisible(visible: Boolean) {
         TaskExecutors.runInUIThread {
+            mSponsorAdapter = SponsorRecyclerAdapter(getSponsorData()?.take(8))
             try {
                 binding.sponsorLayout.visibility = if (visible) View.VISIBLE else View.GONE
 
                 if (visible) {
                     binding.sponsorRecycler.apply {
                         layoutManager = LinearLayoutManager(requireContext())
-                        adapter = SponsorRecyclerAdapter(getSponsorData())
+                        adapter = mSponsorAdapter
                     }
                 }
             } catch (e: Exception) {

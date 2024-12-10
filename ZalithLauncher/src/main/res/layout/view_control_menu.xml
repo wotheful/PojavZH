@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:background="@drawable/background_card"
-    android:padding="@dimen/_8sdp">
+    android:padding="@dimen/_8sdp"
+    tools:ignore="UseSwitchCompatOrMaterialXml">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/TextAppearance.Material3.TitleMedium"
         android:gravity="center_horizontal"
-        android:text="@string/setting_category_game_menu"/>
+        android:text="@string/option_edit_controls"/>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -25,116 +26,133 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <com.movtery.zalithlauncher.ui.view.AnimTextView
-                android:id="@+id/force_close"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/background_item"
-                android:text="@string/option_force_close"
-                android:gravity="center_horizontal"
-                android:paddingHorizontal="@dimen/_8sdp"/>
-
-            <com.movtery.zalithlauncher.ui.view.AnimTextView
-                android:id="@+id/log_output"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_8sdp"
-                android:background="@drawable/background_item"
-                android:text="@string/option_log_out"
-                android:gravity="center_horizontal"
-                android:paddingHorizontal="@dimen/_8sdp"/>
-
-            <com.movtery.zalithlauncher.ui.view.AnimTextView
-                android:id="@+id/send_custom_key"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_8sdp"
-                android:background="@drawable/background_item"
-                android:text="@string/option_send_custom_key"
-                android:gravity="center_horizontal"
-                android:paddingHorizontal="@dimen/_8sdp"/>
-
-            <com.movtery.zalithlauncher.ui.view.AnimTextView
-                android:id="@+id/mouse_settings"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_8sdp"
-                android:background="@drawable/background_item"
-                android:text="@string/mouse_settings_title"
-                android:gravity="center_horizontal"
-                android:paddingHorizontal="@dimen/_8sdp"/>
-
-            <com.movtery.zalithlauncher.ui.view.AnimTextView
-                android:id="@+id/resolution_scaler"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_8sdp"
-                android:background="@drawable/background_item"
-                android:text="@string/setting_resolution_scaler_title"
-                android:gravity="center_horizontal"
-                android:paddingHorizontal="@dimen/_8sdp"/>
-
-            <com.movtery.zalithlauncher.ui.view.AnimTextView
-                android:id="@+id/gyro_sensitivity"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_8sdp"
-                android:background="@drawable/background_item"
-                android:text="@string/setting_gyro_sensitivity_title"
-                android:gravity="center_horizontal"
-                android:paddingHorizontal="@dimen/_8sdp"/>
-
-            <com.movtery.zalithlauncher.ui.view.AnimTextView
-                android:id="@+id/replacement_customcontrol"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_8sdp"
-                android:background="@drawable/background_item"
-                android:text="@string/replacement_customcontrol"
-                android:gravity="center_horizontal"
-                android:paddingHorizontal="@dimen/_8sdp"/>
-
-            <com.movtery.zalithlauncher.ui.view.AnimTextView
-                android:id="@+id/edit_control"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_8sdp"
-                android:background="@drawable/background_item"
-                android:text="@string/option_edit_controls"
-                android:gravity="center_horizontal"
-                android:paddingHorizontal="@dimen/_8sdp"/>
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_8sdp"
-                android:text="@string/option_hotbar"/>
+                android:textStyle="bold"
+                android:textColor="@color/black_or_white"
+                android:text="@string/option_edit_controls"/>
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_2sdp"
+                android:layout_height="@dimen/_1sdp"
                 android:background="@color/text_background_fill"/>
+
+            <com.movtery.zalithlauncher.ui.view.AnimTextView
+                android:id="@+id/add_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:background="@drawable/background_item"
+                android:text="@string/customctrl_addbutton"
+                android:gravity="center_horizontal"
+                android:paddingHorizontal="@dimen/_8sdp"/>
+
+            <com.movtery.zalithlauncher.ui.view.AnimTextView
+                android:id="@+id/add_drawer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:background="@drawable/background_item"
+                android:text="@string/customctrl_addbutton_drawer"
+                android:gravity="center_horizontal"
+                android:paddingHorizontal="@dimen/_8sdp"/>
+
+            <com.movtery.zalithlauncher.ui.view.AnimTextView
+                android:id="@+id/add_joystick"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:background="@drawable/background_item"
+                android:text="@string/customctrl_addbutton_joystick"
+                android:gravity="center_horizontal"
+                android:paddingHorizontal="@dimen/_8sdp"/>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_8sdp"
-                android:text="@string/option_hotbar_type"/>
+                android:textStyle="bold"
+                android:textColor="@color/black_or_white"
+                android:text="@string/generic_save"/>
 
-            <com.skydoves.powerspinner.PowerSpinnerView
-                android:id="@+id/hotbar_type"
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_40sdp"
+                android:layout_height="@dimen/_1sdp"
+                android:background="@color/text_background_fill"/>
+
+            <com.movtery.zalithlauncher.ui.view.AnimTextView
+                android:id="@+id/load"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_8sdp"
                 android:background="@drawable/background_item"
-                android:paddingHorizontal="@dimen/padding_heavy"
-                app:spinner_arrow_tint="@color/primary_text"
-                app:spinner_item_height="@dimen/_40sdp"
-                app:spinner_popup_max_height="@dimen/_240sdp"
-                app:spinner_popup_background="@drawable/background_edit_box"
-                tools:paddingVertical="@dimen/_12sdp" />
+                android:text="@string/generic_load"
+                android:gravity="center_horizontal"
+                android:paddingHorizontal="@dimen/_8sdp"/>
+
+            <com.movtery.zalithlauncher.ui.view.AnimTextView
+                android:id="@+id/save"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:background="@drawable/background_item"
+                android:text="@string/generic_save"
+                android:gravity="center_horizontal"
+                android:paddingHorizontal="@dimen/_8sdp"/>
+
+            <com.movtery.zalithlauncher.ui.view.AnimTextView
+                android:id="@+id/save_and_exit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:background="@drawable/background_item"
+                android:text="@string/global_save_and_exit"
+                android:gravity="center_horizontal"
+                android:paddingHorizontal="@dimen/_8sdp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:textStyle="bold"
+                android:textColor="@color/black_or_white"
+                android:text="@string/pedit_control"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_1sdp"
+                android:background="@color/text_background_fill"/>
+
+            <com.movtery.zalithlauncher.ui.layout.AnimRelativeLayout
+                android:id="@+id/snapping_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:background="@drawable/background_item"
+                android:padding="@dimen/_8sdp">
+
+                <TextView
+                    android:id="@+id/snapping_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginEnd="@dimen/_8sdp"
+                    android:layout_toStartOf="@+id/snapping"
+                    android:text="@string/controls_settings_button_snapping"
+                    android:textColor="@color/black_or_white" />
+
+                <Switch
+                    android:id="@+id/snapping"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true" />
+            </com.movtery.zalithlauncher.ui.layout.AnimRelativeLayout>
 
             <LinearLayout
-                android:id="@+id/hotbar_width_layout"
+                android:id="@+id/snapping_distance_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_8sdp"
@@ -143,14 +161,14 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/option_hotbar_width"/>
+                    android:text="@string/controls_settings_button_snapping_distance"/>
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
                     <TextView
-                        android:id="@+id/hotbar_width_remove"
+                        android:id="@+id/snapping_distance_remove"
                         android:layout_width="@dimen/_16sdp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/_8sdp"
@@ -164,22 +182,22 @@
                         tools:ignore="HardcodedText" />
 
                     <SeekBar
-                        android:id="@+id/hotbar_width"
+                        android:id="@+id/snapping_distance"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/_8sdp"
                         android:layout_centerVertical="true"
-                        android:layout_toEndOf="@id/hotbar_width_remove"
-                        android:layout_toStartOf="@id/hotbar_width_add"/>
+                        android:layout_toEndOf="@id/snapping_distance_remove"
+                        android:layout_toStartOf="@id/snapping_distance_add"
+                        android:max="30"/>
 
                     <TextView
-                        android:id="@+id/hotbar_width_add"
+                        android:id="@+id/snapping_distance_add"
                         android:layout_width="@dimen/_16sdp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/_4sdp"
-                        android:layout_marginEnd="@dimen/_12sdp"
+                        android:layout_marginHorizontal="@dimen/_4sdp"
                         android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/hotbar_width_value"
+                        android:layout_toStartOf="@id/snapping_distance_value"
                         android:gravity="center_horizontal"
                         android:background="?android:attr/selectableItemBackgroundBorderless"
                         android:text="+"
@@ -187,7 +205,7 @@
                         tools:ignore="HardcodedText" />
 
                     <TextView
-                        android:id="@+id/hotbar_width_value"
+                        android:id="@+id/snapping_distance_value"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="@dimen/_8sdp"
@@ -200,72 +218,35 @@
 
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/hotbar_height_layout"
+            <com.movtery.zalithlauncher.ui.view.AnimTextView
+                android:id="@+id/select_default"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_8sdp"
-                android:orientation="vertical">
+                android:background="@drawable/background_item"
+                android:text="@string/customctrl_selectdefault"
+                android:gravity="center_horizontal"
+                android:paddingHorizontal="@dimen/_8sdp"/>
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/option_hotbar_height"/>
+            <com.movtery.zalithlauncher.ui.view.AnimTextView
+                android:id="@+id/export"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:background="@drawable/background_item"
+                android:text="@string/customctrl_export"
+                android:gravity="center_horizontal"
+                android:paddingHorizontal="@dimen/_8sdp"/>
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/hotbar_height_remove"
-                        android:layout_width="@dimen/_16sdp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/_8sdp"
-                        android:layout_marginEnd="@dimen/_4sdp"
-                        android:layout_alignParentStart="true"
-                        android:layout_centerVertical="true"
-                        android:gravity="center_horizontal"
-                        android:background="?android:attr/selectableItemBackgroundBorderless"
-                        android:text="-"
-                        android:textSize="@dimen/_16sdp"
-                        tools:ignore="HardcodedText" />
-
-                    <SeekBar
-                        android:id="@+id/hotbar_height"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/_8sdp"
-                        android:layout_centerVertical="true"
-                        android:layout_toEndOf="@id/hotbar_height_remove"
-                        android:layout_toStartOf="@id/hotbar_height_add"/>
-
-                    <TextView
-                        android:id="@+id/hotbar_height_add"
-                        android:layout_width="@dimen/_16sdp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/_4sdp"
-                        android:layout_marginEnd="@dimen/_12sdp"
-                        android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/hotbar_height_value"
-                        android:gravity="center_horizontal"
-                        android:background="?android:attr/selectableItemBackgroundBorderless"
-                        android:text="+"
-                        android:textSize="@dimen/_16sdp"
-                        tools:ignore="HardcodedText" />
-
-                    <TextView
-                        android:id="@+id/hotbar_height_value"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="@dimen/_8sdp"
-                        android:layout_centerVertical="true"
-                        android:layout_alignParentEnd="true"
-                        android:background="@drawable/background_text"
-                        tools:text="0"/>
-
-                </RelativeLayout>
-
-            </LinearLayout>
+            <com.movtery.zalithlauncher.ui.view.AnimTextView
+                android:id="@+id/exit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:background="@drawable/background_item"
+                android:text="@string/customctrl_editor_exit"
+                android:gravity="center_horizontal"
+                android:paddingHorizontal="@dimen/_8sdp"/>
 
         </LinearLayout>
 

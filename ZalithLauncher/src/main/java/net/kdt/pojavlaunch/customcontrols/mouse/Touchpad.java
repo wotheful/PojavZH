@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.movtery.zalithlauncher.setting.AllSettings;
+import com.movtery.zalithlauncher.setting.AllStaticSettings;
 import com.movtery.zalithlauncher.utils.ZHTools;
 import com.movtery.zalithlauncher.utils.image.Dimension;
 import com.movtery.zalithlauncher.utils.image.ImageUtils;
@@ -29,8 +30,6 @@ public class Touchpad extends View implements GrabListener, AbstractTouchpad {
     /* Mouse pointer icon used by the touchpad */
     private Drawable mMousePointerDrawable;
     private float mMouseX, mMouseY;
-    /* Resolution scaler option, allow downsizing a window */
-    private float mScaleFactor = AllSettings.getResolutionRatio() / 100f;
 
     public Touchpad(@NonNull Context context) {
         this(context, null);
@@ -39,11 +38,6 @@ public class Touchpad extends View implements GrabListener, AbstractTouchpad {
     public Touchpad(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         init();
-    }
-
-    @Override
-    public void refreshScaleFactor(float scaleFactor) {
-        this.mScaleFactor = scaleFactor;
     }
 
     /** Enable the touchpad */
@@ -74,7 +68,7 @@ public class Touchpad extends View implements GrabListener, AbstractTouchpad {
     }
 
     private void sendMousePosition() {
-        CallbackBridge.sendCursorPos((mMouseX * mScaleFactor), (mMouseY * mScaleFactor));
+        CallbackBridge.sendCursorPos((mMouseX * AllStaticSettings.scaleFactor), (mMouseY * AllStaticSettings.scaleFactor));
     }
 
     private void updateMousePosition() {
@@ -110,12 +104,13 @@ public class Touchpad extends View implements GrabListener, AbstractTouchpad {
 
     public void updateMouseScale() {
         Dimension mousescale = ImageUtils.resizeWithRatio(mMousePointerDrawable.getIntrinsicWidth(), mMousePointerDrawable.getIntrinsicHeight(),
-                AllSettings.getMouseScale());
+                AllSettings.getMouseScale().getValue());
         mMousePointerDrawable.setBounds(0, 0, (int) (mousescale.width * 0.5), (int) (mousescale.height * 0.5));
     }
 
     public void updateMouseDrawable() {
         mMousePointerDrawable = ZHTools.customMouse(getContext());
+        updateMouseScale();
     }
 
     @Override
@@ -138,8 +133,8 @@ public class Touchpad extends View implements GrabListener, AbstractTouchpad {
 
     @Override
     public void applyMotionVector(float x, float y) {
-        mMouseX = Math.max(0, Math.min(currentDisplayMetrics.widthPixels, mMouseX + x * (AllSettings.getMouseSpeed() / 100f)));
-        mMouseY = Math.max(0, Math.min(currentDisplayMetrics.heightPixels, mMouseY + y * (AllSettings.getMouseSpeed() / 100f)));
+        mMouseX = Math.max(0, Math.min(currentDisplayMetrics.widthPixels, mMouseX + x * (AllSettings.getMouseSpeed().getValue() / 100f)));
+        mMouseY = Math.max(0, Math.min(currentDisplayMetrics.heightPixels, mMouseY + y * (AllSettings.getMouseSpeed().getValue() / 100f)));
         updateMousePosition();
     }
 

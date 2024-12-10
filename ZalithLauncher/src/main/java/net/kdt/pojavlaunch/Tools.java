@@ -2,13 +2,12 @@ package net.kdt.pojavlaunch;
 
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.P;
-import static net.kdt.pojavlaunch.prefs.LauncherPreferences.PREF_NOTCH_SIZE;
+import static com.movtery.zalithlauncher.setting.AllStaticSettings.notchSize;
 
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -32,6 +31,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.movtery.zalithlauncher.InfoCenter;
 import com.movtery.zalithlauncher.R;
 import com.movtery.zalithlauncher.context.ContextExecutor;
 import com.movtery.zalithlauncher.feature.customprofilepath.ProfilePathHome;
@@ -43,7 +43,7 @@ import com.movtery.zalithlauncher.ui.activity.BaseActivity;
 import com.movtery.zalithlauncher.ui.dialog.EditTextDialog;
 import com.movtery.zalithlauncher.ui.dialog.SelectRuntimeDialog;
 import com.movtery.zalithlauncher.ui.dialog.TipDialog;
-import com.movtery.zalithlauncher.utils.PathAndUrlManager;
+import com.movtery.zalithlauncher.utils.path.PathManager;
 import com.movtery.zalithlauncher.utils.ZHTools;
 import com.movtery.zalithlauncher.utils.file.FileTools;
 import com.movtery.zalithlauncher.utils.stringutils.StringUtils;
@@ -85,7 +85,6 @@ public final class Tools {
     public static final Gson GLOBAL_GSON = new GsonBuilder().setPrettyPrinting().create();
     public static final String LAUNCHERPROFILES_RTPREFIX = "pojav://";
     private final static boolean isClientFirst = false;
-    public static final String APP_NAME = "Zalith Launcher";
     public static String LOCAL_RENDERER = null;
     public static int DEVICE_ARCHITECTURE;
     // New since 3.0.0
@@ -105,7 +104,7 @@ public final class Tools {
      * @return true if storage is fine, false if storage is not accessible
      */
     public static boolean checkStorageRoot() {
-        File externalFilesDir = new File(PathAndUrlManager.DIR_GAME_HOME);
+        File externalFilesDir = new File(PathManager.DIR_GAME_HOME);
         //externalFilesDir == null when the storage is not mounted if it was obtained with the context call
         return Environment.getExternalStorageState(externalFilesDir).equals(Environment.MEDIA_MOUNTED);
     }
@@ -132,10 +131,10 @@ public final class Tools {
                             forgeSplashContent.replace("enabled=true", "enabled=false"));
                 }
             } catch (IOException e) {
-                Logging.w(Tools.APP_NAME, "Could not disable Forge 1.12.2 and below splash screen!", e);
+                Logging.w(InfoCenter.LAUNCHER_NAME, "Could not disable Forge 1.12.2 and below splash screen!", e);
             }
         } else {
-            Logging.w(Tools.APP_NAME, "Failed to create the configuration directory");
+            Logging.w(InfoCenter.LAUNCHER_NAME, "Failed to create the configuration directory");
         }
     }
 
@@ -164,7 +163,7 @@ public final class Tools {
 
     public static String getLWJGL3ClassPath() {
         StringBuilder libStr = new StringBuilder();
-        File lwjgl3Folder = new File(PathAndUrlManager.DIR_GAME_HOME, "lwjgl3");
+        File lwjgl3Folder = new File(PathManager.DIR_GAME_HOME, "lwjgl3");
         File[] lwjgl3Files = lwjgl3Folder.listFiles();
         if (lwjgl3Files != null) {
             for (File file: lwjgl3Files) {
@@ -188,7 +187,7 @@ public final class Tools {
         }
         for (String jarFile : classpath) {
             if (!FileUtils.exists(jarFile)) {
-                Logging.d(APP_NAME, "Ignored non-exists file: " + jarFile);
+                Logging.d(InfoCenter.LAUNCHER_NAME, "Ignored non-exists file: " + jarFile);
                 continue;
             }
             finalClasspath.append((isClientFirst ? ":" : "")).append(jarFile).append(!isClientFirst ? ":" : "");
@@ -216,9 +215,9 @@ public final class Tools {
             if (!activity.shouldIgnoreNotch()) {
                 //Remove notch width when it isn't ignored.
                 if (activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
-                    displayMetrics.heightPixels -= PREF_NOTCH_SIZE;
+                    displayMetrics.heightPixels -= notchSize;
                 else
-                    displayMetrics.widthPixels -= PREF_NOTCH_SIZE;
+                    displayMetrics.widthPixels -= notchSize;
             }
         }
         currentDisplayMetrics = displayMetrics;
@@ -385,11 +384,6 @@ public final class Tools {
                 .buildDialog();
     }
 
-    public static void openURL(Activity act, String url) {
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-        act.startActivity(browserIntent);
-    }
-
     private static boolean checkRules(JMinecraftVersionList.Arguments.ArgValue.ArgRules[] rules) {
         if(rules == null) return true; // always allow
         for (JMinecraftVersionList.Arguments.ArgValue.ArgRules rule : rules) {
@@ -408,7 +402,7 @@ public final class Tools {
                 // we have libjnidispatch 5.13.0 in jniLibs directory
                 if (Integer.parseInt(version[0]) >= 5 && Integer.parseInt(version[1]) >= 13)
                     continue;
-                Logging.d(APP_NAME, "Library " + libItem.name + " has been changed to version 5.13.0");
+                Logging.d(InfoCenter.LAUNCHER_NAME, "Library " + libItem.name + " has been changed to version 5.13.0");
                 createLibraryInfo(libItem);
                 libItem.name = "net.java.dev.jna:jna:5.13.0";
                 libItem.downloads.artifact.path = "net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar";
@@ -420,7 +414,7 @@ public final class Tools {
 
                 if (Integer.parseInt(version[0]) != 6 || Integer.parseInt(version[1]) != 2)
                     continue;
-                Logging.d(APP_NAME, "Library " + libItem.name + " has been changed to version 6.3.0");
+                Logging.d(InfoCenter.LAUNCHER_NAME, "Library " + libItem.name + " has been changed to version 6.3.0");
                 createLibraryInfo(libItem);
                 libItem.name = "com.github.oshi:oshi-core:6.3.0";
                 libItem.downloads.artifact.path = "com/github/oshi/oshi-core/6.3.0/oshi-core-6.3.0.jar";
@@ -431,7 +425,7 @@ public final class Tools {
                 // Java 8, which is not supported by old ASM versions. Mod loaders like Forge, which depend on this
                 // library, often include lwjgl in their class transformations, which causes errors with old ASM versions.
                 if (Integer.parseInt(version[0]) >= 5) continue;
-                Logging.d(APP_NAME, "Library " + libItem.name + " has been changed to version 5.0.4");
+                Logging.d(InfoCenter.LAUNCHER_NAME, "Library " + libItem.name + " has been changed to version 5.0.4");
                 createLibraryInfo(libItem);
                 libItem.name = "org.ow2.asm:asm-all:5.0.4";
                 libItem.url = null;
@@ -492,7 +486,7 @@ public final class Tools {
                         String inheritLibName = inheritLibrary.name.substring(0, inheritLibrary.name.lastIndexOf(":"));
 
                         if(libName.equals(inheritLibName)){
-                            Logging.d(APP_NAME, "Library " + libName + ": Replaced version " +
+                            Logging.d(InfoCenter.LAUNCHER_NAME, "Library " + libName + ": Replaced version " +
                                     libName.substring(libName.lastIndexOf(":") + 1) + " with " +
                                     inheritLibName.substring(inheritLibName.lastIndexOf(":") + 1));
 
@@ -569,7 +563,7 @@ public final class Tools {
                     fieldB.set(targetVer, value);
                 }
             } catch (Throwable th) {
-                Logging.w(Tools.APP_NAME, "Unable to insert " + key + "=" + value, th);
+                Logging.w(InfoCenter.LAUNCHER_NAME, "Unable to insert " + key + "=" + value, th);
             }
         }
     }
@@ -709,12 +703,8 @@ public final class Tools {
         new EditTextDialog.Builder(activity)
                 .setTitle(R.string.dialog_select_jar)
                 .setHintText("-jar/-cp /path/to/file.jar ...")
-                .setConfirmListener(editBox -> {
-                    if (editBox.getText().toString().isEmpty()) {
-                        editBox.setError(activity.getString(R.string.generic_error_field_empty));
-                        return false;
-                    }
-
+                .setAsRequired()
+                .setConfirmListener((editBox, checked) -> {
                     Intent intent = new Intent(activity, JavaGUILauncherActivity.class);
                     intent.putExtra("javaArgs", editBox.getText().toString());
                     SelectRuntimeDialog selectRuntimeDialog = new SelectRuntimeDialog(activity);
@@ -727,17 +717,6 @@ public final class Tools {
 
                     return true;
                 }).buildDialog();
-    }
-
-    /** Display and return a progress dialog, instructing to wait */
-    public static ProgressDialog getWaitingDialog(Context ctx, int message){
-        final ProgressDialog barrier = new ProgressDialog(ctx);
-        barrier.setMessage(ctx.getString(message));
-        barrier.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        barrier.setCancelable(false);
-        barrier.show();
-
-        return barrier;
     }
 
     /** Launch the mod installer activity. The Uri must be from our own content provider or
@@ -760,7 +739,7 @@ public final class Tools {
         Task.runTask(() -> {
             String name = getFileName(context, uri);
             MultiRTUtils.installRuntimeNamed(
-                    PathAndUrlManager.DIR_NATIVE_LIB,
+                    PathManager.DIR_NATIVE_LIB,
                     context.getContentResolver().openInputStream(uri),
                     name);
 
@@ -790,7 +769,7 @@ public final class Tools {
     }
 
     public static String getSelectedRuntime(Version version) {
-        String runtime = AllSettings.getDefaultRuntime();
+        String runtime = AllSettings.getDefaultRuntime().getValue();
         String versionRuntime = getRuntimeName(version.getJavaDir());
         if (versionRuntime != null) {
             if (MultiRTUtils.forceReread(versionRuntime).versionString != null) {
@@ -818,7 +797,7 @@ public final class Tools {
      * Triggers the share intent chooser, with the latestlog file attached to it
      */
     public static void shareLog(Context context) {
-        FileTools.shareFile(context, "latestlog.txt", PathAndUrlManager.DIR_GAME_HOME + "/latestlog.txt");
+        FileTools.shareFile(context, "latestlog.txt", PathManager.DIR_GAME_HOME + "/latestlog.txt");
     }
 
     /** Mesure the textview height, given its current parameters */

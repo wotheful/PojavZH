@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Zalith Launcher</string>
     <!-- Zalith Launcher -->
     <string name="generic_close">Close</string>
     <string name="generic_return">Return</string>
@@ -47,16 +46,18 @@
     <string name="generic_input_too_big">The value is too big, it can be at most %s</string>
     <string name="generic_copied">Copied</string>
     <!-- Error -->
-    <string name="error_fatal">Zalith Launcher crashed unexpectedly</string>
+    <string name="error_fatal">%s crashed unexpectedly</string>
     <string name="error_no_version">No version!</string>
     <string name="error_show_more">Show details</string>
     <string name="error_show_less">Hide details</string>
     <!-- Launcher -->
+    <string name="option_category_debug">Debug</string>
+    <string name="option_category_control">Control</string>
+    <string name="option_category_hotbar">Hotbar Detection Box</string>
     <string name="option_force_close">Force Close</string>
     <string name="option_log_out">Log Output</string>
     <string name="option_send_custom_key">Send Custom Key Code</string>
     <string name="option_edit_controls">Edit Control Layout</string>
-    <string name="option_hotbar">Hotbar Detection Box</string>
     <string name="option_hotbar_type">Hotbar Detection Mode</string>
     <string name="option_hotbar_type_auto">Adaptive (may be inaccurate)</string>
     <string name="option_hotbar_type_manually">Manual Adjustment</string>
@@ -81,9 +82,8 @@
     <string name="notification_game_runs">The game is running!</string>
     <string name="tasks_ongoing">Tasks are being executed, please wait</string>
     <string name="mc_download_failed">Failed to download Minecraft! This may be due to poor network connection, incorrect file placement, etc.</string>
-    <string name="toast_turn_on_gyro">Gyro control needs to be enabled first to use!</string>
     <string name="microsoft_login_retry_later">Your actions are too frequent, please try again later</string>
-    <string name="storage_required">Zalith Launcher requires external storage, please reconnect and restart the software</string>
+    <string name="storage_required">%s requires external storage, please reconnect and restart the software</string>
     <string name="dialog_select_jar">Select Jar File</string>
     <string name="percent_format">%d%%</string>
     <string name="version_select_hint">Select Version</string>
@@ -99,7 +99,7 @@
     <string name="notif_download_finished">The game is ready to launch</string>
     <string name="notif_download_finished_desc">Click here to launch it!</string>
     <string name="notification_permission_dialog_title">Permission Request</string>
-    <string name="notification_permission_dialog_text">Zalith Launcher requires notification permission to prevent game file downloads from stopping when you leave the app. Without this permission, Android may stop your download progress when Zalith Launcher is in the background.</string>
+    <string name="notification_permission_dialog_text">%s requires notification permission to prevent game file downloads from stopping when you leave the app. Without this permission, Android may stop your download progress when %s is in the background.</string>
     <string name="notification_permission_toast">You can change your mind at any time by going to \"System Settings\"</string>
     <string name="newdl_starting">Reading game metadata…</string>
     <string name="newdl_downloading_metadata">Downloading game metadata (%s)</string>
@@ -111,6 +111,7 @@
     <string name="log_view_label_log_output">Log Output:</string>
     <string name="execute_jar_failed_to_read_file">Failed to read .jar file</string>
     <string name="execute_jar_incompatible_runtime">Executing .jar feature is incompatible with Java %d</string>
+    <string name="open_link">Will access this link in the browser:</string>
     <string name="mod_download_progress">Downloading installer for %s</string>
     <string name="mod_forge_searching">Searching for Forge version number</string>
     <string name="mod_neoforge_searching">Searching for NeoForge version number</string>
@@ -157,7 +158,6 @@
     <string name="controls_unsupported_layout_version">Unsupported control layout version!</string>
     <string name="controls_create_new">Create New Control Layout</string>
     <string name="controls_import_control">Import Control Layout</string>
-    <string name="controls_settings_title">Control Layout Editor Settings</string>
     <string name="controls_settings_button_snapping">Button Snapping</string>
     <string name="controls_settings_button_snapping_distance">Button Snapping Distance</string>
     <string name="controls_info_file_name">File Name:</string>
@@ -175,11 +175,6 @@
     <string name="controls_nothing">There are no control layouts here. Restarting the app will generate a new default layout.</string>
     <string name="replacement_customcontrol">Replace Control Layout</string>
     <string name="custom_control_title">Manage Control Layouts</string>
-    <string name="import_control">Control Layout Name:</string>
-    <string name="import_control_invalid_file">File is invalid or corrupted</string>
-    <string name="import_control_verifying_file">File is being verified, please try again later…</string>
-    <string name="import_control_invalid_name">Name is invalid or file already exists</string>
-    <string name="import_control_done">Import Complete</string>
     <string name="controller_button_a" translatable="false">A</string>
     <string name="controller_button_b" translatable="false">B</string>
     <string name="controller_button_x" translatable="false">X</string>
@@ -206,6 +201,7 @@
     <string name="version_manager_title">Version Management</string>
     <string name="version_no_versions">No versions installed</string>
     <string name="version_install_new">Install new version</string>
+    <string name="version_install_new_modloader">Install %s for new version</string>
     <string name="version_install_not_install">Do not install</string>
     <string name="version_install_incompatible">Incompatible with %s</string>
     <string name="version_install_exists">A version with this name already exists!</string>
@@ -224,14 +220,18 @@
     <string name="version_manager_shortcuts_crash_report_path">Crash Report Folder</string>
     <string name="version_manager_edit">Edit Version</string>
     <string name="version_manager_rename">Rename Version</string>
+    <string name="version_manager_copy">Copy Version</string>
+    <string name="version_manager_copy_tip">Copy the current version as a new one with version isolation enabled by default. If "Copy All Files" below is enabled, all files generated by the current version (resource packs, saves, game settings, etc.) will be copied as well.</string>
+    <string name="version_manager_copy_all">Copy All Files</string>
     <string name="version_manager_delete">Delete Version</string>
-    <string name="version_manager_delete_tip">If version isolation is enabled, your game saves, resource packs, mods, and other important resources will be deleted along with the version. Please make sure to back up your data before performing this operation!</string>
+    <string name="version_manager_delete_tip">Deleting a version will also delete all files in the \"./versions/%s\" directory, including important resources such as game saves, resource packs, mods, etc., even if version isolation is not enabled. Therefore, please make sure to backup before performing this operation!</string>
     <string name="version_manager_delete_tip_invalid">The current version is missing the version JSON file and is therefore considered an invalid version. You cannot select this version. Click Confirm to delete this erroneous version.</string>
     <string name="version_manager_task_in_progress">Task in progress, version management is temporarily unavailable</string>
     <string name="version_manager_invalid">This version is invalid</string>
+    <string name="version_manager_no_installed_version">Launcher did not find any installed Minecraft!</string>
     <!-- Profiles Path -->
-    <string name="permissions_manage_external_storage">Zalith Launcher requires permission to manage all files on the device to use this feature properly. Please enable the permission!</string>
-    <string name="permissions_write_external_storage">Zalith Launcher requires storage management permission. If the permission is not enabled, it may cause issues such as game files failing to save or decompress properly. Please grant the permission to ensure proper functionality.</string>
+    <string name="permissions_manage_external_storage">%s requires permission to manage all files on the device to use this feature properly. Please enable the permission!</string>
+    <string name="permissions_write_external_storage">%s requires storage management permission. If the permission is not enabled, it may cause issues such as game files failing to save or decompress properly. Please grant the permission to ensure proper functionality.</string>
     <string name="profiles_path_title">Game Path Management</string>
     <string name="profiles_path_default">Default Path</string>
     <string name="profiles_path_settings">Open Path Settings</string>
@@ -261,9 +261,17 @@
     <string name="account_microsoft_xerr_unauthorized">Your Microsoft account login information seems to be expired, this often happens after the account password is changed. Please remove the current account and log in again to reset your login information.</string>
     <string name="account_local_account">Offline Account</string>
     <string name="account_local_account_empty">Username cannot be empty!</string>
-    <string name="account_local_account_invalid">A valid username only supports English letters (case-insensitive), numbers, and underscores. The length must be between 3 and 16 characters.\nExamples of correct usernames: Name, Name_, Name123\nExamples of incorrect usernames: Name@, N ame, name_name_name_name\nHowever, if you are using relevant Mods or plugins that can bypass this restriction, you may continue using this name. Otherwise, please rename it!</string>
+    <string name="account_local_account_invalid">Valid usernames only support English letters (both uppercase and lowercase), numbers, and underscores. The length must be between 3 and 16 characters, otherwise the game may not run properly.\nExamples of correct usernames: Name, Name_, Name123\nExamples of incorrect usernames: Name@, N ame, name_name_name_name\nHowever, if you have used relevant mods or plugins to bypass this restriction, you can continue using this name. Otherwise, please rename it!</string>
     <string name="account_login_local_name">Username</string>
     <string name="account_login_start">Start Login!</string>
+    <string name="account_login_microsoft_progress">Logging in to Microsoft account: %s</string>
+    <string name="account_login_progress_access_token">Fetching access token</string>
+    <string name="account_login_progress_xbl_token">Fetching Xbox Live token</string>
+    <string name="account_login_progress_xsts_token">Fetching Xbox Service Security Token</string>
+    <string name="account_login_progress_minecraft_token">Fetching Minecraft token</string>
+    <string name="account_login_progress_checking">Checking token</string>
+    <string name="account_login_no_network">Not connected to the internet, login skipped!</string>
+    <string name="account_login_skip">Login failed, do you want to skip the login step?</string>
     <string name="account_no_microsoft_account">Please log in with at least one Minecraft premium account, we do not encourage launching Minecraft without a premium account.</string>
     <string name="account_no_microsoft_account_local">It seems you are not logged in with a premium account! Offline accounts are a backup solution for players who cannot connect to the internet, not for players without a premium account.</string>
     <string name="account_no_microsoft_account_other">It seems you are not logged in with a premium account! Are you sure you want to use third-party login without logging in with a premium account?</string>
@@ -292,13 +300,13 @@
     <string name="multirt_nojava8rt">Java 8 not found, to use this option, you must install Java 8</string>
     <string name="multirt_delete_runtime">Delete Runtime Environment</string>
     <!-- Custom Mouse & Background -->
-    <string name="mouse_settings_title">Virtual Mouse Settings</string>
     <string name="mouse_settings_speed_name">Virtual Mouse Speed</string>
     <string name="mouse_settings_scale_name">Virtual Mouse Scale</string>
     <string name="custom_mouse_add">Add Virtual Mouse</string>
     <string name="custom_mouse_added">Successfully set virtual mouse:</string>
     <string name="custom_mouse_default">Default Virtual Mouse</string>
     <string name="custom_mouse_title">Custom Virtual Mouse</string>
+    <string name="custom_mouse_dialog">You can add mouse images in (Launcher Settings - %s - %s)</string>
     <string name="custom_mouse_desc">Open the virtual mouse management interface, where you can add your favorite virtual mouse icons and use them</string>
     <string name="custom_mouse_message_default">The currently selected virtual mouse is the default virtual mouse, sharing, renaming, and deleting operations are not supported</string>
     <string name="custom_background_add">Add Background Image</string>
@@ -349,7 +357,7 @@
     <string name="main_share_log_title">Please select log file type</string>
     <string name="main_share_launcher_log">Launcher log file</string>
     <string name="main_share_game_log">Last game run log</string>
-    <string name="main_play">Start game</string>
+    <string name="main_launch">Launch Game</string>
     <string name="setting_category_control">Control settings</string>
     <string name="setting_category_virtual_mouse">Virtual mouse</string>
     <string name="setting_category_gyro_controls">Gyro controls</string>
@@ -436,6 +444,8 @@
     <string name="setting_resource_image_cache_desc">When enabled, the launcher will cache the cover images and screenshots of resources for faster loading next time</string>
     <string name="setting_download_source_title">Game Download Source</string>
     <string name="setting_download_source_desc">Choose a mirror download source instead of using the official download source</string>
+    <string name="setting_max_download_threads_title">Max Download Threads</string>
+    <string name="setting_max_download_threads_desc">Maximum number of concurrent downloads when downloading multiple files simultaneously, but too many threads will cause launcher lag. 64 threads are sufficient!</string>
     <string name="setting_version_isolation_title">Default Version Isolation</string>
     <string name="setting_version_isolation_desc">When installing a new version, should version isolation be selected by default?</string>
     <string name="setting_set_game_language_title">Auto Set Game Language</string>
@@ -527,7 +537,7 @@
     <string name="download_install_unpack_world_error">Unable to recognize file structure, automatic unpacking failed, please handle the file manually!</string>
     <!-- ModPack -->
     <string name="select_modpack_local_tip">Please select a modpack file that the launcher supports importing!</string>
-    <string name="select_modpack_local_not_supported">This file is not supported by the launcher!</string>
+    <string name="select_modpack_local_not_supported">This modpack is not supported by the launcher! The launcher only supports importing modpacks in Modrinth, CurseForge, and MCBBS formats. Please check if your modpack is made according to the specified formats!</string>
     <string name="select_modpack_local_installing_files">Installing game files… (%d / %d)</string>
     <string name="modpack_download_downloading_metadata">Downloading modpack metadata (%.2fMB / %.2fMB)</string>
     <string name="modpack_download_downloading_mods">Downloading mods (%.2fMB / %.2fMB)</string>
@@ -571,23 +581,23 @@
     <string name="other_login_select_role_title">Select Role</string>
     <string name="other_login_select_role_message">Multiple roles exist for the current account, please select the role you want to use</string>
     <string name="other_login_registry_now">No account? Click here to register one!</string>
+    <string name="other_login_role_not_found">Role matching the current account not found, please check if this role exists on the server you are using!</string>
     <!-- Splash -->
     <string name="splash_screen_desc">The launcher needs to install these contents to ensure Minecraft can start properly. These contents are included in the app and need to be extracted before they can be used. Click the button below to start extracting and updating these contents.</string>
     <string name="splash_screen_installing">The launcher is extracting these contents. The main interface will automatically open after extraction is complete. Please wait patiently.</string>
     <string name="splash_screen_lwjgl">Lightweight Java Game Library, Minecraft relies on it to run the game.</string>
     <string name="splash_screen_cacio">Provides a portable GUI backend for OpenJDK.</string>
     <string name="splash_screen_authlib_injector">Injects authlib via runtime to enable login outside the game.</string>
-    <string name="splash_screen_pro_grade">This library implements a custom Java security manager and a security policy with deny rules.</string>
-    <string name="splash_screen_loader_installers">Helps automatically install Forge, Fabric, and OptiFine.</string>
+    <string name="splash_screen_components">Some components that the launcher depends on.</string>
     <string name="splash_screen_jre8">Java 8 environment, Minecraft 1.16- depends on Java 8.</string>
     <string name="splash_screen_jre17">Java 17 environment, Minecraft 1.17+ depends on Java 17.</string>
     <string name="splash_screen_jre21">Java 21 environment, Minecraft 1.20.5+ depends on Java 21.</string>
     <string name="splash_screen_apply">Agree and Install</string>
     <!-- About -->
-    <string name="about_tab">About Zalith Launcher</string>
-    <string name="about_dec1">Zalith Launcher is a Minecraft launcher developed based on PojavLauncher, capable of running Minecraft: Java Edition on Android devices.</string>
-    <string name="about_dec2">Zalith Launcher is dedicated to optimizing user experience, redesigning the application interface, and adding more practical features, aiming to lower the barriers to play as much as possible, allowing more people to easily enjoy the fun of Minecraft.</string>
-    <string name="about_dec3">Zalith Launcher is licensed under the GPL 3.0 open source license, which has a "viral" nature; any code that uses, modifies, or derives from GPL libraries or software must also be open-sourced under the GPL license. If you intend to distribute or share this software, please make sure to comply with the relevant provisions of the GPL 3.0 open source license.</string>
+    <string name="about_tab">About %s</string>
+    <string name="about_dec1">%s is a Minecraft launcher based on PojavLauncher that allows Minecraft: Java Edition to run on Android devices.</string>
+    <string name="about_dec2">%s focuses on optimizing user experience, redesigning the application interface, and adding more practical features, aiming to lower the barriers to play and let more people enjoy the fun of Minecraft easily.</string>
+    <string name="about_dec3">%s uses the GPL 3.0 open-source license, which is "viral." Any code that uses, modifies, or derives from GPL libraries or software must also adopt the GPL license for open sourcing. If you intend to distribute this software, please comply with the relevant provisions of the GPL 3.0 open-source license.</string>
     <string name="about_contributors">Contributors and Acknowledgements:</string>
     <string name="about_sponsors">Acknowledgements to Sponsors:</string>
     <string name="about_sponsors_desc">The following are all the sponsors who support the development, thank you very much!</string>

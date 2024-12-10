@@ -6,13 +6,12 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import com.movtery.zalithlauncher.R
-import com.movtery.zalithlauncher.setting.Settings
+import com.movtery.zalithlauncher.setting.unit.StringSettingUnit
 
 @SuppressLint("UseSwitchCompatOrMaterialCode")
 class ListSettingsWrapper(
     val context: Context,
-    val key: String,
-    val defaultValue: String,
+    val unit: StringSettingUnit,
     val mainView: View,
     val titleView: TextView,
     val valueView: TextView,
@@ -22,15 +21,14 @@ class ListSettingsWrapper(
 
     constructor(
         context: Context,
-        key: String,
-        defaultValue: String,
+        unit: StringSettingUnit,
         mainView: View,
         titleView: TextView,
         valueView: TextView,
         itemsId: Int,
         itemValuesId: Int
     ) : this(
-        context, key, defaultValue, mainView, titleView, valueView,
+        context, unit, mainView, titleView, valueView,
         context.resources.getStringArray(itemsId),
         context.resources.getStringArray(itemValuesId)
     )
@@ -41,13 +39,13 @@ class ListSettingsWrapper(
     }
 
     private fun createAListDialog() {
-        val index = entryValues.indexOf(Settings.Manager.getString(key, defaultValue))
+        val index = entryValues.indexOf(unit.getValue())
         AlertDialog.Builder(context, R.style.CustomAlertDialogTheme)
             .setTitle(titleView.text)
             .setSingleChoiceItems(entries, index) { dialog, which ->
                 if (which != index) {
                     val selectedValue = entryValues[which]
-                    Settings.Manager.put(key, selectedValue).save()
+                    unit.put(selectedValue).save()
                     updateListViewValue()
                     checkShowRebootDialog(context)
                 }
@@ -58,9 +56,8 @@ class ListSettingsWrapper(
     }
 
     private fun updateListViewValue() {
-        val value = Settings.Manager.getString(key, defaultValue)
-        val index = entryValues.indexOf(value).takeIf { it in entryValues.indices } ?: run {
-            Settings.Manager.put(key, defaultValue).save()
+        val index = entryValues.indexOf(unit.getValue()).takeIf { it in entryValues.indices } ?: run {
+            unit.reset()
             0
         }
         valueView.text = entries[index]

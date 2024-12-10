@@ -1,7 +1,6 @@
 package net.kdt.pojavlaunch;
 
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.content.ClipboardManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -15,10 +14,10 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.appcompat.app.AlertDialog;
 
 import com.kdt.LoggerView;
 import com.movtery.zalithlauncher.R;
-import com.movtery.zalithlauncher.context.ContextExecutor;
 import com.movtery.zalithlauncher.event.value.JvmExitEvent;
 import com.movtery.zalithlauncher.feature.log.Logging;
 import com.movtery.zalithlauncher.launch.LaunchArgs;
@@ -27,7 +26,8 @@ import com.movtery.zalithlauncher.task.Task;
 import com.movtery.zalithlauncher.task.TaskExecutors;
 import com.movtery.zalithlauncher.ui.activity.BaseActivity;
 import com.movtery.zalithlauncher.ui.dialog.TipDialog;
-import com.movtery.zalithlauncher.utils.PathAndUrlManager;
+import com.movtery.zalithlauncher.utils.path.LibPath;
+import com.movtery.zalithlauncher.utils.path.PathManager;
 import com.movtery.zalithlauncher.utils.ZHTools;
 import com.movtery.zalithlauncher.utils.image.Dimension;
 import com.movtery.zalithlauncher.utils.image.ImageUtils;
@@ -78,7 +78,7 @@ public class JavaGUILauncherActivity extends BaseActivity implements View.OnTouc
         setContentView(R.layout.activity_java_gui_launcher);
 
         try {
-            File latestLogFile = new File(PathAndUrlManager.DIR_GAME_HOME, "latestlog.txt");
+            File latestLogFile = new File(PathManager.DIR_GAME_HOME, "latestlog.txt");
             if (!latestLogFile.exists() && !latestLogFile.createNewFile())
                 throw new IOException("Failed to create a new log file");
             Logger.begin(latestLogFile.getAbsolutePath());
@@ -110,7 +110,7 @@ public class JavaGUILauncherActivity extends BaseActivity implements View.OnTouc
             ViewGroup.LayoutParams params = mMousePointerImageView.getLayoutParams();
             Drawable drawable = mMousePointerImageView.getDrawable();
             Dimension mousescale = ImageUtils.resizeWithRatio(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(),
-                    AllSettings.getMouseScale());
+                    AllSettings.getMouseScale().getValue());
             params.width = (int) (mousescale.width * 0.5);
             params.height = (int) (mousescale.height * 0.5);
         });
@@ -191,11 +191,11 @@ public class JavaGUILauncherActivity extends BaseActivity implements View.OnTouc
             if (javaArgs != null) {
                 startModInstaller(null, javaArgs, jreName);
             }else if(resourceUri != null) {
-                ProgressDialog barrierDialog = Tools.getWaitingDialog(this, R.string.multirt_progress_caching);
+                AlertDialog dialog = ZHTools.showTaskRunningDialog(this, getString(R.string.multirt_progress_caching));
                 Task.runTask(() -> {
                     startModInstallerWithUri(resourceUri, jreName);
                     return null;
-                }).ended(TaskExecutors.getAndroidUI(), r -> barrierDialog.dismiss())
+                }).ended(TaskExecutors.getAndroidUI(), r -> dialog.dismiss())
                         .execute();
             }
         } catch (Throwable th) {
@@ -324,7 +324,7 @@ public class JavaGUILauncherActivity extends BaseActivity implements View.OnTouc
             if (jreName == null) {
                 if (selectedMod == null) {
                     // We were unable to find out the path to the mod. In that case, use the default runtime.
-                    selectedRuntime = MultiRTUtils.forceReread(AllSettings.getDefaultRuntime());
+                    selectedRuntime = MultiRTUtils.forceReread(AllSettings.getDefaultRuntime().getValue());
                 } else {
                     // Autoselect it properly in the other case.
                     selectedRuntime = selectRuntime(selectedMod);
@@ -343,7 +343,7 @@ public class JavaGUILauncherActivity extends BaseActivity implements View.OnTouc
                 .setTitle(R.string.generic_error)
                 .setMessage(msg.toString())
                 .setCenterMessage(false)
-                .setConfirmClickListener(this::finish)
+                .setConfirmClickListener(checked -> finish())
                 .setCancelable(false)
                 .buildDialog());
     }
@@ -351,7 +351,6 @@ public class JavaGUILauncherActivity extends BaseActivity implements View.OnTouc
     @Override
     public void onResume() {
         super.onResume();
-        ContextExecutor.setActivity(this);
         final int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
         final View decorView = getWindow().getDecorView();
         decorView.setSystemUiVisibility(uiOptions);
@@ -423,7 +422,7 @@ public class JavaGUILauncherActivity extends BaseActivity implements View.OnTouc
     }
 
     public void forceClose() {
-        MainActivity.dialogForceClose(this);
+        ZHTools.dialogForceClose(this);
     }
 
     public void openLogOutput(View v) {
@@ -451,17 +450,17 @@ public class JavaGUILauncherActivity extends BaseActivity implements View.OnTouc
                 javaArgList.add(modFile.getAbsolutePath());
             }
             
-            if (AllSettings.getJavaSandbox()) {
+            if (AllSettings.getJavaSandbox().getValue()) {
                 Collections.reverse(javaArgList);
-                javaArgList.add("-Xbootclasspath/a:" + PathAndUrlManager.DIR_DATA + "/security/pro-grade.jar");
+                javaArgList.add("-Xbootclasspath/a:" + LibPath.PRO_GRADE.getAbsolutePath());
                 javaArgList.add("-Djava.security.manager=net.sourceforge.prograde.sm.ProGradeJSM");
-                javaArgList.add("-Djava.security.policy=" + PathAndUrlManager.DIR_DATA + "/security/java_sandbox.policy");
+                javaArgList.add("-Djava.security.policy=" + LibPath.JAVA_SANDBOX_POLICY.getAbsolutePath());
                 Collections.reverse(javaArgList);
             }
 
             Logger.appendToLog("Info: Java arguments: " + Arrays.toString(javaArgList.toArray(new String[0])));
 
-            JREUtils.launchJavaVM(this, runtime,null, javaArgList, AllSettings.getJavaArgs());
+            JREUtils.launchJavaVM(this, runtime,null, javaArgList, AllSettings.getJavaArgs().getValue());
         } catch (Throwable th) {
             Tools.showError(this, th, true);
         }

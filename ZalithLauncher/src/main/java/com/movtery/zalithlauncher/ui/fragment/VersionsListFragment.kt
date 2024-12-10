@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.view.animation.LayoutAnimationController
-import android.widget.EditText
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.Gson
 import com.google.gson.JsonParser
@@ -26,7 +25,7 @@ import com.movtery.zalithlauncher.ui.dialog.EditTextDialog
 import com.movtery.zalithlauncher.ui.subassembly.customprofilepath.ProfileItem
 import com.movtery.zalithlauncher.ui.subassembly.customprofilepath.ProfilePathAdapter
 import com.movtery.zalithlauncher.ui.subassembly.version.VersionAdapter
-import com.movtery.zalithlauncher.utils.PathAndUrlManager
+import com.movtery.zalithlauncher.utils.path.PathManager
 import com.movtery.zalithlauncher.utils.StoragePermissionsUtils
 import com.movtery.zalithlauncher.utils.ZHTools
 import net.kdt.pojavlaunch.Tools
@@ -57,12 +56,9 @@ class VersionsListFragment : FragmentWithAnim(R.layout.fragment_versions_list) {
                 if (path.isNotEmpty() && !isAddedPath(path)) {
                     EditTextDialog.Builder(requireContext())
                         .setTitle(R.string.profiles_path_create_new_title)
-                        .setConfirmListener { editBox: EditText ->
+                        .setAsRequired()
+                        .setConfirmListener { editBox, _ ->
                             val string = editBox.text.toString()
-                            if (string.isEmpty()) {
-                                editBox.error = getString(R.string.generic_error_field_empty)
-                                return@setConfirmListener false
-                            }
 
                             profilePathData.add(ProfileItem(UUID.randomUUID().toString(), string, path))
                             val nomediaFile = File(path, ".nomedia")
@@ -129,12 +125,12 @@ class VersionsListFragment : FragmentWithAnim(R.layout.fragment_versions_list) {
         VersionsManager.refresh()
 
         profilePathData.clear()
-        profilePathData.add(ProfileItem("default", getString(R.string.profiles_path_default), PathAndUrlManager.DIR_GAME_HOME))
+        profilePathData.add(ProfileItem("default", getString(R.string.profiles_path_default), PathManager.DIR_GAME_HOME))
 
         runCatching {
             val json: String
-            if (PathAndUrlManager.FILE_PROFILE_PATH.exists()) {
-                json = Tools.read(PathAndUrlManager.FILE_PROFILE_PATH)
+            if (PathManager.FILE_PROFILE_PATH.exists()) {
+                json = Tools.read(PathManager.FILE_PROFILE_PATH)
                 if (json.isEmpty()) return@runCatching
             } else return@runCatching
 
@@ -160,7 +156,7 @@ class VersionsListFragment : FragmentWithAnim(R.layout.fragment_versions_list) {
     private fun refreshVersions() {
         versionsAdapter?.let {
             val versions = VersionsManager.getVersions()
-            versions.add(null)
+            versions.add(0, null)
             it.refreshVersions(versions)
             binding.versions.scheduleLayoutAnimation()
         }
@@ -184,6 +180,12 @@ class VersionsListFragment : FragmentWithAnim(R.layout.fragment_versions_list) {
     override fun onStop() {
         super.onStop()
         EventBus.getDefault().unregister(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        versionsAdapter?.closeAllPopupWindow()
+        profilePathAdapter?.closeAllPopupWindow()
     }
 
     override fun slideIn(animPlayer: AnimPlayer) {

@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
-import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import com.getkeepsafe.taptargetview.TapTargetSequence
@@ -29,7 +28,7 @@ import com.movtery.zalithlauncher.utils.NewbieGuideUtils
 import com.movtery.zalithlauncher.utils.StoragePermissionsUtils
 import com.movtery.zalithlauncher.utils.ZHTools
 import com.movtery.zalithlauncher.utils.anim.AnimUtils.Companion.setVisibilityAnim
-import com.movtery.zalithlauncher.utils.file.FileTools.Companion.copyFileInBackground
+import com.movtery.zalithlauncher.utils.file.FileTools
 import com.movtery.zalithlauncher.utils.file.PasteFile
 import net.kdt.pojavlaunch.Tools
 import net.kdt.pojavlaunch.contracts.OpenDocumentWithExtension
@@ -70,11 +69,13 @@ class FilesFragment : FragmentWithAnim(R.layout.fragment_files) {
                 val dialog = ZHTools.showTaskRunningDialog((requireContext()))
                 Task.runTask {
                     uriList.forEach { uri ->
-                        copyFileInBackground(requireContext(), uri, binding.fileRecyclerView.fullPath.absolutePath)
+                        FileTools.copyFileInBackground(requireContext(), uri, binding.fileRecyclerView.fullPath.absolutePath)
                     }
                 }.ended(TaskExecutors.getAndroidUI()) {
                     Toast.makeText(requireContext(), getString(R.string.file_added), Toast.LENGTH_SHORT).show()
                     binding.fileRecyclerView.refreshPath()
+                }.onThrowable { e ->
+                    Tools.showErrorRemote(e)
                 }.finallyTask(TaskExecutors.getAndroidUI()) {
                     dialog.dismiss()
                 }.execute()
@@ -159,27 +160,23 @@ class FilesFragment : FragmentWithAnim(R.layout.fragment_files) {
             }
 
             currentPath.setOnClickListener {
-                val builder = EditTextDialog.Builder(requireContext())
-                builder.setTitle(R.string.file_jump_to_path)
-                builder.setEditText(fileRecyclerView.fullPath.absolutePath)
-                builder.setConfirmListener { editBox: EditText ->
-                    val path = editBox.text.toString()
-                    if (path.isEmpty()) {
-                        editBox.error = getString(R.string.generic_error_field_empty)
-                        return@setConfirmListener false
-                    }
+                EditTextDialog.Builder(requireContext())
+                    .setTitle(R.string.file_jump_to_path)
+                    .setEditText(fileRecyclerView.fullPath.absolutePath)
+                    .setAsRequired()
+                    .setConfirmListener { editBox, _ ->
+                        val path = editBox.text.toString()
 
-                    val file = File(path)
-                    //检查路径是否符合要求：最少为最顶部路径、路径是一个文件夹、这个路径存在
-                    if (!path.contains(mLockPath!!) || !file.isDirectory || !file.exists()) {
-                        editBox.error = getString(R.string.file_does_not_exist)
-                        return@setConfirmListener false
-                    }
+                        val file = File(path)
+                        //检查路径是否符合要求：最少为最顶部路径、路径是一个文件夹、这个路径存在
+                        if (!path.contains(mLockPath!!) || !file.isDirectory || !file.exists()) {
+                            editBox.error = getString(R.string.file_does_not_exist)
+                            return@setConfirmListener false
+                        }
 
-                    fileRecyclerView.listFileAt(file)
-                    true
-                }
-                builder.buildDialog()
+                        fileRecyclerView.listFileAt(file)
+                        true
+                    }.buildDialog()
             }
 
             externalStorage.setOnClickListener {
@@ -225,7 +222,7 @@ class FilesFragment : FragmentWithAnim(R.layout.fragment_files) {
                 closeMultiSelect()
                 EditTextDialog.Builder(requireContext())
                     .setTitle(R.string.file_folder_dialog_insert_name)
-                    .setConfirmListener { editBox: EditText ->
+                    .setConfirmListener { editBox, _ ->
                         val name = editBox.text.toString().replace("/", "")
                         if (name.isEmpty()) {
                             editBox.error = getString(R.string.file_rename_empty)
