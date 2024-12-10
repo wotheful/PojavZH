@@ -143,7 +143,7 @@ static void abort_waiter_setup() {
 }
 
 static jint launchJVM(int margc, char** margv) {
-   static void* libjli = dlopen("libjli.so", RTLD_LAZY | RTLD_GLOBAL);
+   void* libjli = dlopen("libjli.so", RTLD_LAZY | RTLD_GLOBAL);
    // Boardwalk: silence
    // LOGD("JLI lib = %x", (int)libjli);
    if (NULL == libjli)
@@ -179,21 +179,21 @@ static jint launchJVM(int margc, char** margv) {
 
 JNIEXPORT jint JNICALL Java_com_oracle_dalvik_VMLauncher_launchJVM(JNIEnv *env, jclass clazz, jobjectArray argsArray) {
 #ifdef TRY_SIG2JVM
-  static void* libjsig = dlopen("libjsig.so", RTLD_LAZY | RTLD_GLOBAL);
+  void* libjsig = dlopen("libjsig.so", RTLD_LAZY | RTLD_GLOBAL);
   if (NULL == libjsig) {
       LOGE("JSig lib = NULL: %s", dlerror());
       return -1;
   }
   sigaction_p = (void*) dlsym(libjsig, "sigaction");
 
-  static void* libjvm = dlopen("libjvm.so", RTLD_LAZY | RTLD_GLOBAL);
+  void* libjvm = dlopen("libjvm.so", RTLD_LAZY | RTLD_GLOBAL);
   if (NULL == libjvm) {
       LOGE("JVM lib = NULL: %s", dlerror());
       return -1;
   }
   JVM_handle_linux_signal = dlsym(libjvm, "JVM_handle_linux_signal");
 #endif
-   static jint res = 0;
+   jint res = 0;
    // int i;
    //Prepare the signal trapper
    struct sigaction catcher;
@@ -223,8 +223,8 @@ JNIEXPORT jint JNICALL Java_com_oracle_dalvik_VMLauncher_launchJVM(JNIEnv *env, 
         return 0;
     }
 
-    static int argc = (*env)->GetArrayLength(env, argsArray);
-    static char **argv = convert_to_char_array(env, argsArray);
+    int argc = (*env)->GetArrayLength(env, argsArray);
+    char **argv = convert_to_char_array(env, argsArray);
     LOGD("Done processing args");
 
     res = launchJVM(argc, argv);
