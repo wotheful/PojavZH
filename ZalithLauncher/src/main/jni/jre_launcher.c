@@ -40,7 +40,7 @@
 // Uncomment to try redirect signal handling to JVM
 
 // PojavLancher: fixme: are these wrong?
-if (getenv("JSP")) {
+if getenv("JSP") {
 #define TRY_SIG2JVM
 }
 #define FULL_VERSION "1.8.0-internal"
