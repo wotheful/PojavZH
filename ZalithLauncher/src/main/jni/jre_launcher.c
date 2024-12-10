@@ -94,14 +94,14 @@ struct {
 
 _Noreturn extern void nominal_exit(int code, bool is_signal);
 
-_Noreturn void* abort_waiter_thread(void* extraArg) {
+_Noreturn static void* abort_waiter_thread(void* extraArg) {
     pthread_sigmask(SIG_BLOCK, &abort_waiter_data.tracked_sigset, NULL);
     int signal;
     read(abort_waiter_data.pipe[0], &signal, sizeof(int));
     nominal_exit(signal, true);
 }
 
-_Noreturn void abort_waiter_handler(int signal) {
+_Noreturn static void abort_waiter_handler(int signal) {
     write(abort_waiter_data.pipe[1], &signal, sizeof(int));
     while(1) {}
 }
@@ -143,7 +143,7 @@ static void abort_waiter_setup() {
 }
 
 static jint launchJVM(int margc, char** margv) {
-   void* libjli = dlopen("libjli.so", RTLD_LAZY | RTLD_GLOBAL);
+   static void* libjli = dlopen("libjli.so", RTLD_LAZY | RTLD_GLOBAL);
    // Boardwalk: silence
    // LOGD("JLI lib = %x", (int)libjli);
    if (NULL == libjli)
@@ -179,21 +179,21 @@ static jint launchJVM(int margc, char** margv) {
 
 JNIEXPORT jint JNICALL Java_com_oracle_dalvik_VMLauncher_launchJVM(JNIEnv *env, jclass clazz, jobjectArray argsArray) {
 #ifdef TRY_SIG2JVM
-  void* libjsig = dlopen("libjsig.so", RTLD_LAZY | RTLD_GLOBAL);
+  static void* libjsig = dlopen("libjsig.so", RTLD_LAZY | RTLD_GLOBAL);
   if (NULL == libjsig) {
       LOGE("JSig lib = NULL: %s", dlerror());
       return -1;
   }
   sigaction_p = (void*) dlsym(libjsig, "sigaction");
 
-  void* libjvm = dlopen("libjvm.so", RTLD_LAZY | RTLD_GLOBAL);
+  static void* libjvm = dlopen("libjvm.so", RTLD_LAZY | RTLD_GLOBAL);
   if (NULL == libjvm) {
       LOGE("JVM lib = NULL: %s", dlerror());
       return -1;
   }
   JVM_handle_linux_signal = dlsym(libjvm, "JVM_handle_linux_signal");
 #endif
-   jint res = 0;
+   static jint res = 0;
    // int i;
    //Prepare the signal trapper
    struct sigaction catcher;
@@ -223,8 +223,8 @@ JNIEXPORT jint JNICALL Java_com_oracle_dalvik_VMLauncher_launchJVM(JNIEnv *env, 
         return 0;
     }
 
-    int argc = (*env)->GetArrayLength(env, argsArray);
-    char **argv = convert_to_char_array(env, argsArray);
+    static int argc = (*env)->GetArrayLength(env, argsArray);
+    static char **argv = convert_to_char_array(env, argsArray);
     LOGD("Done processing args");
 
     res = launchJVM(argc, argv);
