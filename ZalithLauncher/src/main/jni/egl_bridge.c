@@ -232,7 +232,6 @@ static int pojavInitOpenGL(void) {
         setenv("force_glsl_extensions_warn", "true", 1);
         setenv("allow_higher_compat_version", "true", 1);
         setenv("allow_glsl_extension_directive_midshader", "true", 1);
-        setenv("MESA_SHADER_CACHE_MAX_SIZE", "512MB", 1);
         setenv("MESA_NO_ERROR", "1", 1);
         if (!strcmp(getenv("OSMESA_NO_FLUSH_FRONTBUFFER"), "0"))
             printf("VirGL: OSMesa buffer flush is ENABLED!\n");
