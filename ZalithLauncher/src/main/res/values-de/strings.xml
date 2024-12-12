@@ -76,7 +76,7 @@
     <string name="memory_warning_msg">Der verfügbare Speicher (%d) ist niedriger als der zugewiesene Speicher (%d), was zu Abstürzen führen kann. Wenn das Spiel abstürzt, ändere bitte die Konfiguration!</string>
     <string name="address_memory_warning_msg">Der verfügbare freie Speicherplatz (%d) ist niedriger als der zugewiesene Speicher (%d), was zu Abstürzen führen kann. Wenn das Spiel abstürzt, passe bitte die Speicherzuweisung an.</string>
     <string name="notif_channel_name">Allgemein</string>
-    <string name="lazy_service_default_title">Zalith Empfangsdienst</string>
+    <string name="lazy_service_default_title">%s Empfangsdienst</string>
     <string name="progresslayout_tasks_in_progress">%d Aufgaben laufen</string>
     <string name="notification_terminate">Beenden</string>
     <string name="notification_game_runs">Das Spiel läuft!</string>
@@ -515,6 +515,7 @@
     <string name="download_info_dependencies">Abhängigkeitsart:</string>
     <string name="download_info_release_type_beta">Beta</string>
     <string name="download_info_release_type_alpha">Alpha</string>
+    <string name="download_info_load_screenshot">Bildschirmfoto anzeigen</string>
     <string name="download_search_failed">Fehler beim Suchen nach Ressourcen!</string>
     <string name="download_search_no_result">Keine verwandten Ressourcen gefunden!</string>
     <string name="download_search_platform_not_supported">Die aktuelle Plattform unterstützt das Herunterladen dieses Typs von Ressourcen oder diese Kategoriefilterung nicht!</string>

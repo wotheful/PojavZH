@@ -78,7 +78,7 @@
     <string name="memory_warning_msg">当前可用内存（%d）低于所分配的内存（%d），这可能会导致游戏崩溃，如果游戏崩溃请更改配置！</string>
     <string name="address_memory_warning_msg">当前可用的空闲内存空间 (%d) 低于分配的内存 (%d)，这会导致崩溃，如果游戏崩溃，请调整内存分配。</string>
     <string name="notif_channel_name">常规</string>
-    <string name="lazy_service_default_title">Zalith 前台服务</string>
+    <string name="lazy_service_default_title">%s 前台服务</string>
     <string name="progresslayout_tasks_in_progress">%d 项任务正在进行中</string>
     <string name="notification_terminate">终止</string>
     <string name="notification_game_runs">游戏正在运行！</string>
@@ -545,6 +545,7 @@
     <string name="download_info_dependencies">依赖类型:</string>
     <string name="download_info_release_type_beta">测试版</string>
     <string name="download_info_release_type_alpha">内测版</string>
+    <string name="download_info_load_screenshot">展示屏幕截图</string>
     <string name="download_search_failed">搜索资源时失败！</string>
     <string name="download_search_no_result">未找到相关资源！</string>
     <string name="download_search_platform_not_supported">当前平台不支持下载这类资源，或不支持此类别筛选！</string>

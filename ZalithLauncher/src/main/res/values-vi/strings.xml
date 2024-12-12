@@ -76,7 +76,7 @@
     <string name="memory_warning_msg">Bộ nhớ hiện có (%d) thấp hơn bộ nhớ được phân bổ (%d), điều này có thể gây ra sự cố trò chơi, nếu trò chơi bị sự cố, vui lòng thay đổi cấu hình!</string>
     <string name="address_memory_warning_msg">Không gian bộ nhớ trống hiện có (%d) thấp hơn bộ nhớ được phân bổ (%d), điều này sẽ gây ra sự cố, nếu trò chơi bị sự cố, vui lòng điều chỉnh phân bổ bộ nhớ.</string>
     <string name="notif_channel_name">Thông thường</string>
-    <string name="lazy_service_default_title">Dịch vụ Tiếp tân Zalith</string>
+    <string name="lazy_service_default_title">Dịch vụ Tiếp tân %s</string>
     <string name="progresslayout_tasks_in_progress">%d nhiệm vụ đang diễn ra</string>
     <string name="notification_terminate">Kết thúc</string>
     <string name="notification_game_runs">Trò chơi đang chạy!</string>
@@ -515,6 +515,7 @@
     <string name="download_info_dependencies">Loại phụ thuộc:</string>
     <string name="download_info_release_type_beta">Phiên bản Beta</string>
     <string name="download_info_release_type_alpha">Phiên bản Alpha</string>
+    <string name="download_info_load_screenshot">Hiển thị ảnh chụp màn hình</string>
     <string name="download_search_failed">Tìm kiếm tài nguyên thất bại!</string>
     <string name="download_search_no_result">Không tìm thấy tài nguyên liên quan!</string>
     <string name="download_search_platform_not_supported">Nền tảng hiện tại không hỗ trợ tải xuống loại tài nguyên này hoặc bộ lọc loại này!</string>

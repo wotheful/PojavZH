@@ -76,7 +76,7 @@
     <string name="memory_warning_msg">The available memory (%d) is lower than the allocated memory (%d), which may cause the game to crash. If the game crashes, please change the configuration!</string>
     <string name="address_memory_warning_msg">The available free memory space (%d) is lower than the allocated memory (%d), which will cause a crash. If the game crashes, please adjust the memory allocation.</string>
     <string name="notif_channel_name">General</string>
-    <string name="lazy_service_default_title">Zalith Front Desk Service</string>
+    <string name="lazy_service_default_title">%s Front Desk Service</string>
     <string name="progresslayout_tasks_in_progress">%d tasks in progress</string>
     <string name="notification_terminate">Terminate</string>
     <string name="notification_game_runs">The game is running!</string>
@@ -520,6 +520,7 @@
     <string name="download_info_dependencies">Dependency Type:</string>
     <string name="download_info_release_type_beta">Beta</string>
     <string name="download_info_release_type_alpha">Alpha</string>
+    <string name="download_info_load_screenshot">Show Screenshot</string>
     <string name="download_search_failed">Failed to search for resources!</string>
     <string name="download_search_no_result">No related resources found!</string>
     <string name="download_search_platform_not_supported">The current platform does not support downloading this type of resource, or does not support this category filter!</string>

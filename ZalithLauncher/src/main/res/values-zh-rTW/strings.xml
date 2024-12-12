@@ -76,7 +76,7 @@
     <string name="memory_warning_msg">目前可用記憶體（%d）低於已分配的記憶體（%d），這可能會導致遊戲當機，若遊戲當機，請更改設定！</string>
     <string name="address_memory_warning_msg">目前可用的空閒記憶體空間 (%d) 低於分配的記憶體 (%d)，這會導致當機，若遊戲當機，請調整記憶體分配。</string>
     <string name="notif_channel_name">一般</string>
-    <string name="lazy_service_default_title">Zalith 前台服務</string>
+    <string name="lazy_service_default_title">%s 前台服務</string>
     <string name="progresslayout_tasks_in_progress">%d 項任務正在進行中</string>
     <string name="notification_terminate">終止</string>
     <string name="notification_game_runs">遊戲正在執行中！</string>
@@ -515,6 +515,7 @@
     <string name="download_info_dependencies">依賴類型:</string>
     <string name="download_info_release_type_beta">測試版</string>
     <string name="download_info_release_type_alpha">內測版</string>
+    <string name="download_info_load_screenshot">展示螢幕截圖</string>
     <string name="download_search_failed">搜尋資源時失敗！</string>
     <string name="download_search_no_result">未找到相關資源！</string>
     <string name="download_search_platform_not_supported">當前平台不支持下載這類資源，或不支持此類別篩選！</string>

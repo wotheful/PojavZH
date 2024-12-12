@@ -76,7 +76,7 @@
     <string name="memory_warning_msg">A memória disponível atual (%d) é menor que a memória alocada (%d), o que pode causar falhas no jogo. Se o jogo falhar, altere a configuração!</string>
     <string name="address_memory_warning_msg">O espaço de memória livre disponível (%d) é menor que a memória alocada (%d), o que causará falhas. Se o jogo falhar, ajuste a alocação de memória.</string>
     <string name="notif_channel_name">Geral</string>
-    <string name="lazy_service_default_title">Serviço de Recepção Zalith</string>
+    <string name="lazy_service_default_title">Serviço de Recepção %s</string>
     <string name="progresslayout_tasks_in_progress">%d tarefas em andamento</string>
     <string name="notification_terminate">Encerrar</string>
     <string name="notification_game_runs">O jogo está em execução!</string>
@@ -515,6 +515,7 @@
     <string name="download_info_dependencies">Tipo de Dependência:</string>
     <string name="download_info_release_type_beta">Beta</string>
     <string name="download_info_release_type_alpha">Alpha</string>
+    <string name="download_info_load_screenshot">Mostrar Captura de Tela</string>
     <string name="download_search_failed">Falha ao buscar recursos!</string>
     <string name="download_search_no_result">Nenhum recurso relacionado encontrado!</string>
     <string name="download_search_platform_not_supported">A plataforma atual não suporta o download deste tipo de recurso ou este filtro de categoria!</string>
