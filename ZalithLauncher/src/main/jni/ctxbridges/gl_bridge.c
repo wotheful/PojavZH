@@ -19,7 +19,7 @@ static const char* g_LogTag = "GLBridge";
 static __thread gl_render_window_t* currentBundle;
 static EGLDisplay g_EglDisplay;
 
-bool gl_init() {
+bool gl_init(void) {
     dlsym_EGL();
     g_EglDisplay = eglGetDisplay_p(EGL_DEFAULT_DISPLAY);
 
@@ -38,7 +38,7 @@ bool gl_init() {
     return true;
 }
 
-gl_render_window_t* gl_get_current() {
+gl_render_window_t* gl_get_current(void) {
     return currentBundle;
 }
 
@@ -56,7 +56,7 @@ static void gl4esi_get_display_dimensions(int* width, int* height) {
 }
 
 static bool already_initialized = false;
-static void gl_init_gl4es_internals() {
+static void gl_init_gl4es_internals(void) {
     if (already_initialized) return;
     already_initialized = true;
 
@@ -74,19 +74,9 @@ static void gl_init_gl4es_internals() {
 }
 
 gl_render_window_t* gl_init_context(gl_render_window_t *share) {
+    EGLint egl_attributes[] = { EGL_BLUE_SIZE, 8, EGL_GREEN_SIZE, 8, EGL_RED_SIZE, 8, EGL_ALPHA_SIZE, 8, EGL_DEPTH_SIZE, 24, EGL_ALPHA_MASK_SIZE, 8, EGL_SURFACE_TYPE, EGL_WINDOW_BIT|EGL_PBUFFER_BIT, EGL_CONFORMANT, EGL_OPENGL_ES3_BIT, EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT, EGL_NONE };
     gl_render_window_t* bundle = malloc(sizeof(gl_render_window_t));
     memset(bundle, 0, sizeof(gl_render_window_t));
-    EGLint egl_attributes[] = { EGL_BLUE_SIZE, 8,
-                    EGL_GREEN_SIZE, 8,
-                    EGL_RED_SIZE, 8,
-                    EGL_ALPHA_SIZE, 8,
-                    EGL_DEPTH_SIZE, 24,
-                    EGL_SURFACE_TYPE,
-                    EGL_WINDOW_BIT|EGL_PBUFFER_BIT,
-                    EGL_RENDERABLE_TYPE,
-                    EGL_OPENGL_ES2_BIT,
-                    EGL_NONE
-                    };
     EGLint num_configs = 0;
 
     if (eglChooseConfig_p(g_EglDisplay, egl_attributes, NULL, 0, &num_configs) != EGL_TRUE)
@@ -112,7 +102,7 @@ gl_render_window_t* gl_init_context(gl_render_window_t *share) {
         EGLBoolean bindResult;
         printf("EGLBridge: Binding to OpenGL ES\n");
         bindResult = eglBindAPI_p(EGL_OPENGL_ES_API);
-        if (!bindResult) printf("EGLBridge: bind failed: %p\n", eglGetError_p());
+        if (!bindResult) printf("EGLBridge: bind failed: %d\n", eglGetError_p());
     }
 
     int libgl_es = strtol(getenv("LIBGL_ES"), NULL, 0);
@@ -130,7 +120,7 @@ gl_render_window_t* gl_init_context(gl_render_window_t *share) {
     return bundle;
 }
 
-void gl_swap_surface(gl_render_window_t* bundle) {
+static void gl_swap_surface(gl_render_window_t* bundle) {
     if (bundle->nativeSurface != NULL)
         ANativeWindow_release(bundle->nativeSurface);
 
@@ -145,15 +135,16 @@ void gl_swap_surface(gl_render_window_t* bundle) {
         ANativeWindow_acquire(bundle->nativeSurface);
         ANativeWindow_setBuffersGeometry(bundle->nativeSurface, 0, 0, bundle->format);
         bundle->surface = eglCreateWindowSurface_p(g_EglDisplay, bundle->config, bundle->nativeSurface, NULL);
-    } else {
-        __android_log_print(ANDROID_LOG_ERROR, g_LogTag, "No new native surface, switching to 1x1 pbuffer");
+    }else{
+        const EGLint pbuffer_attrs[] = {EGL_WIDTH, 4 , EGL_HEIGHT, 4, EGL_NONE};
+        __android_log_print(ANDROID_LOG_ERROR, g_LogTag, "No new native surface, switching to 4x4 pbuffer");
         bundle->nativeSurface = NULL;
-        const EGLint pbuffer_attrs[] = {EGL_WIDTH, 1 , EGL_HEIGHT, 1, EGL_NONE};
         bundle->surface = eglCreatePbufferSurface_p(g_EglDisplay, bundle->config, pbuffer_attrs);
     }
 }
 
 void gl_make_current(gl_render_window_t* bundle) {
+
     gl_init_gl4es_internals();
 
     if (bundle == NULL)
