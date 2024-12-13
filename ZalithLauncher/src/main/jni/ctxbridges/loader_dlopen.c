@@ -10,8 +10,4 @@ void* loader_dlopen(char* primaryName, int flags) {
 
     dl_handle = dlopen(primaryName, flags);
     if(dl_handle != NULL) return dl_handle;
-
-    dl_error:
-    printf("%s", dlerror());
-    return NULL;
 }
