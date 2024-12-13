@@ -24,7 +24,7 @@ void* (*OSMesaGetProcAddress_p)(const char* funcName);
 
 bool dlsym_OSMesa() {
     char* mesa_library = getenv("MESA_LIBRARY");
-    void* dl_handle = loader_dlopen(mesa_library, RTLD_LOCAL | RTLD_LAZY);
+    void* dl_handle = dlopen(mesa_library, RTLD_LOCAL | RTLD_LAZY);
     if(dl_handle == NULL) return false;
     OSMesaGetProcAddress_p = dlsym(dl_handle, "OSMesaGetProcAddress");
 
