@@ -2,7 +2,7 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
 }
-// apply plugin: 'stringfog'
+apply plugin: 'stringfog'
 
 def getCFApiKey = {
     String key = System.getenv("CURSEFORGE_API_KEY")
