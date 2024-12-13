@@ -183,7 +183,7 @@ void gl_make_current(gl_render_window_t* bundle) {
 
 }
 
-void gl_swap_buffers() {
+void gl_swap_buffers(void) {
     if (currentBundle->state == STATE_RENDERER_NEW_WINDOW)
     {
         eglMakeCurrent_p(g_EglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
@@ -204,7 +204,7 @@ void gl_swap_buffers() {
 
 }
 
-void gl_setup_window() {
+void gl_setup_window(void) {
     if (pojav_environ->mainWindowBundle != NULL)
     {
         __android_log_print(ANDROID_LOG_INFO, g_LogTag, "Main window bundle is not NULL, changing state");
