@@ -223,15 +223,15 @@ public class VersionConfigFragment extends FragmentWithAnim {
                 .setOnStart(() -> {
                     setViewVisible(binding.isolationConfig, true);
                     setViewVisible(binding.customPathLayout, true);
-                    binding.isolationConfig.setEnabled(false);
-                    binding.customPathLayout.setEnabled(false);
+                    binding.isolationConfig.setEnabled(true);
+                    binding.customPathLayout.setEnabled(true);
                     binding.saveButton.setEnabled(false);
                 })
                 .setOnEnd(() -> {
                     setViewVisible(binding.isolationConfig, show);
-                    setViewVisible(binding.customPathLayout, !show);
+                    setViewVisible(binding.customPathLayout, show);
                     binding.isolationConfig.setEnabled(show);
-                    binding.customPathLayout.setEnabled(!show);
+                    binding.customPathLayout.setEnabled(show);
                     binding.saveButton.setEnabled(true);
                 }).start();
     }
