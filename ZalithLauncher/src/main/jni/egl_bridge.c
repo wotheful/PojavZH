@@ -236,7 +236,6 @@ static int pojavInitOpenGL(void) {
         if (!strcmp(getenv("OSMESA_NO_FLUSH_FRONTBUFFER"), "0"))
             printf("VirGL: OSMesa buffer flush is ENABLED!\n");
         loadSymbolsVirGL();
-        virglInit();
         return 0;
     }
 
