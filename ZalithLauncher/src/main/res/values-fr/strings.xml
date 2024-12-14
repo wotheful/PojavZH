@@ -93,6 +93,7 @@
     <string name="version_select_hint">Sélectionner une version</string>
     <string name="notif_error_occured">Une erreur est survenue</string>
     <string name="notif_error_occured_desc">Cliquez pour voir les détails</string>
+    <string name="input_preview_tip">Aperçu du champ de saisie, capture l\'entrée du clavier virtuel, à titre de référence uniquement :</string>
     <string name="dl_tampered_manifest_title">Avertissement de vérification de fichier</string>
     <string name="dl_tampered_manifest"><![CDATA[La liste des versions de jeu sur la source miroir ne correspond pas à celle de Mojang, ce qui signifie qu\'elle pourrait avoir été modifiée.<br/>
         <b>Cela n\'est pas sûr. Si vous continuez, vos informations personnelles pourraient être en danger !</b><br/>
@@ -243,6 +244,7 @@
     <string name="pedit_isolation_enabled">Activer l\'isolement des versions</string>
     <string name="pedit_reset_icon">Cela réinitialisera l\'icône personnalisée que vous avez définie, et l\'opération est irréversible. Êtes-vous sûr de vouloir réinitialiser l\'icône de la version ?</string>
     <string name="pedit_control">Disposition de contrôle</string>
+    <string name="pedit_custom_path">Chemin personnalisé</string>
     <string name="pedit_default">(Utiliser la valeur par défaut globale)</string>
     <string name="profile_mods_download_mod">Télécharger le Mod</string>
     <string name="profile_mods_download_mod_release_version">Afficher uniquement les versions officielles de Minecraft</string>

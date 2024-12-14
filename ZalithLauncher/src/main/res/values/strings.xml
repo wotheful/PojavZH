@@ -93,6 +93,7 @@
     <string name="version_select_hint">Select Version</string>
     <string name="notif_error_occured">An error occurred</string>
     <string name="notif_error_occured_desc">Click to view details</string>
+    <string name="input_preview_tip">Input preview box, capturing soft keyboard input, for reference only:</string>
     <string name="dl_tampered_manifest_title">File Verification Warning</string>
     <string name="dl_tampered_manifest"><![CDATA[The game version manifest on the mirror does not match the official Mojang version manifest, which means it may have been tampered with.<br/>
         <b>This is not safe. Your personal information may be at risk if you continue.</b><br/>
@@ -248,6 +249,7 @@
     <string name="pedit_isolation_enabled">Enable Version Isolation</string>
     <string name="pedit_reset_icon">This will reset the custom icon you set, and the operation is irreversible. Are you sure you want to reset the version icon?</string>
     <string name="pedit_control">Control Layout</string>
+    <string name="pedit_custom_path">Custom Path</string>
     <string name="pedit_default">(Use global default)</string>
     <string name="profile_mods_download_mod">Download Mod</string>
     <string name="profile_mods_download_mod_release_version">Show only official Minecraft versions</string>

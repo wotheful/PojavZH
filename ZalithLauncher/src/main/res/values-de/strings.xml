@@ -93,6 +93,7 @@
     <string name="version_select_hint">Version auswählen</string>
     <string name="notif_error_occured">Ein Fehler ist aufgetreten</string>
     <string name="notif_error_occured_desc">Klicken Sie hier, um Details anzuzeigen</string>
+    <string name="input_preview_tip">Eingabevorschau-Feld, erfasst die Eingabe der Soft-Tastatur, nur als Referenz:</string>
     <string name="dl_tampered_manifest_title">Warnung zur Dateiprüfung</string>
     <string name="dl_tampered_manifest"><![CDATA[Die Versionsliste der Spiele auf der Mirror-Quelle stimmt nicht mit der offiziellen Versionsliste von Mojang überein, was bedeutet, dass sie möglicherweise manipuliert wurde.<br/>
         <b>Dies ist nicht sicher. Wenn Sie fortfahren, könnte Ihre persönliche Sicherheit gefährdet sein!</b><br/>
@@ -243,6 +244,7 @@
     <string name="pedit_isolation_enabled">Versionstrennung aktivieren</string>
     <string name="pedit_reset_icon">Dadurch wird das benutzerdefinierte Symbol, das du festgelegt hast, zurückgesetzt, und der Vorgang ist nicht rückgängig zu machen. Bist du sicher, dass du das Versionssymbol zurücksetzen möchtest?</string>
     <string name="pedit_control">Steuerungsraster</string>
+    <string name="pedit_custom_path">Benutzerdefinierter Pfad</string>
     <string name="pedit_default">(Globale Standardeinstellung verwenden)</string>
     <string name="profile_mods_download_mod">Mod herunterladen</string>
     <string name="profile_mods_download_mod_release_version">Nur offizielle Minecraft-Versionen anzeigen</string>

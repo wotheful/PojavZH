@@ -95,6 +95,7 @@
     <string name="version_select_hint">选择版本</string>
     <string name="notif_error_occured">出现了一个错误</string>
     <string name="notif_error_occured_desc">点击查看详细信息</string>
+    <string name="input_preview_tip">预览输入框，捕获软键盘输入，仅供参考:</string>
 
     <string name="dl_tampered_manifest_title">文件校验警告</string>
     <string name="dl_tampered_manifest"><![CDATA[镜像源上的游戏版本列表与 Mojang 官方版本列表并不一致，这意味着它可能被篡改了<br/>
@@ -254,6 +255,7 @@
     <string name="pedit_isolation_enabled">启用版本隔离</string>
     <string name="pedit_reset_icon">这将会重置你设置的自定义图标，且操作不可逆，你确定要重置版本图标吗？</string>
     <string name="pedit_control">控制布局</string>
+    <string name="pedit_custom_path">自定义路径</string>
     <string name="pedit_default">（使用全局默认值）</string>
 
     <string name="profile_mods_download_mod">下载模组</string>
