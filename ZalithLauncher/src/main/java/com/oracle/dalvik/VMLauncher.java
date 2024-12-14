@@ -1,5 +1,8 @@
 package com.oracle.dalvik;
 
+import androidx.annotation.Keep;
+import dalvik.annotation.optimization.CriticalNative;
+
 public final class VMLauncher {
 	private VMLauncher() {
 	}
