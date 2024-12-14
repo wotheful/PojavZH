@@ -352,7 +352,7 @@ public class MinecraftGLSurface extends View implements GrabListener {
 
     private void realStart(Surface surface){
         // Initial size set
-        refreshSize();
+        refreshSize(true);
 
         //Load Minecraft options:
         MCOptionUtils.set("fullscreen", "false");
