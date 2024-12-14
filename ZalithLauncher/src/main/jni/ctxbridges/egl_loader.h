@@ -3,6 +3,7 @@
 //
 #include <EGL/egl.h>
 #include <stdbool.h>
+
 #ifndef __POJAVLAUNCHER_EGL_LOADER_H_
 #define __POJAVLAUNCHER_EGL_LOADER_H_
 
@@ -24,7 +25,11 @@ extern EGLint (*eglGetError_p) (void);
 extern EGLContext (*eglCreateContext_p) (EGLDisplay dpy, EGLConfig config, EGLContext share_list, const EGLint *attrib_list);
 extern EGLBoolean (*eglSwapInterval_p) (EGLDisplay dpy, EGLint interval);
 extern EGLSurface (*eglGetCurrentSurface_p) (EGLint readdraw);
-extern EGLBoolean (*eglQuerySurface_p)(EGLDisplay display, EGLSurface surface, EGLint attribute, EGLint * value);
+extern EGLBoolean (*eglQuerySurface_p)( 	EGLDisplay display,
+                                      EGLSurface surface,
+                                      EGLint attribute,
+                                      EGLint * value);
+
 extern __eglMustCastToProperFunctionPointerType (*eglGetProcAddress_p) (const char *procname);
 
 bool dlsym_EGL(void);
