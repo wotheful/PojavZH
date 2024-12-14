@@ -25,7 +25,10 @@ EGLint (*eglGetError_p) (void);
 EGLContext (*eglCreateContext_p) (EGLDisplay dpy, EGLConfig config, EGLContext share_list, const EGLint *attrib_list);
 EGLBoolean (*eglSwapInterval_p) (EGLDisplay dpy, EGLint interval);
 EGLSurface (*eglGetCurrentSurface_p) (EGLint readdraw);
-EGLBoolean (*eglQuerySurface_p)(EGLDisplay display, EGLSurface surface, EGLint attribute, EGLint * value);
+EGLBoolean (*eglQuerySurface_p)( 	EGLDisplay display,
+                                           EGLSurface surface,
+                                           EGLint attribute,
+                                           EGLint * value);
 __eglMustCastToProperFunctionPointerType (*eglGetProcAddress_p) (const char *procname);
 
 bool dlsym_EGL(void) {
