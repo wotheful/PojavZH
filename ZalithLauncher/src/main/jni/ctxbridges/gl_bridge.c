@@ -114,7 +114,7 @@ static void gl_swap_surface(gl_render_window_t* bundle) {
 
 void gl_make_current(gl_render_window_t* bundle) {
 
-    gl_init_gl4es_internals();
+    // gl_init_gl4es_internals();
 
     if (bundle == NULL)
     {
@@ -184,34 +184,4 @@ void gl_swap_interval(int swapInterval) {
     if (pojav_environ->force_vsync) swapInterval = 1;
 
     eglSwapInterval_p(g_EglDisplay, swapInterval);
-}
-
-static void gl4esi_get_display_dimensions(int* width, int* height) {
-    if (currentBundle == NULL) goto zero;
-    EGLSurface surface = currentBundle->surface;
-    EGLBoolean result_width = eglQuerySurface_p(g_EglDisplay, surface, EGL_WIDTH, width);
-    EGLBoolean result_height = eglQuerySurface_p(g_EglDisplay, surface, EGL_HEIGHT, height);
-    if (!result_width || !result_height) goto zero;
-    return;
-
-    zero:
-    *width = 0;
-    *height = 0;
-}
-static void gl_init_gl4es_internals(void) {
-    if(already_initialized) return;
-    already_initialized = true;
-    void* gl4es = dlopen("libgl4es_114.so", RTLD_NOLOAD);
-    if(gl4es == NULL) return;
-    void (*set_getmainfbsize)(void (*new_getMainFBSize)(int* width, int* height));
-    set_getmainfbsize = dlsym(gl4es, "set_getmainfbsize");
-    if(set_getmainfbsize == NULL) goto warn;
-    set_getmainfbsize(gl4esi_get_display_dimensions);
-    goto cleanup;
-
-    warn:
-    printf("gl4esinternals warning: gl4es was found but internals not initialized. expect rendering issues.\n");
-    cleanup:
-    // dlclose just decreases a ref counter, so this is fine
-    dlclose(gl4es);
 }
