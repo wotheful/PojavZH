@@ -183,7 +183,11 @@ void gl_make_current(gl_render_window_t* bundle) {
 
 }
 
-void gl_swap_buffers() {
+void gl_swap_buffers(void) {
+    return gl_swap_buffers_x()
+}
+
+static void gl_swap_buffers_x(void) {
     if(currentBundle->state == STATE_RENDERER_NEW_WINDOW) {
         eglMakeCurrent_p(g_EglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT); //detach everything to destroy the old EGLSurface
         gl_swap_surface(currentBundle);
