@@ -144,7 +144,7 @@ static void gl_swap_surface(gl_render_window_t* bundle) {
 
 void gl_make_current(gl_render_window_t* bundle) {
 
-    gl_init_gl4es_internals();
+    // gl_init_gl4es_internals();
 
     if (bundle == NULL)
     {
