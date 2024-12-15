@@ -45,7 +45,7 @@ LOCAL_CFLAGS += -Ofast -fPIC -DPIC -flto=thin -fwhole-program-vtables -mllvm -po
 LOCAL_LDLAGS += --lto=thin -flto=thin -Wl,-plugin-opt=-emulated-tls -fuse-ld=lld
 LOCAL_LDLIBS += -lEGL -lGLESv3
 endif
-include $(BUILD_STATIC_LIBRARY)
+include $(BUILD_SHRAED_LIBRARY)
 
 #ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
 include $(CLEAR_VARS)
