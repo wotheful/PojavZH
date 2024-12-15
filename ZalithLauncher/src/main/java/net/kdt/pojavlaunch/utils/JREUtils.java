@@ -231,8 +231,8 @@ public class JREUtils {
     private static void setRendererEnv() throws Throwable {
         Map<String, String> envMap = new ArrayMap<>();
 
-        if (LOCAL_RENDERER.startsWith("opengles2")) {
-            envMap.put("LIBGL_ES", "2");
+        if (LOCAL_RENDERER.startsWith("opengles3")) {
+            envMap.put("LIBGL_ES", "3");
             envMap.put("LIBGL_MIPMAP", "3");
             envMap.put("LIBGL_NOERROR", "1");
             envMap.put("LIBGL_NOINTOVLHACK", "1");
@@ -484,7 +484,7 @@ public class JREUtils {
         if (LOCAL_RENDERER == null) return null;
         String renderLibrary;
         switch (LOCAL_RENDERER){
-            case "opengles2":
+            case "opengles3":
                 renderLibrary = "libgl4es_114.so";
                 break;
             case "vulkan_zink":
