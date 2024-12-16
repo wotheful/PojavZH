@@ -23,6 +23,6 @@ void gl_make_current(gl_render_window_t* bundle);
 void gl_swap_buffers(void);
 void gl_setup_window(void);
 void gl_swap_interval(int swapInterval);
-
+void gl_init_gl4es_internals(void);
 
 #endif //__POJAVLAUNCHER_GL_BRIDGE_H_
