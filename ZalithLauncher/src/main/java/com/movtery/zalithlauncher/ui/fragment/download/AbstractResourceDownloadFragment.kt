@@ -2,7 +2,6 @@ package com.movtery.zalithlauncher.ui.fragment.download
 
 import android.os.Bundle
 import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,7 +17,10 @@ import com.movtery.anim.animations.Animations
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.databinding.FragmentDownloadResourceBinding
 import com.movtery.zalithlauncher.event.value.DownloadPageSwapEvent
+import com.movtery.zalithlauncher.event.value.DownloadPageSwapEvent.Companion.IN
+import com.movtery.zalithlauncher.event.value.DownloadPageSwapEvent.Companion.OUT
 import com.movtery.zalithlauncher.event.value.DownloadRecyclerEnableEvent
+import com.movtery.zalithlauncher.event.value.InDownloadFragmentEvent
 import com.movtery.zalithlauncher.feature.download.Filters
 import com.movtery.zalithlauncher.feature.download.InfoAdapter
 import com.movtery.zalithlauncher.feature.download.SelfReferencingFuture
@@ -31,6 +33,7 @@ import com.movtery.zalithlauncher.feature.download.item.InfoItem
 import com.movtery.zalithlauncher.feature.download.item.SearchResult
 import com.movtery.zalithlauncher.feature.download.platform.PlatformNotSupportedException
 import com.movtery.zalithlauncher.feature.log.Logging
+import com.movtery.zalithlauncher.listener.SimpleTextWatcher
 import com.movtery.zalithlauncher.task.TaskExecutors
 import com.movtery.zalithlauncher.ui.dialog.SelectVersionDialog
 import com.movtery.zalithlauncher.ui.fragment.FragmentWithAnim
@@ -115,18 +118,7 @@ abstract class AbstractResourceDownloadFragment(
             backToTop.setOnClickListener { recyclerView.smoothScrollToPosition(0) }
 
             searchView.setOnClickListener { search() }
-            nameEdit.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    count: Int,
-                    after: Int
-                ) {
-                }
-
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                }
-
+            nameEdit.addTextChangedListener(object : SimpleTextWatcher {
                 override fun afterTextChanged(s: Editable?) {
                     mFilters.name = s?.toString() ?: ""
                 }
@@ -137,8 +129,7 @@ abstract class AbstractResourceDownloadFragment(
                 false
             }
 
-            // 打开版本选择弹窗
-            mcVersionButton.setOnClickListener {
+            val selectMcVersion = View.OnClickListener {
                 val selectVersionDialog = SelectVersionDialog(requireContext())
                 selectVersionDialog.setOnVersionSelectedListener(object : VersionSelectedListener() {
                     override fun onVersionSelected(version: String?) {
@@ -149,6 +140,9 @@ abstract class AbstractResourceDownloadFragment(
                 })
                 selectVersionDialog.show()
             }
+            // 打开版本选择弹窗
+            selectedMcVersionView.setOnClickListener(selectMcVersion)
+            mcVersionButton.setOnClickListener(selectMcVersion)
         }
 
         // 初始化 Spinner
@@ -166,28 +160,22 @@ abstract class AbstractResourceDownloadFragment(
                 mCurrentPlatform = it
                 search()
             }
-            platformSpinner.selectItemByIndex(recommendedPlatform.ordinal)
 
             sortSpinner.setSpinnerAdapter(mSortAdapter)
             setSpinnerListener<Sort>(sortSpinner) { mFilters.sort = it }
-            sortSpinner.selectItemByIndex(0)
 
             categorySpinner.setSpinnerAdapter(mCategoryAdapter)
             setSpinnerListener<Category>(binding.categorySpinner) { mFilters.category = it }
-            categorySpinner.selectItemByIndex(0)
 
             modloaderSpinner.setSpinnerAdapter(mModLoaderAdapter)
             setSpinnerListener<ModLoader>(modloaderSpinner) {
                 mFilters.modloader = it.takeIf { loader -> loader != ModLoader.ALL }
             }
-            modloaderSpinner.selectItemByIndex(0)
+            initSpinnerIndex()
 
             reset.setOnClickListener {
                 nameEdit.setText("")
-                platformSpinner.selectItemByIndex(0)
-                sortSpinner.selectItemByIndex(0)
-                categorySpinner.selectItemByIndex(0)
-                modloaderSpinner.selectItemByIndex(0)
+                initSpinnerIndex()
                 binding.selectedMcVersionView.text = null
                 mFilters.mcVersion = null
             }
@@ -197,6 +185,15 @@ abstract class AbstractResourceDownloadFragment(
 
         showModLoader()
         checkSearch()
+    }
+
+    private fun initSpinnerIndex() {
+        binding.apply {
+            platformSpinner.selectItemByIndex(recommendedPlatform.ordinal)
+            sortSpinner.selectItemByIndex(0)
+            categorySpinner.selectItemByIndex(0)
+            modloaderSpinner.selectItemByIndex(0)
+        }
     }
 
     override fun onStart() {
@@ -320,7 +317,19 @@ abstract class AbstractResourceDownloadFragment(
 
     @Subscribe
     fun event(event: DownloadPageSwapEvent) {
-        if (event.index == classify.type) slideIn()
+        if (event.index == classify.type) {
+            when (event.classify) {
+                IN -> slideIn()
+                OUT -> slideOut()
+                else -> {}
+            }
+        }
+    }
+
+    @Subscribe
+    fun event(event: InDownloadFragmentEvent) {
+        //确保父Fragment退出时，这里的Spinner能够正常且及时的关闭
+        if (!event.isIn) closeSpinner()
     }
 
     private inner class SearchApiTask(

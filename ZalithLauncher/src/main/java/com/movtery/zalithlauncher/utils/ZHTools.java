@@ -2,10 +2,12 @@ package com.movtery.zalithlauncher.utils;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.opengl.EGL14;
 import android.opengl.EGLConfig;
 import android.opengl.EGLContext;
@@ -14,10 +16,12 @@ import android.opengl.GLES20;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.LocaleList;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -29,11 +33,14 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.movtery.zalithlauncher.BuildConfig;
+import com.movtery.zalithlauncher.InfoCenter;
 import com.movtery.zalithlauncher.R;
 import com.movtery.zalithlauncher.context.ContextExecutor;
 import com.movtery.zalithlauncher.feature.log.Logging;
 import com.movtery.zalithlauncher.setting.AllSettings;
+import com.movtery.zalithlauncher.ui.dialog.TipDialog;
 import com.movtery.zalithlauncher.ui.fragment.FragmentWithAnim;
+import com.movtery.zalithlauncher.utils.path.PathManager;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -81,39 +88,87 @@ public final class ZHTools {
     }
 
     public static File getCustomMouse() {
-        String customMouse = AllSettings.getCustomMouse();
-        if (customMouse == null) {
-            return null;
-        }
-        return new File(PathAndUrlManager.DIR_CUSTOM_MOUSE, customMouse);
+        String customMouse = AllSettings.getCustomMouse().getValue();
+        if (customMouse.isEmpty()) return null;
+        return new File(PathManager.DIR_CUSTOM_MOUSE, customMouse);
     }
 
-    public static void swapFragmentWithAnim(Fragment fragment, Class<? extends Fragment> fragmentClass,
-                                            @Nullable String fragmentTag, @Nullable Bundle bundle) {
-        FragmentTransaction transaction = fragment.requireActivity().getSupportFragmentManager().beginTransaction();
+    public static void dialogForceClose(Context ctx) {
+        new TipDialog.Builder(ctx)
+                .setMessage(R.string.force_exit_confirm)
+                .setConfirmClickListener(checked -> {
+                    try {
+                        ZHTools.killProcess();
+                    } catch (Throwable th) {
+                        Logging.w(InfoCenter.LAUNCHER_NAME, "Could not enable System.exit() method!", th);
+                    }
+                }).buildDialog();
+    }
 
-        boolean animation = AllSettings.getAnimation();
-        if (animation) transaction.setCustomAnimations(R.anim.cut_into, R.anim.cut_out, R.anim.cut_into, R.anim.cut_out);
+    /**
+     * 展示一个提示弹窗，告知用户接下来将要在浏览器内访问的链接，用户可以选择不进行访问
+     * @param link 要访问的链接
+     */
+    public static void openLink(Context context, String link) {
+        openLink(context, link, null);
+    }
 
-        transaction.setReorderingAllowed(true).replace(R.id.container_fragment, fragmentClass, bundle, fragmentTag);
-        transaction.addToBackStack(fragmentClass.getName());
-        if (animation && fragment instanceof FragmentWithAnim) {
+    /**
+     * 展示一个提示弹窗，告知用户接下来将要在浏览器内访问的链接，用户可以选择不进行访问
+     * @param link 要访问的链接
+     * @param dataType 设置 intent 的数据以及显式 MIME 数据类型
+     */
+    public static void openLink(Context context, String link, String dataType) {
+        new TipDialog.Builder(context)
+                .setTitle(R.string.open_link)
+                .setMessage(link)
+                .setConfirmClickListener(checked -> {
+                    Uri uri = Uri.parse(link);
+                    Intent browserIntent;
+                    if (dataType != null) {
+                        browserIntent = new Intent(Intent.ACTION_VIEW);
+                        browserIntent.setDataAndType(uri, dataType);
+                    } else {
+                        browserIntent = new Intent(Intent.ACTION_VIEW, uri);
+                    }
+                    context.startActivity(browserIntent);
+                }).buildDialog();
+    }
+
+    public static void swapFragmentWithAnim(
+            Fragment fragment,
+            Class<? extends Fragment> fragmentClass,
+            @Nullable String fragmentTag,
+            @Nullable Bundle bundle
+    ) {
+        if (fragment instanceof FragmentWithAnim) {
             ((FragmentWithAnim) fragment).slideOut();
         }
-        transaction.commit();
+        getFragmentTransaction(fragment)
+                .replace(R.id.container_fragment, fragmentClass, bundle, fragmentTag)
+                .addToBackStack(fragmentClass.getName())
+                .commit();
     }
 
-    public static void addFragment(Fragment fragment, Class<? extends Fragment> fragmentClass,
-                                   @Nullable String fragmentTag, @Nullable Bundle bundle) {
-        FragmentTransaction transaction = fragment.requireActivity().getSupportFragmentManager().beginTransaction();
-
-        if (AllSettings.getAnimation()) transaction.setCustomAnimations(R.anim.cut_into, R.anim.cut_out, R.anim.cut_into, R.anim.cut_out);
-
-        transaction.setReorderingAllowed(true)
+    public static void addFragment(
+            Fragment fragment,
+            Class<? extends Fragment> fragmentClass,
+            @Nullable String fragmentTag,
+            @Nullable Bundle bundle
+    ) {
+        getFragmentTransaction(fragment)
                 .addToBackStack(fragmentClass.getName())
                 .add(R.id.container_fragment, fragmentClass, bundle, fragmentTag)
                 .hide(fragment)
                 .commit();
+    }
+
+    private static FragmentTransaction getFragmentTransaction(Fragment fragment) {
+        FragmentTransaction transaction = fragment.requireActivity().getSupportFragmentManager().beginTransaction();
+        if (AllSettings.getAnimation().getValue()) {
+            transaction.setCustomAnimations(R.anim.cut_into, R.anim.cut_out, R.anim.cut_into, R.anim.cut_out);
+        }
+        return transaction.setReorderingAllowed(true);
     }
 
     public static void killProcess() {
@@ -149,9 +204,9 @@ public final class ZHTools {
     //获取版本状态信息
     public static String getVersionStatus(Context context) {
         String status;
-        if (getVersionName().contains("pre-release")) status = context.getString(R.string.about_version_status_pre_release);
-        else if (Objects.equals(BuildConfig.BUILD_TYPE, "release")) status = context.getString(R.string.version_release);
-        else status = context.getString(R.string.about_version_status_debug);
+        if (getVersionName().contains("pre-release")) status = context.getString(R.string.generic_pre_release);
+        else if (Objects.equals(BuildConfig.BUILD_TYPE, "release")) status = context.getString(R.string.generic_release);
+        else status = context.getString(R.string.generic_debug);
 
         return status;
     }
@@ -187,14 +242,32 @@ public final class ZHTools {
     }
 
     public static AlertDialog createTaskRunningDialog(Context context) {
+        return createTaskRunningDialog(context, null);
+    }
+
+    public static AlertDialog createTaskRunningDialog(Context context, String message) {
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View dialogView = inflater.inflate(R.layout.view_task_running, null);
+
+        TextView textView = dialogView.findViewById(R.id.text_view);
+        if (textView != null && message != null) {
+            textView.setText(message);
+        }
+
         return new AlertDialog.Builder(context, R.style.CustomAlertDialogTheme)
-                .setView(R.layout.view_task_running)
+                .setView(dialogView)
                 .setCancelable(false)
                 .create();
     }
 
     public static AlertDialog showTaskRunningDialog(Context context) {
         AlertDialog dialog = createTaskRunningDialog(context);
+        dialog.show();
+        return dialog;
+    }
+
+    public static AlertDialog showTaskRunningDialog(Context context, String message) {
+        AlertDialog dialog = createTaskRunningDialog(context, message);
         dialog.show();
         return dialog;
     }

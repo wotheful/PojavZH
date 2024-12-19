@@ -2,32 +2,36 @@ package com.movtery.zalithlauncher.feature.download.install
 
 import com.kdt.mcgui.ProgressLayout
 import com.movtery.zalithlauncher.R
+import com.movtery.zalithlauncher.event.value.DownloadProgressKeyEvent
 import com.movtery.zalithlauncher.feature.download.item.ModLoaderWrapper
 import com.movtery.zalithlauncher.feature.download.item.VersionItem
 import com.movtery.zalithlauncher.feature.log.Logging
 import com.movtery.zalithlauncher.feature.version.VersionsManager
 import com.movtery.zalithlauncher.task.Task
-import com.movtery.zalithlauncher.utils.PathAndUrlManager
+import com.movtery.zalithlauncher.utils.path.PathManager
 import net.kdt.pojavlaunch.progresskeeper.DownloaderProgressWrapper
 import net.kdt.pojavlaunch.utils.DownloadUtils
 import org.apache.commons.io.FileUtils
+import org.greenrobot.eventbus.EventBus
 import java.io.File
 import java.io.IOException
 
 class InstallHelper {
     companion object {
         @Throws(Throwable::class)
-        fun downloadFile(version: VersionItem, targetFile: File?) {
-            downloadFile(version, targetFile, null)
+        fun downloadFile(version: VersionItem, targetFile: File, progressKey: String) {
+            downloadFile(version, targetFile, progressKey, null)
         }
 
         @Throws(Throwable::class)
         fun downloadFile(
             version: VersionItem,
-            targetFile: File?,
+            targetFile: File,
+            progressKey: String,
             listener: OnFileDownloadedListener?
         ) {
             Task.runTask {
+                EventBus.getDefault().post(DownloadProgressKeyEvent(progressKey, true))
                 try {
                     val downloadBuffer = ByteArray(8192)
                     DownloadUtils.ensureSha1<Void?>(targetFile, version.fileHash) {
@@ -37,16 +41,14 @@ class InstallHelper {
                         )
                         DownloadUtils.downloadFileMonitored(
                             version.fileUrl, targetFile, downloadBuffer,
-                            DownloaderProgressWrapper(
-                                R.string.download_install_download_file,
-                                ProgressLayout.INSTALL_RESOURCE
-                            )
+                            DownloaderProgressWrapper(R.string.download_install_download_file, progressKey)
                         )
                         null
                     }
                 } finally {
-                    targetFile?.let { listener?.onEnded(it) }
-                    ProgressLayout.clearProgress(ProgressLayout.INSTALL_RESOURCE)
+                    listener?.onEnded(targetFile)
+                    ProgressLayout.clearProgress(progressKey)
+                    EventBus.getDefault().post(DownloadProgressKeyEvent(progressKey, false))
                 }
             }.execute()
         }
@@ -58,7 +60,7 @@ class InstallHelper {
             installFunction: ModPackInstallFunction
         ): ModLoaderWrapper? {
             val modpackFile = File(
-                PathAndUrlManager.DIR_CACHE, "$customName.cf"
+                PathManager.DIR_CACHE, "$customName.cf"
             ) // Cache File
 
             val modLoaderInfo: ModLoaderWrapper?

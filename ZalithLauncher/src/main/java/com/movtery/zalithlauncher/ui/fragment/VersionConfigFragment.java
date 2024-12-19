@@ -18,7 +18,8 @@ import com.movtery.anim.animations.Animations;
 import com.movtery.zalithlauncher.R;
 import com.movtery.zalithlauncher.databinding.FragmentVersionConfigBinding;
 import com.movtery.zalithlauncher.event.sticky.FileSelectorEvent;
-import com.movtery.zalithlauncher.feature.log.Logging;
+import com.movtery.zalithlauncher.feature.customprofilepath.ProfilePathManager;
+import com.movtery.zalithlauncher.feature.version.NoVersionException;
 import com.movtery.zalithlauncher.feature.version.Version;
 import com.movtery.zalithlauncher.feature.version.VersionConfig;
 import com.movtery.zalithlauncher.feature.version.VersionIconUtils;
@@ -29,6 +30,7 @@ import com.movtery.zalithlauncher.task.TaskExecutors;
 import com.movtery.zalithlauncher.ui.dialog.TipDialog;
 import com.movtery.zalithlauncher.utils.ZHTools;
 import com.movtery.zalithlauncher.utils.file.FileTools;
+import com.movtery.zalithlauncher.utils.stringutils.StringUtils;
 import com.skydoves.powerspinner.DefaultSpinnerAdapter;
 import com.skydoves.powerspinner.OnSpinnerItemSelectedListener;
 
@@ -38,7 +40,6 @@ import net.kdt.pojavlaunch.multirt.Runtime;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -46,6 +47,8 @@ import java.util.Objects;
 
 public class VersionConfigFragment extends FragmentWithAnim {
     public static final String TAG = "VersionConfigFragment";
+    private static final String SELECT_CONTROL = "SELECT_CONTROL";
+    private static final String SELECT_CUSTOM_PATH = "SELECT_CUSTOM_PATH";
 
     private FragmentVersionConfigBinding binding;
     private Version mTempVersion = null;
@@ -62,10 +65,11 @@ public class VersionConfigFragment extends FragmentWithAnim {
                     Task.runTask(() -> FileTools.copyFileInBackground(requireActivity(), result, VersionsManager.INSTANCE.getVersionIconFile(mTempVersion)))
                             .ended(TaskExecutors.getAndroidUI(), file -> refreshIcon(false))
                             .finallyTask(TaskExecutors.getAndroidUI(), dialog::dismiss)
-                            .onThrowable(e -> Logging.e("Version Config Editor", Tools.printToString(e)))
+                            .onThrowable(Tools::showErrorRemote)
                             .execute();
                 }
             });
+    private String mSelectPathMark = "";
 
     public VersionConfigFragment(){
         super(R.layout.fragment_version_config);
@@ -79,7 +83,12 @@ public class VersionConfigFragment extends FragmentWithAnim {
         if (mTempConfig != null) {
             if (fileSelectorEvent != null && fileSelectorEvent.getPath() != null) {
                 String path = fileSelectorEvent.getPath();
-                mTempConfig.setControl(path);
+                if (Objects.equals(mSelectPathMark, SELECT_CONTROL)) {
+                    mTempConfig.setControl(path);
+                }
+                else if (Objects.equals(mSelectPathMark, SELECT_CUSTOM_PATH)) {
+                    mTempConfig.setCustomPath(path);
+                }
             }
         }
 
@@ -93,55 +102,69 @@ public class VersionConfigFragment extends FragmentWithAnim {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         // Set up behaviors
         binding.cancelButton.setOnClickListener(v -> ZHTools.onBackPressed(requireActivity()));
-
         binding.saveButton.setOnClickListener(v -> {
             save();
             Tools.backToMainMenu(requireActivity());
         });
 
-        binding.selectControl.setOnClickListener(v -> {
+        View.OnClickListener selectControl = v -> {
+            mSelectPathMark = SELECT_CONTROL;
             Bundle bundle = new Bundle();
             bundle.putBoolean(ControlButtonFragment.BUNDLE_SELECT_CONTROL, true);
-
             ZHTools.swapFragmentWithAnim(this, ControlButtonFragment.class, ControlButtonFragment.TAG, bundle);
-        });
+        };
+        View.OnClickListener selectCustomPath = v -> {
+            mSelectPathMark = SELECT_CUSTOM_PATH;
+            Bundle bundle = new Bundle();
+            bundle.putBoolean(FilesFragment.BUNDLE_SELECT_FOLDER_MODE, true);
+            bundle.putBoolean(FilesFragment.BUNDLE_SHOW_FILE, false);
+            bundle.putBoolean(FilesFragment.BUNDLE_REMOVE_LOCK_PATH, false);
+            bundle.putString(FilesFragment.BUNDLE_LOCK_PATH, ProfilePathManager.getCurrentPath());
+            bundle.putString(FilesFragment.BUNDLE_LIST_PATH, mTempVersion.getVersionsFolder());
+            ZHTools.swapFragmentWithAnim(this, FilesFragment.class, FilesFragment.TAG, bundle);
+        };
+
+        binding.controlName.setOnClickListener(selectControl);
+        binding.selectControl.setOnClickListener(selectControl);
+        binding.customPath.setOnClickListener(selectCustomPath);
+        binding.selectCustomPath.setOnClickListener(selectCustomPath);
 
         binding.iconLayout.setOnClickListener(v -> openDocumentLauncher.launch(new String[]{"image/*"}));
-
         binding.iconReset.setOnClickListener(v -> resetIcon());
 
-        mTempVersion = Objects.requireNonNull(VersionsManager.INSTANCE.getCurrentVersion());
-        mVersionIconUtils = new VersionIconUtils(mTempVersion);
-        File versionFolder = mTempVersion.getVersionPath();
+        Version version = VersionsManager.INSTANCE.getCurrentVersion();
+        if (version == null) {
+            Tools.showError(requireActivity(), getString(R.string.version_manager_no_installed_version), new NoVersionException("There is no installed version"));
+            ZHTools.onBackPressed(requireActivity());
+            return;
+        }
 
-        if (mTempVersion.getVersionConfig() != null) {
-            mTempConfig = mTempVersion.getVersionConfig();
-            if (mTempConfig.getVersionPath() == null) {
-                //以防万一版本路径是空的，这里做个检查，是空的就会在这里赋值
-                mTempConfig.setVersionPath(versionFolder);
-            }
+        mTempVersion = version;
+        mTempConfig = mTempVersion.getVersionConfig();
+        mVersionIconUtils = new VersionIconUtils(mTempVersion);
+
+        if (mTempVersion.getVersionConfig().isIsolation()) {
             binding.isolation.setChecked(true);
-            setIsolationVisible(true);
-            loadValues(view.getContext());
+            setViewVisible(binding.isolationConfig, true);
+            setViewVisible(binding.customPathLayout, false);
         } else {
             binding.isolation.setChecked(false);
-            setIsolationVisible(false);
+            setViewVisible(binding.isolationConfig, false);
+            setViewVisible(binding.customPathLayout, true);
         }
 
         binding.isolation.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
-                mTempConfig = new VersionConfig(versionFolder);
-                show();
-                loadValues(view.getContext());
+                mTempConfig.setIsolation(true);
+                setIsolationAnim(true);
             } else {
-                hide();
-                mTempConfig.delete();
-                mTempConfig = null;
-                VersionsManager.INSTANCE.refresh();
+                mTempConfig.setIsolation(false);
+                setIsolationAnim(false);
             }
             closeSpinner();
         });
 
+        loadValues(view.getContext());
         refreshIcon(true);
     }
 
@@ -181,49 +204,35 @@ public class VersionConfigFragment extends FragmentWithAnim {
     private void resetIcon() {
         new TipDialog.Builder(requireActivity())
                 .setMessage(R.string.pedit_reset_icon)
-                .setConfirmClickListener(() -> {
+                .setWarning()
+                .setConfirmClickListener(checked -> {
                     mVersionIconUtils.resetIcon();
                     refreshIcon(false);
                 }).buildDialog();
     }
 
-    private void setIsolationVisible(boolean visible) {
-        int visibility = visible ? View.VISIBLE : View.GONE;
-        binding.isolationConfig.setVisibility(visibility);
-        binding.saveButton.setVisibility(visibility);
+    private void setViewVisible(View view, boolean visible) {
+        view.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
-    private void show() {
+    private void setIsolationAnim(boolean show) {
         isolationAnimPlayer.clearEntries();
-        isolationAnimPlayer.apply(new AnimPlayer.Entry(binding.isolationConfig, Animations.BounceInUp))
-                .apply(new AnimPlayer.Entry(binding.saveButton, Animations.BounceEnlarge))
-                .duration(AllSettings.getAnimationSpeed() / 2)
+        isolationAnimPlayer.apply(new AnimPlayer.Entry(binding.isolationConfig, show ? Animations.BounceInUp : Animations.FadeOutDown))
+                .apply(new AnimPlayer.Entry(binding.customPathLayout, show ? Animations.FadeOutUp : Animations.BounceInDown))
+                .duration(AllSettings.getAnimationSpeed().getValue() / 2)
                 .setOnStart(() -> {
-                    setIsolationVisible(true);
-                    binding.isolationConfig.setEnabled(false);
-                    binding.saveButton.setEnabled(false);
-                })
-                .setOnEnd(() -> {
-                    setIsolationVisible(true);
+                    setViewVisible(binding.isolationConfig, true);
+                    setViewVisible(binding.customPathLayout, true);
                     binding.isolationConfig.setEnabled(true);
-                    binding.saveButton.setEnabled(true);
-                }).start();
-    }
-
-    private void hide() {
-        isolationAnimPlayer.clearEntries();
-        isolationAnimPlayer.apply(new AnimPlayer.Entry(binding.isolationConfig, Animations.FadeOutDown))
-                .apply(new AnimPlayer.Entry(binding.saveButton, Animations.FadeOut))
-                .duration(AllSettings.getAnimationSpeed() / 2)
-                .setOnStart(() -> {
-                    setIsolationVisible(true);
-                    binding.isolationConfig.setEnabled(false);
+                    binding.customPathLayout.setEnabled(true);
                     binding.saveButton.setEnabled(false);
                 })
                 .setOnEnd(() -> {
-                    setIsolationVisible(false);
-                    binding.isolationConfig.setEnabled(false);
-                    binding.saveButton.setEnabled(false);
+                    setViewVisible(binding.isolationConfig, show);
+                    setViewVisible(binding.customPathLayout, show);
+                    binding.isolationConfig.setEnabled(show);
+                    binding.customPathLayout.setEnabled(show);
+                    binding.saveButton.setEnabled(true);
                 }).start();
     }
 
@@ -273,6 +282,7 @@ public class VersionConfigFragment extends FragmentWithAnim {
 
         binding.jvmArgsEdit.setText(mTempConfig.getJavaArgs());
         binding.controlName.setText(mTempConfig.getControl());
+        binding.customPath.setText(StringUtils.getStringNotNull(mTempConfig.getCustomPath()).replaceFirst(ProfilePathManager.getCurrentPath(), "."));
     }
 
     private void save() {

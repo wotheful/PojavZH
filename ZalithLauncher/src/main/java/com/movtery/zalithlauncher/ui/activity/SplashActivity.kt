@@ -8,8 +8,8 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.movtery.zalithlauncher.InfoCenter
 import com.movtery.zalithlauncher.R
-import com.movtery.zalithlauncher.context.ContextExecutor
 import com.movtery.zalithlauncher.databinding.ActivitySplashBinding
 import com.movtery.zalithlauncher.feature.unpack.Components
 import com.movtery.zalithlauncher.feature.unpack.Jre
@@ -39,6 +39,7 @@ class SplashActivity : BaseActivity() {
         setContentView(binding.root)
 
         val splashText = findViewById<TextView>(R.id.splash_text)
+        binding.titleText.text = InfoCenter.APP_NAME
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(this@SplashActivity)
             adapter = installableAdapter
@@ -64,18 +65,14 @@ class SplashActivity : BaseActivity() {
         //但是并不强制要求用户必须授予权限，如果用户拒绝，那么之后产生的问题将由用户承担
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P && !StoragePermissionsUtils.hasStoragePermissions(this)) {
             TipDialog.Builder(this)
-                .setMessage(R.string.permissions_write_external_storage)
+                .setMessage(InfoCenter.replaceName(this, R.string.permissions_write_external_storage))
+                .setWarning()
                 .setConfirmClickListener { requestStoragePermissions() }
                 .setCancelClickListener { checkEnd() } //用户取消，那就跟随用户的意愿
                 .buildDialog()
         } else {
             checkEnd()
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        ContextExecutor.setActivity(this)
     }
 
     private fun requestStoragePermissions() {

@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
-import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import com.getkeepsafe.taptargetview.TapTargetSequence
@@ -29,7 +28,7 @@ import com.movtery.zalithlauncher.utils.NewbieGuideUtils
 import com.movtery.zalithlauncher.utils.StoragePermissionsUtils
 import com.movtery.zalithlauncher.utils.ZHTools
 import com.movtery.zalithlauncher.utils.anim.AnimUtils.Companion.setVisibilityAnim
-import com.movtery.zalithlauncher.utils.file.FileTools.Companion.copyFileInBackground
+import com.movtery.zalithlauncher.utils.file.FileTools
 import com.movtery.zalithlauncher.utils.file.PasteFile
 import net.kdt.pojavlaunch.Tools
 import net.kdt.pojavlaunch.contracts.OpenDocumentWithExtension
@@ -49,6 +48,7 @@ class FilesFragment : FragmentWithAnim(R.layout.fragment_files) {
         const val BUNDLE_MULTI_SELECT_MODE: String = "multi_select_mode"
         const val BUNDLE_SELECT_FOLDER_MODE: String = "select_folder_mode"
         const val BUNDLE_REMOVE_LOCK_PATH: String = "remove_lock_path"
+        const val BUNDLE_TITLE_REMOVE_LOCK_PATH: String = "title_remove_lock_path"
     }
 
     private lateinit var binding: FragmentFilesBinding
@@ -60,6 +60,7 @@ class FilesFragment : FragmentWithAnim(R.layout.fragment_files) {
     private var mMultiSelectMode = false
     private var mSelectFolderMode = false
     private var mRemoveLockPath = false
+    private var mTitleRemoveLockPath = false
     private var mLockPath: String? = null
     private var mListPath: String? = null
 
@@ -70,11 +71,13 @@ class FilesFragment : FragmentWithAnim(R.layout.fragment_files) {
                 val dialog = ZHTools.showTaskRunningDialog((requireContext()))
                 Task.runTask {
                     uriList.forEach { uri ->
-                        copyFileInBackground(requireContext(), uri, binding.fileRecyclerView.fullPath.absolutePath)
+                        FileTools.copyFileInBackground(requireContext(), uri, binding.fileRecyclerView.fullPath.absolutePath)
                     }
                 }.ended(TaskExecutors.getAndroidUI()) {
                     Toast.makeText(requireContext(), getString(R.string.file_added), Toast.LENGTH_SHORT).show()
                     binding.fileRecyclerView.refreshPath()
+                }.onThrowable { e ->
+                    Tools.showErrorRemote(e)
                 }.finallyTask(TaskExecutors.getAndroidUI()) {
                     dialog.dismiss()
                 }.execute()
@@ -103,7 +106,7 @@ class FilesFragment : FragmentWithAnim(R.layout.fragment_files) {
             fileRecyclerView.apply {
                 setShowFiles(mShowFiles)
                 setShowFolders(mShowFolders)
-                setTitleListener { title: String? -> currentPath.text = removeLockPath(title!!) }
+                setTitleListener { title: String? -> currentPath.text = removeLockPath(title!!, mTitleRemoveLockPath) }
 
                 setFileSelectedListener(object : FileSelectedListener() {
                     override fun onFileSelected(file: File?, path: String?) {
@@ -159,27 +162,23 @@ class FilesFragment : FragmentWithAnim(R.layout.fragment_files) {
             }
 
             currentPath.setOnClickListener {
-                val builder = EditTextDialog.Builder(requireContext())
-                builder.setTitle(R.string.file_jump_to_path)
-                builder.setEditText(fileRecyclerView.fullPath.absolutePath)
-                builder.setConfirmListener { editBox: EditText ->
-                    val path = editBox.text.toString()
-                    if (path.isEmpty()) {
-                        editBox.error = getString(R.string.generic_error_field_empty)
-                        return@setConfirmListener false
-                    }
+                EditTextDialog.Builder(requireContext())
+                    .setTitle(R.string.file_jump_to_path)
+                    .setEditText(fileRecyclerView.fullPath.absolutePath)
+                    .setAsRequired()
+                    .setConfirmListener { editBox, _ ->
+                        val path = editBox.text.toString()
 
-                    val file = File(path)
-                    //检查路径是否符合要求：最少为最顶部路径、路径是一个文件夹、这个路径存在
-                    if (!path.contains(mLockPath!!) || !file.isDirectory || !file.exists()) {
-                        editBox.error = getString(R.string.file_does_not_exist)
-                        return@setConfirmListener false
-                    }
+                        val file = File(path)
+                        //检查路径是否符合要求：最少为最顶部路径、路径是一个文件夹、这个路径存在
+                        if (!path.contains(mLockPath!!) || !file.isDirectory || !file.exists()) {
+                            editBox.error = getString(R.string.file_does_not_exist)
+                            return@setConfirmListener false
+                        }
 
-                    fileRecyclerView.listFileAt(file)
-                    true
-                }
-                builder.buildDialog()
+                        fileRecyclerView.listFileAt(file)
+                        true
+                    }.buildDialog()
             }
 
             externalStorage.setOnClickListener {
@@ -212,7 +211,7 @@ class FilesFragment : FragmentWithAnim(R.layout.fragment_files) {
                     Tools.removeCurrentFragment(requireActivity())
                 } else {
                     EventBus.getDefault().postSticky(FileSelectorEvent(
-                        removeLockPath(fileRecyclerView.fullPath.absolutePath)
+                        removeLockPath(fileRecyclerView.fullPath.absolutePath, mRemoveLockPath)
                     ))
                     Tools.removeCurrentFragment(requireActivity())
                 }
@@ -225,7 +224,7 @@ class FilesFragment : FragmentWithAnim(R.layout.fragment_files) {
                 closeMultiSelect()
                 EditTextDialog.Builder(requireContext())
                     .setTitle(R.string.file_folder_dialog_insert_name)
-                    .setConfirmListener { editBox: EditText ->
+                    .setConfirmListener { editBox, _ ->
                         val name = editBox.text.toString().replace("/", "")
                         if (name.isEmpty()) {
                             editBox.error = getString(R.string.file_rename_empty)
@@ -332,9 +331,9 @@ class FilesFragment : FragmentWithAnim(R.layout.fragment_files) {
         filesDialog.show()
     }
 
-    private fun removeLockPath(path: String): String {
+    private fun removeLockPath(path: String, remove: Boolean): String {
         var string = path
-        if (mRemoveLockPath) {
+        if (remove) {
             string = path.replace(mLockPath!!, ".")
         }
         return string
@@ -395,6 +394,7 @@ class FilesFragment : FragmentWithAnim(R.layout.fragment_files) {
         mMultiSelectMode = bundle.getBoolean(BUNDLE_MULTI_SELECT_MODE, true)
         mSelectFolderMode = bundle.getBoolean(BUNDLE_SELECT_FOLDER_MODE, false)
         mRemoveLockPath = bundle.getBoolean(BUNDLE_REMOVE_LOCK_PATH, true)
+        mTitleRemoveLockPath = bundle.getBoolean(BUNDLE_TITLE_REMOVE_LOCK_PATH, true)
     }
 
     override fun slideIn(animPlayer: AnimPlayer) {
