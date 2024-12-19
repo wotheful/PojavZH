@@ -191,7 +191,6 @@ static int pojavInitOpenGL(void) {
     {
         pojav_environ->config_renderer = RENDERER_GL4ES;
         set_gl_bridge_tbl();
-        gl_init_gl4es_internals();
     }
 
     if (strcmp(renderer, "vulkan_zink") == 0)
