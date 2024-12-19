@@ -11,17 +11,17 @@
 
 typedef basic_render_window_t* (*br_init_context_t)(basic_render_window_t* share);
 typedef void (*br_make_current_t)(basic_render_window_t* bundle);
-typedef basic_render_window_t* (*br_get_current_t)();
+typedef basic_render_window_t* (*br_get_current_t)(void);
 
 static void set_osm_bridge_tbl(void);
 static void set_gl_bridge_tbl(void);
 
-bool (*br_init)() = NULL;
+bool (*br_init)(void) = NULL;
 br_init_context_t br_init_context = NULL;
 br_make_current_t br_make_current = NULL;
 br_get_current_t br_get_current = NULL;
-void (*br_swap_buffers)() = NULL;
-void (*br_setup_window)() = NULL;
+void (*br_swap_buffers)(void) = NULL;
+void (*br_setup_window)(void) = NULL;
 void (*br_swap_interval)(int swapInterval) = NULL;
 
 

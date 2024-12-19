@@ -29,6 +29,7 @@
 #include <android/dlext.h>
 #include "utils.h"
 #include "ctxbridges/bridge_tbl.h"
+#include "ctxbridges/gl_bridge.h"
 #include "ctxbridges/osm_bridge.h"
 
 #define GLFW_CLIENT_API 0x22001
@@ -72,7 +73,7 @@ EXTERNAL_API void pojavTerminate(void) {
 
 JNIEXPORT void JNICALL Java_net_kdt_pojavlaunch_utils_JREUtils_setupBridgeWindow(JNIEnv* env, ABI_COMPAT jclass clazz, jobject surface) {
     pojav_environ->pojavWindow = ANativeWindow_fromSurface(env, surface);
-    if (br_setup_window) br_setup_window();
+    if (br_setup_window != NULL) br_setup_window();
 }
 
 JNIEXPORT void JNICALL
@@ -181,29 +182,31 @@ static void load_vulkan(void) {
 
 static int pojavInitOpenGL(void) {
     const char *forceVsync = getenv("FORCE_VSYNC");
-    if (!strcmp(forceVsync, "true"))
+    if (!strcmp(forceVsync, "true") == 0)
         pojav_environ->force_vsync = true;
 
     const char *renderer = getenv("POJAV_RENDERER");
 
-    if (!strncmp("opengles", renderer, 8))
+    if (strncmp("opengles", renderer, 8) == 0)
     {
         pojav_environ->config_renderer = RENDERER_GL4ES;
         set_gl_bridge_tbl();
+        gl_init_gl4es_internals();
     }
 
-    if (!strcmp(renderer, "vulkan_zink"))
+    if (strcmp(renderer, "vulkan_zink") == 0)
     {
         pojav_environ->config_renderer = RENDERER_VK_ZINK;
         load_vulkan();
         setenv("GALLIUM_DRIVER", "zink", 1);
-        setenv("MESA_GL_VERSION_OVERRIDE", "4.6", 1);
+        setenv("MESA_GL_VERSION_OVERRIDE", "4.6COMPAT", 1);
         setenv("MESA_GLSL_VERSION_OVERRIDE", "460", 1);
         setenv("mesa_glthread", "true", 1);
+        setenv("vblank_mode", "0", 1);
         set_osm_bridge_tbl();
     }
 
-    if (!strcmp(renderer, "gallium_freedteno"))
+    if (strcmp(renderer, "gallium_freedteno") == 0)
     {
         pojav_environ->config_renderer = RENDERER_VK_ZINK;
         setenv("MESA_LOADER_DRIVER_OVERRIDE", "kgsl", 1);
@@ -211,7 +214,7 @@ static int pojavInitOpenGL(void) {
         set_osm_bridge_tbl();
     }
 
-    if (!strcmp(renderer, "gallium_panfrost"))
+    if (strcmp(renderer, "gallium_panfrost") == 0)
     {
         pojav_environ->config_renderer = RENDERER_VK_ZINK;
         setenv("GALLIUM_DRIVER", "panfrost", 1);
@@ -219,22 +222,28 @@ static int pojavInitOpenGL(void) {
         set_osm_bridge_tbl();
     }
 
-    if (!strcmp(renderer, "gallium_virgl"))
+    if (strcmp(renderer, "gallium_virgl") == 0)
     {
         pojav_environ->config_renderer = RENDERER_VIRGL;
         setenv("GALLIUM_DRIVER", "virpipe", 1);
-        setenv("OSMESA_NO_FLUSH_FRONTBUFFER", "1", false);
-        setenv("MESA_GL_VERSION_OVERRIDE", "4.3", 1);
-        setenv("MESA_GLSL_VERSION_OVERRIDE", "430", 1);
-        if (!strcmp(getenv("OSMESA_NO_FLUSH_FRONTBUFFER"), "1"))
-            printf("VirGL: OSMesa buffer flush is DISABLED!\n");
+        setenv("MESA_GL_VERSION_OVERRIDE", "4.6COMPAT", 1);
+        setenv("MESA_GLSL_VERSION_OVERRIDE", "460", 1);
+        setenv("mesa_glthread", "true", 1);
+        setenv("OSMESA_NO_FLUSH_FRONTBUFFER", "0", 1);
+        setenv("vblank_mode", "0", 1);
+        setenv("force_glsl_extensions_warn", "true", 1);
+        setenv("allow_higher_compat_version", "true", 1);
+        setenv("allow_glsl_extension_directive_midshader", "true", 1);
+        setenv("MESA_NO_ERROR", "1", 1);
+        if (!strcmp(getenv("OSMESA_NO_FLUSH_FRONTBUFFER"), "0"))
+            printf("VirGL: OSMesa buffer flush is ENABLED!\n");
         loadSymbolsVirGL();
-        virglInit();
         return 0;
     }
 
-    if (br_init()) br_setup_window();
-
+    if(br_init()) {
+        br_setup_window();
+    }
     return 0;
 }
 
@@ -266,39 +275,16 @@ EXTERNAL_API void pojavSetWindowHint(int hint, int value) {
 }
 
 EXTERNAL_API void pojavSwapBuffers() {
-    if (pojav_environ->config_renderer == RENDERER_VK_ZINK
-     || pojav_environ->config_renderer == RENDERER_GL4ES)
-    {
-        br_swap_buffers();
-    }
-
-    if (pojav_environ->config_renderer == RENDERER_VIRGL)
-    {
-        virglSwapBuffers();
-    }
-
+   br_swap_buffers();
 }
 
 EXTERNAL_API void pojavMakeCurrent(void* window) {
-    if (pojav_environ->config_renderer == RENDERER_VK_ZINK
-     || pojav_environ->config_renderer == RENDERER_GL4ES)
-    {
-        br_make_current((basic_render_window_t*)window);
-    }
-
-    if (pojav_environ->config_renderer == RENDERER_VIRGL)
-    {
-        virglMakeCurrent(window);
-    }
-
+     br_make_current((basic_render_window_t*)window);
 }
 
 EXTERNAL_API void* pojavCreateContext(void* contextSrc) {
     if (pojav_environ->config_renderer == RENDERER_VULKAN)
         return (void *) pojav_environ->pojavWindow;
-
-    if (pojav_environ->config_renderer == RENDERER_VIRGL)
-        return virglCreateContext(contextSrc);
 
     return br_init_context((basic_render_window_t*)contextSrc);
 }
@@ -314,17 +300,7 @@ Java_org_lwjgl_vulkan_VK_getVulkanDriverHandle(ABI_COMPAT JNIEnv *env, ABI_COMPA
 }
 
 EXTERNAL_API void pojavSwapInterval(int interval) {
-    if (pojav_environ->config_renderer == RENDERER_VK_ZINK
-     || pojav_environ->config_renderer == RENDERER_GL4ES)
-    {
-        br_swap_interval(interval);
-    }
-
-    if (pojav_environ->config_renderer == RENDERER_VIRGL)
-    {
-        virglSwapInterval(interval);
-    }
-
+    br_swap_interval(interval);
 }
 
 JNIEXPORT JNICALL jlong

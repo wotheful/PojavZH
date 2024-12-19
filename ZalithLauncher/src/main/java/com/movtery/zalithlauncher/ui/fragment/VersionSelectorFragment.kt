@@ -56,9 +56,6 @@ class VersionSelectorFragment : FragmentWithAnim(R.layout.fragment_version) {
                 }
             })
 
-            refreshButton.setOnClickListener {
-                refresh(versionTab.getTabAt(versionTab.selectedTabPosition))
-            }
             returnButton.setOnClickListener { ZHTools.onBackPressed(requireActivity()) }
 
             version.setVersionSelectedListener(object : VersionSelectedListener() {
@@ -94,7 +91,7 @@ class VersionSelectorFragment : FragmentWithAnim(R.layout.fragment_version) {
 
     private fun bindTab() {
         binding.apply {
-            release = versionTab.newTab().setText(getString(R.string.version_release))
+            release = versionTab.newTab().setText(getString(R.string.generic_release))
             snapshot = versionTab.newTab().setText(getString(R.string.version_snapshot))
             beta = versionTab.newTab().setText(getString(R.string.version_beta))
             alpha = versionTab.newTab().setText(getString(R.string.version_alpha))
@@ -111,7 +108,6 @@ class VersionSelectorFragment : FragmentWithAnim(R.layout.fragment_version) {
     override fun slideIn(animPlayer: AnimPlayer) {
         animPlayer.apply(AnimPlayer.Entry(binding.versionLayout, Animations.BounceInDown))
             .apply(AnimPlayer.Entry(binding.operateLayout, Animations.BounceInLeft))
-            .apply(AnimPlayer.Entry(binding.refreshButton, Animations.FadeInLeft))
             .apply(AnimPlayer.Entry(binding.returnButton, Animations.FadeInLeft))
     }
 

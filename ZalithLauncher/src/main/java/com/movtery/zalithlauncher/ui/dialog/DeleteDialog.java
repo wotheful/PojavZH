@@ -1,5 +1,6 @@
 package com.movtery.zalithlauncher.ui.dialog;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
@@ -20,6 +21,7 @@ public class DeleteDialog extends TipDialog.Builder {
         init(files, endTask);
     }
 
+    @SuppressLint("CheckResult")
     private void init(List<File> files, Task<?> endTask) {
         this.setCancelable(false);
 
@@ -33,8 +35,9 @@ public class DeleteDialog extends TipDialog.Builder {
                 R.string.file_delete_dir_message :
                 R.string.file_delete) : R.string.file_delete_multiple_items_message);
         setConfirm(R.string.generic_delete);
+        setWarning();
 
-        setConfirmClickListener(() -> new FileDeletionHandler(context, files, endTask).start());
+        setConfirmClickListener(checked -> new FileDeletionHandler(context, files, endTask).start());
     }
 
     public void show() {

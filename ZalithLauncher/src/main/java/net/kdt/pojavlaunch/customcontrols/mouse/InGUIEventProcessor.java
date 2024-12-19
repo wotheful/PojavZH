@@ -3,6 +3,7 @@ package net.kdt.pojavlaunch.customcontrols.mouse;
 import android.view.MotionEvent;
 
 import com.movtery.zalithlauncher.setting.AllSettings;
+import com.movtery.zalithlauncher.setting.AllStaticSettings;
 
 import net.kdt.pojavlaunch.LwjglGlfwKeycode;
 import net.kdt.pojavlaunch.Tools;
@@ -19,15 +20,9 @@ public class InGUIEventProcessor implements TouchEventProcessor {
     private boolean mIsMouseDown = false;
     private float mStartX, mStartY;
     private final Scroller mScroller = new Scroller(FINGER_SCROLL_THRESHOLD);
-    private float mScaleFactor;
 
-    public InGUIEventProcessor(float scaleFactor) {
+    public InGUIEventProcessor() {
         mSingleTapDetector = new TapDetector(1, TapDetector.DETECTION_METHOD_BOTH);
-        mScaleFactor = scaleFactor;
-    }
-
-    public void refreshScaleFactor(float scaleFactor) {
-        this.mScaleFactor = scaleFactor;
     }
 
     @Override
@@ -41,7 +36,7 @@ public class InGUIEventProcessor implements TouchEventProcessor {
                     sendTouchCoordinates(motionEvent.getX(), motionEvent.getY());
 
                     // disabled gestures means no scrolling possible, send gesture early
-                    if (AllSettings.getDisableGestures()) enableMouse();
+                    if (AllSettings.getDisableGestures().getValue()) enableMouse();
                     else setGestureStart(motionEvent);
                 }
                 break;
@@ -49,7 +44,7 @@ public class InGUIEventProcessor implements TouchEventProcessor {
             case MotionEvent.ACTION_MOVE:
                 int pointerCount = motionEvent.getPointerCount();
                 int pointerIndex = mTracker.trackEvent(motionEvent);
-                if(pointerCount == 1 || AllSettings.getDisableGestures()) {
+                if(pointerCount == 1 || AllSettings.getDisableGestures().getValue()) {
                     if(touchpadDisplayed()) {
                         mTouchpad.applyMotionVector(mTracker.getMotionVector());
                     } else {
@@ -73,7 +68,7 @@ public class InGUIEventProcessor implements TouchEventProcessor {
                 mTracker.cancelTracking();
 
                 // Handle single tap on gestures
-                if((!AllSettings.getDisableGestures() || touchpadDisplayed()) && !mIsMouseDown && singleTap) {
+                if((!AllSettings.getDisableGestures().getValue() || touchpadDisplayed()) && !mIsMouseDown && singleTap) {
                     CallbackBridge.putMouseEventWithCoords(LwjglGlfwKeycode.GLFW_MOUSE_BUTTON_LEFT, CallbackBridge.mouseX, CallbackBridge.mouseY);
                 }
 
@@ -94,7 +89,7 @@ public class InGUIEventProcessor implements TouchEventProcessor {
     }
 
     private void sendTouchCoordinates(float x, float y) {
-        CallbackBridge.sendCursorPos( x * mScaleFactor, y * mScaleFactor);
+        CallbackBridge.sendCursorPos( x * AllStaticSettings.scaleFactor, y * AllStaticSettings.scaleFactor);
     }
 
     private void enableMouse() {
@@ -108,8 +103,8 @@ public class InGUIEventProcessor implements TouchEventProcessor {
     }
 
     private void setGestureStart(MotionEvent event) {
-        mStartX = event.getX() * mScaleFactor;
-        mStartY = event.getY() * mScaleFactor;
+        mStartX = event.getX() * AllStaticSettings.scaleFactor;
+        mStartY = event.getY() * AllStaticSettings.scaleFactor;
     }
 
     private void resetGesture() {

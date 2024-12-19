@@ -45,17 +45,24 @@
     <string name="generic_input_too_small">Der Wert ist zu klein, mindestens %s</string>
     <string name="generic_input_too_big">Der Wert ist zu groß, maximal %s</string>
     <string name="generic_copied">Kopiert</string>
+    <string name="generic_release">Release</string>
+    <string name="generic_debug">Testversion</string>
+    <string name="generic_pre_release">Vorabversion</string>
+    <string name="generic_beta">Beta-Version</string>
+    <string name="generic_alpha">Alpha-Version</string>
     <!-- Error -->
-    <string name="error_fatal">Zalith Launcher ist unerwartet abgestürzt</string>
+    <string name="error_fatal">%s ist unerwartet abgestürzt</string>
     <string name="error_no_version">Keine Version vorhanden!</string>
     <string name="error_show_more">Mehr Details anzeigen</string>
     <string name="error_show_less">Details ausblenden</string>
     <!-- Launcher -->
+    <string name="option_category_debug">Debuggen</string>
+    <string name="option_category_control">Steuerung</string>
+    <string name="option_category_hotbar">Hotbar Erkennungsbox</string>
     <string name="option_force_close">Zwangsschluss</string>
     <string name="option_log_out">Protokoll ausgeben</string>
     <string name="option_send_custom_key">Benutzerdefinierten Tastenbefehl senden</string>
     <string name="option_edit_controls">Steuerungseinstellungen</string>
-    <string name="option_hotbar">Hotbar Erkennungsbox</string>
     <string name="option_hotbar_type">Hotbar Erkennungsmodus</string>
     <string name="option_hotbar_type_auto">Adaptiv (kann ungenau sein)</string>
     <string name="option_hotbar_type_manually">Manuelle Anpassung</string>
@@ -65,7 +72,6 @@
     <string name="customctrl_editor_exit_msg">Möchtest du wirklich beenden?</string>
     <string name="customctrl_editor_exit">Editor beenden</string>
     <string name="global_save_and_exit">Speichern und beenden</string>
-    <string name="version_release">Offizielle Version</string>
     <string name="version_snapshot">Snapshot</string>
     <string name="version_alpha">Alpha-Version</string>
     <string name="version_beta">Beta-Version</string>
@@ -74,20 +80,20 @@
     <string name="memory_warning_msg">Der verfügbare Speicher (%d) ist niedriger als der zugewiesene Speicher (%d), was zu Abstürzen führen kann. Wenn das Spiel abstürzt, ändere bitte die Konfiguration!</string>
     <string name="address_memory_warning_msg">Der verfügbare freie Speicherplatz (%d) ist niedriger als der zugewiesene Speicher (%d), was zu Abstürzen führen kann. Wenn das Spiel abstürzt, passe bitte die Speicherzuweisung an.</string>
     <string name="notif_channel_name">Allgemein</string>
-    <string name="lazy_service_default_title">Zalith Empfangsdienst</string>
+    <string name="lazy_service_default_title">%s Empfangsdienst</string>
     <string name="progresslayout_tasks_in_progress">%d Aufgaben laufen</string>
     <string name="notification_terminate">Beenden</string>
     <string name="notification_game_runs">Das Spiel läuft!</string>
     <string name="tasks_ongoing">Aufgaben werden ausgeführt, bitte warten</string>
     <string name="mc_download_failed">Herunterladen von Minecraft fehlgeschlagen! Dies könnte auf eine schlechte Netzwerkverbindung, falsche Dateipositionierung usw. zurückzuführen sein</string>
-    <string name="toast_turn_on_gyro">Gyroskop-Steuerung muss zuerst aktiviert werden, um sie zu verwenden!</string>
     <string name="microsoft_login_retry_later">Deine Aktionen sind zu häufig, bitte versuche es später erneut</string>
-    <string name="storage_required">Zalith Launcher benötigt eine externe Speicherverbindung, bitte erneut verbinden und die Software neu starten</string>
+    <string name="storage_required">%s benötigt eine externe Speicherverbindung, bitte erneut verbinden und die Software neu starten</string>
     <string name="dialog_select_jar">Jar-Datei auswählen</string>
     <string name="percent_format">%d%%</string>
     <string name="version_select_hint">Version auswählen</string>
     <string name="notif_error_occured">Ein Fehler ist aufgetreten</string>
     <string name="notif_error_occured_desc">Klicken Sie hier, um Details anzuzeigen</string>
+    <string name="input_preview_tip">Eingabevorschau-Feld, erfasst die Eingabe der Soft-Tastatur, nur als Referenz:</string>
     <string name="dl_tampered_manifest_title">Warnung zur Dateiprüfung</string>
     <string name="dl_tampered_manifest"><![CDATA[Die Versionsliste der Spiele auf der Mirror-Quelle stimmt nicht mit der offiziellen Versionsliste von Mojang überein, was bedeutet, dass sie möglicherweise manipuliert wurde.<br/>
         <b>Dies ist nicht sicher. Wenn Sie fortfahren, könnte Ihre persönliche Sicherheit gefährdet sein!</b><br/>
@@ -98,7 +104,7 @@
     <string name="notif_download_finished">Das Spiel ist bereit zum Starten</string>
     <string name="notif_download_finished_desc">Klicke hier, um es zu starten!</string>
     <string name="notification_permission_dialog_title">Berechtigungsanfrage</string>
-    <string name="notification_permission_dialog_text">Zalith Launcher benötigt die Berechtigung, Benachrichtigungen zu senden, um zu verhindern, dass beim Verlassen der Anwendung der Download von Spieldateien gestoppt wird. Ohne diese Berechtigung könnte Android deinen Download-Fortschritt stoppen, wenn du Zalith Launcher in den Hintergrund stellst.</string>
+    <string name="notification_permission_dialog_text">%s benötigt die Berechtigung, Benachrichtigungen zu senden, um zu verhindern, dass beim Verlassen der Anwendung der Download von Spieldateien gestoppt wird. Ohne diese Berechtigung könnte Android deinen Download-Fortschritt stoppen, wenn du %s in den Hintergrund stellst.</string>
     <string name="notification_permission_toast">Du kannst deine Meinung jederzeit ändern, indem du in die \"Systemeinstellungen\" gehst</string>
     <string name="newdl_starting">Lese Spiel-Metadaten…</string>
     <string name="newdl_downloading_metadata">Lade Spiel-Metadaten herunter (%s)</string>
@@ -110,6 +116,7 @@
     <string name="log_view_label_log_output">Protokollausgabe:</string>
     <string name="execute_jar_failed_to_read_file">Fehler beim Lesen der .jar-Datei</string>
     <string name="execute_jar_incompatible_runtime">Die Ausführung der .jar-Funktion ist nicht kompatibel mit Java %d</string>
+    <string name="open_link">Diesen Link wird in der Browser öffnen:</string>
     <string name="mod_download_progress">Lade Installationsprogramm für %s herunter</string>
     <string name="mod_forge_searching">Suche nach Forge-Versionsnummer</string>
     <string name="mod_neoforge_searching">Suche nach NeoForge-Versionsnummer</string>
@@ -156,7 +163,6 @@
     <string name="controls_unsupported_layout_version">Nicht unterstützte Layoutversion!</string>
     <string name="controls_create_new">Neues Steuerungslayout erstellen</string>
     <string name="controls_import_control">Steuerungslayout importieren</string>
-    <string name="controls_settings_title">Einstellungen des Steuerungslayout-Editors</string>
     <string name="controls_settings_button_snapping">Tastenrasterung aktivieren</string>
     <string name="controls_settings_button_snapping_distance">Tastenrasterungsabstand</string>
     <string name="controls_info_file_name">Dateiname:</string>
@@ -174,11 +180,6 @@
     <string name="controls_nothing">Hier gibt es keine Steuerungsraster. Beim Neustart der Anwendung wird ein neues Standard-Steuerungsraster generiert.</string>
     <string name="replacement_customcontrol">Steuerungsraster ersetzen</string>
     <string name="custom_control_title">Steuerungsraster verwalten</string>
-    <string name="import_control">Name des Steuerungsrasters:</string>
-    <string name="import_control_invalid_file">Datei ist ungültig oder beschädigt</string>
-    <string name="import_control_verifying_file">Datei wird überprüft, bitte versuchen Sie es später erneut…</string>
-    <string name="import_control_invalid_name">Name ist ungültig oder die Datei existiert bereits</string>
-    <string name="import_control_done">Import abgeschlossen</string>
     <string name="controller_button_start">Start</string>
     <string name="controller_button_trigger_left">Linker Trigger</string>
     <string name="controller_button_trigger_right">Rechter Trigger</string>
@@ -200,6 +201,7 @@
     <string name="version_manager_title">Versionsverwaltung</string>
     <string name="version_no_versions">Keine Versionen installiert</string>
     <string name="version_install_new">Neue Version installieren</string>
+    <string name="version_install_new_modloader">Installieren Sie %s für die neue Version</string>
     <string name="version_install_not_install">Nicht installieren</string>
     <string name="version_install_incompatible">Nicht kompatibel mit %s</string>
     <string name="version_install_exists">Eine Version mit diesem Namen existiert bereits!</string>
@@ -218,14 +220,18 @@
     <string name="version_manager_shortcuts_crash_report_path">Absturzbericht-Ordner</string>
     <string name="version_manager_edit">Version bearbeiten</string>
     <string name="version_manager_rename">Version umbenennen</string>
+    <string name="version_manager_copy">Version kopieren</string>
+    <string name="version_manager_copy_tip">Die aktuelle Version als neue kopieren und Versionsisolation standardmäßig aktivieren. Wenn "Alle Dateien kopieren" unten aktiviert ist, werden auch alle von der aktuellen Version erzeugte Dateien (Ressourcenpakete, Spielstände, Spieleinstellungen etc.) kopiert.</string>
+    <string name="version_manager_copy_all">Alle Dateien kopieren</string>
     <string name="version_manager_delete">Version löschen</string>
-    <string name="version_manager_delete_tip">Wenn die Versionsisolierung aktiviert ist, werden beim Löschen auch wichtige Daten wie Spielstände, Ressourcenpakete und Mods gelöscht. Bitte erstellen Sie vorher ein Backup!</string>
+    <string name="version_manager_delete_tip">Beim Löschen einer Version werden auch alle Dateien in dem Verzeichnis \"./versions/%s\" gelöscht, einschließlich wichtiger Ressourcen wie Spielstandsicherungen, Ressourcenpakete, Mods usw., auch wenn die Versionsisolation nicht aktiviert ist. Daher sollten Sie unbedingt eine Sicherung vornehmen, bevor Sie diese Operation ausführen!</string>
     <string name="version_manager_delete_tip_invalid">Die aktuelle Version fehlt die Versions-JSON-Datei und wird daher als ungültige Version betrachtet. Sie können diese Version nicht auswählen. Klicken Sie auf Bestätigen, um diese fehlerhafte Version zu löschen.</string>
     <string name="version_manager_task_in_progress">Aufgabe wird ausgeführt, Versionsverwaltung ist vorübergehend nicht verfügbar</string>
     <string name="version_manager_invalid">Diese Version ist ungültig</string>
+    <string name="version_manager_no_installed_version">Der Launcher keine installierte Minecraft-Version gefunden!</string>
     <!-- Profiles Path -->
-    <string name="permissions_manage_external_storage">Zalith Launcher benötigt die Berechtigung, um alle Dateien auf dem Gerät zu verwalten, damit diese Funktion ordnungsgemäß funktioniert. Bitte erteilen Sie die Berechtigung!</string>
-    <string name="permissions_write_external_storage">Zalith Launcher benötigt die Speicherverwaltungsberechtigung. Wenn die Berechtigung nicht aktiviert ist, können Probleme auftreten, wie z. B. das fehlerhafte Speichern oder Entpacken von Spieldateien. Bitte erteilen Sie die Berechtigung, um die ordnungsgemäße Funktion sicherzustellen.</string>
+    <string name="permissions_manage_external_storage">%s benötigt die Berechtigung, um alle Dateien auf dem Gerät zu verwalten, damit diese Funktion ordnungsgemäß funktioniert. Bitte erteilen Sie die Berechtigung!</string>
+    <string name="permissions_write_external_storage">%s benötigt die Speicherverwaltungsberechtigung. Wenn die Berechtigung nicht aktiviert ist, können Probleme auftreten, wie z. B. das fehlerhafte Speichern oder Entpacken von Spieldateien. Bitte erteilen Sie die Berechtigung, um die ordnungsgemäße Funktion sicherzustellen.</string>
     <string name="profiles_path_title">Spielpfad-Verwaltung</string>
     <string name="profiles_path_default">Standardpfad</string>
     <string name="profiles_path_settings">Pfad-Einstellungen öffnen</string>
@@ -238,6 +244,7 @@
     <string name="pedit_isolation_enabled">Versionstrennung aktivieren</string>
     <string name="pedit_reset_icon">Dadurch wird das benutzerdefinierte Symbol, das du festgelegt hast, zurückgesetzt, und der Vorgang ist nicht rückgängig zu machen. Bist du sicher, dass du das Versionssymbol zurücksetzen möchtest?</string>
     <string name="pedit_control">Steuerungsraster</string>
+    <string name="pedit_custom_path">Benutzerdefinierter Pfad</string>
     <string name="pedit_default">(Globale Standardeinstellung verwenden)</string>
     <string name="profile_mods_download_mod">Mod herunterladen</string>
     <string name="profile_mods_download_mod_release_version">Nur offizielle Minecraft-Versionen anzeigen</string>
@@ -255,9 +262,17 @@
     <string name="account_microsoft_xerr_unauthorized">Deine Microsoft-Konto-Anmeldeinformationen scheinen abgelaufen zu sein. Dies passiert oft, nachdem das Kontopasswort geändert wurde. Bitte entferne das aktuelle Konto und melde dich erneut an, um deine Anmeldeinformationen zurückzusetzen.</string>
     <string name="account_local_account">Offline-Konto</string>
     <string name="account_local_account_empty">Der Benutzername darf nicht leer sein!</string>
-    <string name="account_local_account_invalid">Ein gültiger Benutzername unterstützt nur englische Buchstaben (Groß- und Kleinschreibung sind erlaubt), Zahlen und Unterstriche. Die Länge darf nicht weniger als 3 Zeichen und nicht mehr als 16 Zeichen betragen.\nBeispiele für korrekte Benutzernamen: Name, Name_, Name123\nBeispiele für falsche Benutzernamen: Name@, N ame, name_name_name_name\nWenn du jedoch relevante Mods oder Plugins verwendest, die diese Einschränkung umgehen können, kannst du diesen Namen weiter verwenden. Andernfalls benenne ihn bitte um!</string>
+    <string name="account_local_account_invalid">Gültige Benutzernamen unterstützen nur englische Buchstaben (Groß- und Kleinschreibung), Zahlen und Unterstriche. Die Länge muss zwischen 3 und 16 Zeichen liegen, sonst kann das Spiel nicht ordnungsgemäß ausgeführt werden.\nBeispiele für korrekte Benutzernamen: Name, Name_, Name123\nBeispiele für falsche Benutzernamen: Name@, N ame, name_name_name_name\nJedoch, wenn Sie relevante Mods oder Plugins verwendet haben, um diese Mechanik zu umgehen, können Sie diesen Namen weiterhin verwenden. Ansonsten, bitte umbenennen Sie ihn!</string>
     <string name="account_login_local_name">Benutzername</string>
     <string name="account_login_start">Anmeldung starten!</string>
+    <string name="account_login_microsoft_progress">Anmelden beim Microsoft-Konto: %s</string>
+    <string name="account_login_progress_access_token">Zugriffstoken wird abgerufen</string>
+    <string name="account_login_progress_xbl_token">Xbox Live-Token wird abgerufen</string>
+    <string name="account_login_progress_xsts_token">Xbox Service Security Token wird abgerufen</string>
+    <string name="account_login_progress_minecraft_token">Minecraft-Token wird abgerufen</string>
+    <string name="account_login_progress_checking">Token wird überprüft</string>
+    <string name="account_login_no_network">Nicht mit dem Internet verbunden, Login übersprungen!</string>
+    <string name="account_login_skip">Anmeldung fehlgeschlagen, möchten Sie den Anmeldeschritt überspringen?</string>
     <string name="account_no_microsoft_account">Bitte melde dich mindestens mit einem offiziellen Minecraft-Konto an. Wir empfehlen nicht, Minecraft ohne offizielles Konto zu starten.</string>
     <string name="account_no_microsoft_account_local">Du scheinst kein offizielles Konto angemeldet zu haben! Offline-Konten sind eine Notlösung für Spieler, die nicht online sein können, und nicht für Spieler ohne offizielles Konto.</string>
     <string name="account_no_microsoft_account_other">Du scheinst kein offizielles Konto angemeldet zu haben! Bist du sicher, dass du ohne offizielles Konto eine externe Anmeldung verwenden möchtest?</string>
@@ -286,13 +301,13 @@
     <string name="multirt_nojava8rt">Java 8 konnte nicht gefunden werden, um diese Option zu verwenden, müssen Sie Java 8 installieren</string>
     <string name="multirt_delete_runtime">Laufzeitumgebung löschen</string>
     <!-- Custom Mouse & Background -->
-    <string name="mouse_settings_title">Virtuelle Maus-Einstellungen</string>
     <string name="mouse_settings_speed_name">Virtuelle Mausgeschwindigkeit</string>
     <string name="mouse_settings_scale_name">Virtuelle Mausskalierung</string>
     <string name="custom_mouse_add">Virtuelle Maus hinzufügen</string>
     <string name="custom_mouse_added">Virtuelle Maus erfolgreich eingestellt:</string>
     <string name="custom_mouse_default">Standard-Virtuelle Maus</string>
     <string name="custom_mouse_title">Benutzerdefinierte virtuelle Maus</string>
+    <string name="custom_mouse_dialog">Sie können Mausbilder in (Startereinstellungen - %s - %s) hinzufügen</string>
     <string name="custom_mouse_desc">Öffnen Sie die virtuelle Maus-Verwaltungsoberfläche, um Ihre bevorzugten virtuellen Maus-Grafiken hinzuzufügen und zu verwenden</string>
     <string name="custom_mouse_message_default">Die aktuell ausgewählte virtuelle Maus ist die Standard-Virtuelle Maus, die nicht für die Freigabe, Umbenennung oder Löschung unterstützt wird</string>
     <string name="custom_background_add">Hintergrundbild hinzufügen</string>
@@ -343,7 +358,7 @@
     <string name="main_share_log_title">Bitte wähle den Typ der Logdatei aus</string>
     <string name="main_share_launcher_log">Launcher-Logdatei</string>
     <string name="main_share_game_log">Letztes Spiel-Log</string>
-    <string name="main_play">Spiel starten</string>
+    <string name="main_launch">Spiel starten</string>
     <string name="setting_category_control">Steuerungseinstellungen</string>
     <string name="setting_category_virtual_mouse">Virtueller Mauszeiger</string>
     <string name="setting_category_gyro_controls">Gyroskop-Steuerung</string>
@@ -430,6 +445,8 @@
     <string name="setting_resource_image_cache_desc">Wenn aktiviert, speichert der Launcher die Titelbilder und Screenshots von Ressourcen im Cache, um sie beim nächsten Mal schneller zu laden</string>
     <string name="setting_download_source_title">Spiel-Downloadquelle</string>
     <string name="setting_download_source_desc">Wählen Sie eine Mirror-Downloadquelle anstelle der offiziellen Downloadquelle</string>
+    <string name="setting_max_download_threads_title">Maximale Download-Threads</string>
+    <string name="setting_max_download_threads_desc">Maximale Anzahl von gleichzeitigen Downloads bei gleichzeitigen Downloads mehrerer Dateien, aber zu viele Threads können zu Störungen beim Start führen. 64 Threads sind ausreichend!</string>
     <string name="setting_version_isolation_title">Standardversion-Isolierung</string>
     <string name="setting_version_isolation_desc">Soll bei der Installation einer neuen Version standardmäßig die Versionsisolierung ausgewählt werden?</string>
     <string name="setting_set_game_language_title">Automatische Spielsprachen-Einstellung</string>
@@ -502,8 +519,7 @@
     <string name="download_info_date">Erstellungsdatum:</string>
     <string name="download_info_modloader">Kompatibel mit:</string>
     <string name="download_info_dependencies">Abhängigkeitsart:</string>
-    <string name="download_info_release_type_beta">Beta</string>
-    <string name="download_info_release_type_alpha">Alpha</string>
+    <string name="download_info_load_screenshot">Bildschirmfoto anzeigen</string>
     <string name="download_search_failed">Fehler beim Suchen nach Ressourcen!</string>
     <string name="download_search_no_result">Keine verwandten Ressourcen gefunden!</string>
     <string name="download_search_platform_not_supported">Die aktuelle Plattform unterstützt das Herunterladen dieses Typs von Ressourcen oder diese Kategoriefilterung nicht!</string>
@@ -521,7 +537,7 @@
     <string name="download_install_unpack_world_error">Dateistruktur konnte nicht erkannt werden, automatisches Entpacken fehlgeschlagen, bitte bearbeiten Sie die Datei manuell!</string>
     <!-- ModPack -->
     <string name="select_modpack_local_tip">Bitte wählen Sie eine Modpack-Datei aus, die der Launcher unterstützt!</string>
-    <string name="select_modpack_local_not_supported">Diese Datei wird vom Launcher nicht unterstützt!</string>
+    <string name="select_modpack_local_not_supported">Dieses Modpack wird nicht von dem Launcher unterstützt! Der Launcher nur Modpacks in Modrinth, CurseForge und MCBBS Format unterstützt. Bitte überprüfen Sie, ob Ihr Modpack gemäß der vorgeschriebenen Formatierung erstellt wurde!</string>
     <string name="select_modpack_local_installing_files">Installiere Spieldateien… (%d / %d)</string>
     <string name="modpack_download_downloading_metadata">Lade Modpack-Metadaten herunter (%.2fMB / %.2fMB)</string>
     <string name="modpack_download_downloading_mods">Lade Mods herunter (%.2fMB / %.2fMB)</string>
@@ -565,23 +581,23 @@
     <string name="other_login_select_role_title">Rolle auswählen</string>
     <string name="other_login_select_role_message">Ihr aktueller Account hat mehrere Rollen. Bitte wählen Sie die Rolle aus, die Sie verwenden möchten.</string>
     <string name="other_login_registry_now">Kein Konto? Klicken Sie hier, um sich zu registrieren!</string>
+    <string name="other_login_role_not_found">Rolle, die dem aktuellen Konto entspricht, nicht gefunden. Bitte überprüfen Sie, ob diese Rolle auf dem von Ihnen verwendeten Server vorhanden ist!</string>
     <!-- Splash -->
     <string name="splash_screen_desc">Der Launcher benötigt diese Inhalte, um sicherzustellen, dass Minecraft ordnungsgemäß gestartet werden kann. Diese Inhalte sind in der Anwendung enthalten und müssen entpackt werden, bevor sie verwendet werden können. Klicken Sie auf die Schaltfläche unten, um den Entpackvorgang zu starten und diese Inhalte zu aktualisieren.</string>
     <string name="splash_screen_installing">Der Launcher entpackt diese Inhalte. Nach dem Entpacken gelangen Sie automatisch zur Hauptoberfläche. Bitte haben Sie einen Moment Geduld.</string>
     <string name="splash_screen_lwjgl">Lightweight Java Game Library, die Minecraft zum Ausführen des Spiels benötigt.</string>
     <string name="splash_screen_cacio">Bietet einen portablen GUI-Backend für OpenJDK.</string>
     <string name="splash_screen_authlib_injector">Ändert authlib zur Laufzeit, um eine Anmeldung außerhalb des Spiels zu ermöglichen.</string>
-    <string name="splash_screen_pro_grade">Diese Bibliothek implementiert einen benutzerdefinierten Java-Sicherheitsmanager und eine Sicherheitsrichtlinie mit Ablehnungsregeln.</string>
-    <string name="splash_screen_loader_installers">Hilft beim automatischen Installieren von Forge, Fabric und OptiFine.</string>
+    <string name="splash_screen_components">Einige Komponenten, von denen der Launcher abhängt.</string>
     <string name="splash_screen_jre8">Java 8-Umgebung, Minecraft 1.16- benötigt Java 8.</string>
     <string name="splash_screen_jre17">Java 17-Umgebung, Minecraft 1.17+ benötigt Java 17.</string>
     <string name="splash_screen_jre21">Java 21-Umgebung, Minecraft 1.20.5+ benötigt Java 21.</string>
     <string name="splash_screen_apply">Zustimmen und installieren</string>
     <!-- About -->
-    <string name="about_tab">Über Zalith Launcher</string>
-    <string name="about_dec1">Zalith Launcher ist ein auf PojavLauncher basierender Minecraft-Launcher, der in der Lage ist, Minecraft: Java Edition auf Android-Geräten auszuführen.</string>
-    <string name="about_dec2">Zalith Launcher widmet sich der Optimierung der Benutzererfahrung, hat die Anwendungsoberfläche neu gestaltet und weitere nützliche Funktionen hinzugefügt, um die Hürden für das Spielen so weit wie möglich zu senken, damit mehr Menschen die Freude an Minecraft leicht genießen können.</string>
-    <string name="about_dec3">Zalith Launcher ist unter der GPL 3.0 Open-Source-Lizenz lizenziert, die eine "virale" Natur hat; jeder Code, der GPL-Bibliotheken oder -Software verwendet, modifiziert oder davon abgeleitet wird, muss ebenfalls unter der GPL-Lizenz open-source sein. Wenn Sie beabsichtigen, diese Software zu verbreiten oder zu teilen, stellen Sie bitte sicher, dass Sie die relevanten Bestimmungen der GPL 3.0 Open-Source-Lizenz einhalten.</string>
+    <string name="about_tab">Über %s</string>
+    <string name="about_dec1">%s ist ein Minecraft-Launcher basierend auf PojavLauncher, der es ermöglicht, Minecraft: Java Edition auf Android-Geräten auszuführen.</string>
+    <string name="about_dec2">%s konzentriert sich auf die Optimierung der Benutzererfahrung, die Neugestaltung der Anwendungsoberfläche und das Hinzufügen weiterer praktischer Funktionen, um die Einstiegshürden zu senken und mehr Menschen den einfachen Zugang zum Spaß von Minecraft zu ermöglichen.</string>
+    <string name="about_dec3">%s verwendet die GPL-3.0-Open-Source-Lizenz, die "virale" Eigenschaften hat. Jeder Code, der Bibliotheken oder Software der GPL verwendet, modifiziert oder davon abgeleitet ist, muss ebenfalls die GPL-Lizenz für Open Source verwenden. Wenn Sie beabsichtigen, diese Software zu verbreiten, halten Sie sich bitte an die entsprechenden Bestimmungen der GPL-3.0-Lizenz.</string>
     <string name="about_contributors">Beiträger und Danksagungen:</string>
     <string name="about_sponsors">Danksagungen an Sponsoren:</string>
     <string name="about_sponsors_desc">Hier sind alle Sponsoren, die die Entwicklung unterstützen, vielen Dank!</string>
@@ -600,8 +616,6 @@
     <string name="about_version_code">Software-Versionscode:</string>
     <string name="about_last_update_time">Letzte Aktualisierungszeit:</string>
     <string name="about_version_status">Versionsstatus:</string>
-    <string name="about_version_status_debug">Testversion</string>
-    <string name="about_version_status_pre_release">Vorabversion</string>
     <!-- Newbie Guide -->
     <string name="newbie_guide_general_close">Klicken Sie auf diese Schaltfläche, um zu schließen und zum vorherigen Bildschirm zurückzukehren.</string>
     <string name="newbie_guide_general_refresh">Klicken Sie auf diese Schaltfläche, um den aktuellen Inhalt zu aktualisieren.</string>

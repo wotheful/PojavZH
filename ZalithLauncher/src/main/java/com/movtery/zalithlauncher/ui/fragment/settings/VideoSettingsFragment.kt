@@ -7,18 +7,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.movtery.anim.AnimPlayer
+import com.movtery.anim.animations.Animations
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.databinding.SettingsFragmentVideoBinding
 import com.movtery.zalithlauncher.setting.AllSettings
+import com.movtery.zalithlauncher.setting.AllStaticSettings
 import com.movtery.zalithlauncher.ui.dialog.TipDialog
 import com.movtery.zalithlauncher.ui.fragment.settings.wrapper.ListSettingsWrapper
 import com.movtery.zalithlauncher.ui.fragment.settings.wrapper.SeekBarSettingsWrapper
 import com.movtery.zalithlauncher.ui.fragment.settings.wrapper.SwitchSettingsWrapper
 import com.movtery.zalithlauncher.utils.ZHTools
 import net.kdt.pojavlaunch.Tools
-import net.kdt.pojavlaunch.prefs.LauncherPreferences
 
-class VideoSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragment_video) {
+class VideoSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragment_video, SettingCategory.VIDEO) {
     private lateinit var binding: SettingsFragmentVideoBinding
 
     override fun onCreateView(
@@ -36,8 +38,7 @@ class VideoSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragmen
         val renderers = Tools.getCompatibleRenderers(context)
         ListSettingsWrapper(
             context,
-            "renderer",
-            "opengles2",
+            AllSettings.renderer,
             binding.rendererLayout,
             binding.rendererTitle,
             binding.rendererValue,
@@ -47,17 +48,15 @@ class VideoSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragmen
 
         val ignoreNotch = SwitchSettingsWrapper(
             context,
-            "ignoreNotch",
             AllSettings.ignoreNotch,
             binding.ignoreNotchLayout,
             binding.ignoreNotch
         )
-        if (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && LauncherPreferences.PREF_NOTCH_SIZE > 0))
+        if (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && AllStaticSettings.notchSize > 0))
             ignoreNotch.setGone()
 
         SeekBarSettingsWrapper(
             context,
-            "resolutionRatio",
             AllSettings.resolutionRatio,
             binding.resolutionRatioLayout,
             binding.resolutionRatioTitle,
@@ -71,7 +70,6 @@ class VideoSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragmen
 
         SwitchSettingsWrapper(
             context,
-            "sustainedPerformance",
             AllSettings.sustainedPerformance,
             binding.sustainedPerformanceLayout,
             binding.sustainedPerformance
@@ -79,7 +77,6 @@ class VideoSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragmen
 
         SwitchSettingsWrapper(
             context,
-            "alternate_surface",
             AllSettings.alternateSurface,
             binding.alternateSurfaceLayout,
             binding.alternateSurface
@@ -87,7 +84,6 @@ class VideoSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragmen
 
         SwitchSettingsWrapper(
             context,
-            "force_vsync",
             AllSettings.forceVsync,
             binding.forceVsyncLayout,
             binding.forceVsync
@@ -95,7 +91,6 @@ class VideoSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragmen
 
         SwitchSettingsWrapper(
             context,
-            "vsync_in_zink",
             AllSettings.vsyncInZink,
             binding.vsyncInZinkLayout,
             binding.vsyncInZink
@@ -103,7 +98,6 @@ class VideoSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragmen
 
         val zinkPreferSystemDriver = SwitchSettingsWrapper(
             context,
-            "zinkPreferSystemDriver",
             AllSettings.zinkPreferSystemDriver,
             binding.zinkPreferSystemDriverLayout,
             binding.zinkPreferSystemDriver
@@ -116,6 +110,7 @@ class VideoSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragmen
                     TipDialog.Builder(requireActivity())
                         .setTitle(R.string.generic_warning)
                         .setMessage(R.string.setting_zink_driver_adreno)
+                        .setWarning()
                         .setCancelable(false)
                         .setConfirmClickListener { listener.onSave() }
                         .setCancelClickListener { buttonView.isChecked = false }
@@ -126,7 +121,7 @@ class VideoSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragmen
             }
         }
 
-        changeResolutionRatioPreview(AllSettings.resolutionRatio)
+        changeResolutionRatioPreview(AllSettings.resolutionRatio.getValue())
         computeVisibility()
     }
 
@@ -141,8 +136,12 @@ class VideoSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragmen
 
     private fun computeVisibility() {
         binding.apply {
-            binding.forceVsyncLayout.visibility = if (AllSettings.alternateSurface) View.VISIBLE else View.GONE
+            binding.forceVsyncLayout.visibility = if (AllSettings.alternateSurface.getValue()) View.VISIBLE else View.GONE
         }
+    }
+
+    override fun slideIn(animPlayer: AnimPlayer) {
+        animPlayer.apply(AnimPlayer.Entry(binding.root, Animations.BounceInDown))
     }
 
     companion object {

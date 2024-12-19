@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.movtery.anim.AnimPlayer
+import com.movtery.anim.animations.Animations
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.databinding.SettingsFragmentGameBinding
 import com.movtery.zalithlauncher.setting.AllSettings
@@ -26,7 +28,7 @@ import net.kdt.pojavlaunch.contracts.OpenDocumentWithExtension
 import net.kdt.pojavlaunch.multirt.MultiRTConfigDialog
 import kotlin.math.min
 
-class GameSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragment_game) {
+class GameSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragment_game, SettingCategory.GAME) {
     private lateinit var binding: SettingsFragmentGameBinding
     private val mVmInstallLauncher = registerForActivityResult(
         OpenDocumentWithExtension("xz")
@@ -52,7 +54,6 @@ class GameSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragment
 
         SwitchSettingsWrapper(
             context,
-            "versionIsolation",
             AllSettings.versionIsolation,
             binding.versionIsolationLayout,
             binding.versionIsolation
@@ -60,7 +61,6 @@ class GameSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragment
 
         SwitchSettingsWrapper(
             context,
-            "autoSetGameLanguage",
             AllSettings.autoSetGameLanguage,
             binding.autoSetGameLanguageLayout,
             binding.autoSetGameLanguage
@@ -68,7 +68,6 @@ class GameSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragment
 
         SwitchSettingsWrapper(
             context,
-            "gameLanguageOverridden",
             AllSettings.gameLanguageOverridden,
             binding.gameLanguageOverriddenLayout,
             binding.gameLanguageOverridden
@@ -76,8 +75,7 @@ class GameSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragment
 
         ListSettingsWrapper(
             context,
-            "setGameLanguage",
-            "system",
+            AllSettings.setGameLanguage,
             binding.setGameLanguageLayout,
             binding.setGameLanguageTitle,
             binding.setGameLanguageValue,
@@ -94,7 +92,6 @@ class GameSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragment
         }
 
         EditTextSettingsWrapper(
-            "javaArgs",
             AllSettings.javaArgs,
             binding.javaArgsLayout,
             binding.javaArgsEdittext
@@ -109,8 +106,7 @@ class GameSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragment
 
         SeekBarSettingsWrapper(
             context,
-            "allocation",
-            AllSettings.ramAllocation,
+            AllSettings.ramAllocation.value,
             binding.allocationLayout,
             binding.allocationTitle,
             binding.allocationSummary,
@@ -119,7 +115,7 @@ class GameSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragment
             "MB"
         ) { wrapper ->
             wrapper.seekbarView.max = maxRAM
-            wrapper.seekbarView.progress = AllSettings.ramAllocation
+            wrapper.seekbarView.progress = AllSettings.ramAllocation.value.getValue()
             wrapper.setSeekBarValueTextView()
 
             updateMemoryInfo(context, wrapper.seekbarView.progress.toLong())
@@ -134,7 +130,6 @@ class GameSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragment
 
         SwitchSettingsWrapper(
             context,
-            "java_sandbox",
             AllSettings.javaSandbox,
             binding.javaSandboxLayout,
             binding.javaSandbox
@@ -142,7 +137,6 @@ class GameSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragment
 
         SwitchSettingsWrapper(
             context,
-            "gameMenuShowMemory",
             AllSettings.gameMenuShowMemory,
             binding.gameMenuShowMemoryLayout,
             binding.gameMenuShowMemory
@@ -152,7 +146,6 @@ class GameSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragment
         }
 
         EditTextSettingsWrapper(
-            "gameMenuMemoryText",
             AllSettings.gameMenuMemoryText,
             binding.gameMenuMemoryTextLayout,
             binding.gameMenuMemoryText
@@ -162,8 +155,7 @@ class GameSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragment
 
         ListSettingsWrapper(
             context,
-            "gameMenuLocation",
-            "center",
+            AllSettings.gameMenuLocation,
             binding.gameMenuLocationLayout,
             binding.gameMenuLocationTitle,
             binding.gameMenuLocationValue,
@@ -172,7 +164,6 @@ class GameSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragment
 
         SeekBarSettingsWrapper(
             context,
-            "gameMenuAlpha",
             AllSettings.gameMenuAlpha,
             binding.gameMenuAlphaLayout,
             binding.gameMenuAlphaTitle,
@@ -186,7 +177,11 @@ class GameSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragment
 
         openGameMenuMemory()
         updateGameMenuMemoryText()
-        setGameMenuAlpha(AllSettings.gameMenuAlpha.toFloat() / 100F)
+        setGameMenuAlpha(AllSettings.gameMenuAlpha.getValue().toFloat() / 100F)
+    }
+
+    override fun slideIn(animPlayer: AnimPlayer) {
+        animPlayer.apply(AnimPlayer.Entry(binding.root, Animations.BounceInDown))
     }
 
     private fun updateMemoryInfo(context: Context, seekValue: Long) {
@@ -212,7 +207,7 @@ class GameSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragment
     }
 
     private fun openGameMenuMemory() {
-        binding.gameMenuPreview.memoryText.visibility = if (AllSettings.gameMenuShowMemory) View.VISIBLE else View.GONE
+        binding.gameMenuPreview.memoryText.visibility = if (AllSettings.gameMenuShowMemory.getValue()) View.VISIBLE else View.GONE
     }
 
     private fun setGameMenuAlpha(alpha: Float) {
@@ -220,7 +215,7 @@ class GameSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragment
     }
 
     private fun updateGameMenuMemoryText() {
-        val text = "${AllSettings.gameMenuMemoryText} 0MB/0MB"
+        val text = "${AllSettings.gameMenuMemoryText.getValue()} 0MB/0MB"
         binding.gameMenuPreview.memoryText.text = text.trim()
     }
 }

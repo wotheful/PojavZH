@@ -37,7 +37,7 @@ class InstallLocalModPack {
                     when (type) {
                         ModPackEnum.CURSEFORGE -> {
                             modLoader = curseforgeModPack(zipFile, versionPath) ?: return null
-                            VersionConfig(versionPath).save()
+                            VersionConfig.createIsolation(versionPath).save()
 
                             return modLoader
                         }
@@ -52,17 +52,16 @@ class InstallLocalModPack {
                             )
 
                             modLoader = mcbbsModPack(context, zipFile, versionPath) ?: return null
-                            VersionConfig(
-                                versionPath,
-                                javaArgs = StringUtils.insertSpace(null, *mcbbsPackMeta.launchInfo.javaArgument)
-                            ).save()
+                            VersionConfig.createIsolation(versionPath).apply {
+                                setJavaArgs(StringUtils.insertSpace(null, *mcbbsPackMeta.launchInfo.javaArgument))
+                            }.save()
 
                             return modLoader
                         }
 
                         ModPackEnum.MODRINTH -> {
                             modLoader = modrinthModPack(zipFile, versionPath) ?: return null
-                            VersionConfig(versionPath).save()
+                            VersionConfig.createIsolation(versionPath).save()
 
                             return modLoader
                         }
@@ -71,6 +70,7 @@ class InstallLocalModPack {
                             TaskExecutors.runInUIThread {
                                 TipDialog.Builder(context)
                                     .setMessage(R.string.select_modpack_local_not_supported) //弹窗提醒
+                                    .setWarning()
                                     .setShowCancel(true)
                                     .setShowConfirm(false)
                                     .buildDialog()

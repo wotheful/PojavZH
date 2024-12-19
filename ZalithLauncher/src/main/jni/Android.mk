@@ -25,6 +25,7 @@ LOCAL_SRC_FILES := \
     ctxbridges/common.c \
     ctxbridges/bridge_tbl.c \
     ctxbridges/renderer_config.c \
+    ctxbridges/loader_dlopen.c \
     ctxbridges/gl_bridge.c \
     ctxbridges/osm_bridge.c \
     ctxbridges/egl_loader.c \

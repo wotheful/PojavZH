@@ -25,17 +25,21 @@ public class InGameEventProcessor implements TouchEventProcessor {
         switch (motionEvent.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
                 mTracker.startTracking(motionEvent);
-                if(AllSettings.getDisableGestures()) break;
+                if(AllSettings.getDisableGestures().getValue()) break;
                 mEventTransitioned = false;
                 checkGestures();
                 break;
             case MotionEvent.ACTION_MOVE:
                 mTracker.trackEvent(motionEvent);
                 float[] motionVector = mTracker.getMotionVector();
-                CallbackBridge.mouseX += motionVector[0] * mSensitivity;
-                CallbackBridge.mouseY += motionVector[1] * mSensitivity;
+                float deltaX = (float) (motionVector[0] * mSensitivity);
+                float deltaY = (float) (motionVector[1] * mSensitivity);
+                mLeftClickGesture.setMotion(deltaX, deltaY);
+                mRightClickGesture.setMotion(deltaX, deltaY);
+                CallbackBridge.mouseX += deltaX;
+                CallbackBridge.mouseY += deltaY;
                 CallbackBridge.sendCursorPos(CallbackBridge.mouseX, CallbackBridge.mouseY);
-                if(AllSettings.getDisableGestures()) break;
+                if(AllSettings.getDisableGestures().getValue()) break;
                 checkGestures();
                 break;
             case MotionEvent.ACTION_UP:

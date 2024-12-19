@@ -1,8 +1,8 @@
 package com.movtery.zalithlauncher.feature.accounts;
 
-import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -12,14 +12,13 @@ import com.movtery.zalithlauncher.context.ContextExecutor;
 import com.movtery.zalithlauncher.event.single.AccountUpdateEvent;
 import com.movtery.zalithlauncher.feature.log.Logging;
 import com.movtery.zalithlauncher.setting.AllSettings;
-import com.movtery.zalithlauncher.setting.Settings;
-import com.movtery.zalithlauncher.utils.PathAndUrlManager;
-import com.movtery.zalithlauncher.utils.ZHTools;
+import com.movtery.zalithlauncher.task.TaskExecutors;
+import com.movtery.zalithlauncher.ui.dialog.TipDialog;
+import com.movtery.zalithlauncher.utils.path.PathManager;
 
 import net.kdt.pojavlaunch.Tools;
 import net.kdt.pojavlaunch.authenticator.listener.DoneListener;
 import net.kdt.pojavlaunch.authenticator.listener.ErrorListener;
-import net.kdt.pojavlaunch.authenticator.listener.ProgressListener;
 import net.kdt.pojavlaunch.authenticator.microsoft.PresentedException;
 import net.kdt.pojavlaunch.value.MinecraftAccount;
 
@@ -31,12 +30,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class AccountsManager {
-    private final static int MAX_LOGIN_STEP = 5;
     @SuppressLint("StaticFieldLeak")
     private static volatile AccountsManager accountsManager;
     private final List<MinecraftAccount> accounts = new ArrayList<>();
-    private ObjectAnimator mLoginBarAnimator;
-    private ProgressListener mProgressListener;
     private DoneListener mDoneListener;
     private ErrorListener mErrorListener;
 
@@ -48,10 +44,9 @@ public final class AccountsManager {
             synchronized (AccountsManager.class) {
                 if (accountsManager == null) {
                     accountsManager = new AccountsManager();
-                    //确保完全初始化，初始化完成之后，初始化监听器，然后执行刷新与登录操作
+                    //确保完全初始化，初始化完成之后，初始化监听器，然后执行刷新操作
                     accountsManager.initListener();
                     accountsManager.reload();
-                    accountsManager.performLogin(accountsManager.getCurrentAccount(), false);
                 }
                 return accountsManager;
             }
@@ -61,24 +56,14 @@ public final class AccountsManager {
 
     @SuppressLint("ObjectAnimatorBinding")
     private void initListener() {
-        mProgressListener = step -> {
-            // Animate the login bar, cosmetic purposes only
-            float mLoginBarWidth = -1;
-            float value = (float) Tools.currentDisplayMetrics.widthPixels / MAX_LOGIN_STEP;
-            if (mLoginBarAnimator != null) {
-                mLoginBarAnimator.cancel();
-                mLoginBarAnimator.setFloatValues(mLoginBarWidth, value * step);
-            } else {
-                mLoginBarAnimator = ObjectAnimator.ofFloat(this, "LoginBarWidth", mLoginBarWidth, value * step);
-            }
-            mLoginBarAnimator.start();
-        };
-
         mDoneListener = account -> {
-            ContextExecutor.showToast(R.string.account_login_done, Toast.LENGTH_SHORT);
+            TaskExecutors.runInUIThread(() -> ContextExecutor.showToast(R.string.account_login_done, Toast.LENGTH_SHORT));
 
             //检查账号是否已存在
-            if (getAllAccount().contains(account)) return;
+            if (getAllAccount().contains(account)) {
+                EventBus.getDefault().post(new AccountUpdateEvent());
+                return;
+            }
 
             reload();
 
@@ -86,42 +71,51 @@ public final class AccountsManager {
             else EventBus.getDefault().post(new AccountUpdateEvent());
         };
 
-        mErrorListener = errorMessage -> {
+        mErrorListener = errorMessage -> TaskExecutors.runInUIThread(() -> {
             Activity activity = ContextExecutor.getActivity();
             if (errorMessage instanceof PresentedException) {
                 PresentedException exception = (PresentedException) errorMessage;
                 Throwable cause = exception.getCause();
                 if (cause == null) {
-                    Tools.dialog(activity, activity.getString(R.string.generic_error), exception.toString(activity));
+                    new TipDialog.Builder(activity)
+                            .setTitle(R.string.generic_error)
+                            .setMessage(exception.toString(activity))
+                            .setWarning()
+                            .setConfirm(android.R.string.ok)
+                            .setShowCancel(false)
+                            .buildDialog();
                 } else {
                     Tools.showError(activity, exception.toString(activity), exception.getCause());
                 }
             } else {
                 Tools.showError(activity, errorMessage);
             }
-        };
+        });
     }
 
-    public void performLogin(MinecraftAccount minecraftAccount, boolean force) {
-        if (AccountUtils.isNoLoginRequired(minecraftAccount)) return;
+    public void performLogin(final Context context, MinecraftAccount minecraftAccount) {
+        performLogin(context, minecraftAccount, getDoneListener(), getErrorListener());
+    }
+
+    public void performLogin(final Context context, MinecraftAccount minecraftAccount, DoneListener doneListener, ErrorListener errorListener) {
+        if (AccountUtils.isNoLoginRequired(minecraftAccount)) {
+            doneListener.onLoginDone(minecraftAccount);
+            return;
+        }
 
         if (AccountUtils.isOtherLoginAccount(minecraftAccount)) {
-            if (force || ZHTools.getCurrentTimeMillis() > minecraftAccount.expiresAt) {
-                AccountUtils.otherLogin(ContextExecutor.getApplication(), minecraftAccount);
-                return;
-            }
+            AccountUtils.otherLogin(context, minecraftAccount, doneListener, errorListener);
+            return;
         }
 
         if (AccountUtils.isMicrosoftAccount(minecraftAccount)) {
-            if (force || ZHTools.getCurrentTimeMillis() > minecraftAccount.expiresAt) {
-                AccountUtils.microsoftLogin(minecraftAccount);
-            }
+            AccountUtils.microsoftLogin(context, minecraftAccount, doneListener, errorListener);
         }
     }
 
     public void reload() {
         accounts.clear();
-        File accountsPath = new File(PathAndUrlManager.DIR_ACCOUNT_NEW);
+        File accountsPath = new File(PathManager.DIR_ACCOUNT_NEW);
         if (accountsPath.exists() && accountsPath.isDirectory()) {
             File[] files = accountsPath.listFiles();
             if (files != null) {
@@ -140,7 +134,7 @@ public final class AccountsManager {
     }
 
     public MinecraftAccount getCurrentAccount() {
-        MinecraftAccount account = MinecraftAccount.loadFromUniqueUUID(AllSettings.getCurrentAccount());
+        MinecraftAccount account = MinecraftAccount.loadFromUniqueUUID(AllSettings.getCurrentAccount().getValue());
         if (account == null) {
             if (getAllAccount().isEmpty()) return null;
             MinecraftAccount account1 = getAllAccount().get(0);
@@ -164,12 +158,8 @@ public final class AccountsManager {
     }
 
     public void setCurrentAccount(@NonNull MinecraftAccount account) {
-        Settings.Manager.put("currentAccount", account.getUniqueUUID()).save();
+        AllSettings.getCurrentAccount().put(account.getUniqueUUID()).save();
         EventBus.getDefault().post(new AccountUpdateEvent());
-    }
-
-    public ProgressListener getProgressListener() {
-        return mProgressListener;
     }
 
     public DoneListener getDoneListener() {

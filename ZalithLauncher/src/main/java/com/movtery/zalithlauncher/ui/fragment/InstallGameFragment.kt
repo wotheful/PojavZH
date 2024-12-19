@@ -82,7 +82,7 @@ class InstallGameFragment : FragmentWithAnim(R.layout.fragment_install_game), Vi
 
             back.setOnClickListener(clickListener)
             install.setOnClickListener(clickListener)
-            isolation.isChecked = AllSettings.versionIsolation
+            isolation.isChecked = AllSettings.versionIsolation.getValue()
         }
     }
 
@@ -236,6 +236,7 @@ class InstallGameFragment : FragmentWithAnim(R.layout.fragment_install_game), Vi
                         TipDialog.Builder(activity)
                             .setTitle(R.string.generic_warning)
                             .setMessage(R.string.version_install_optifine_and_forge)
+                            .setWarning()
                             .setConfirmClickListener { install() }
                             .buildDialog()
                     } else install()
@@ -264,7 +265,7 @@ class InstallGameFragment : FragmentWithAnim(R.layout.fragment_install_game), Vi
                 Addon.OPTIFINE -> {
                     val endTask: InstallTaskItem.EndTask = if (mapSize < 2) { //安装为一个版本
                         InstallTaskItem.EndTask { activity, file ->
-                            installInGUITask(activity, taskPair.first) { intent, argUtils ->
+                            installInGUITask(activity, addon.addonName, taskPair.first) { intent, argUtils ->
                                 argUtils.setOptiFine(intent, file)
                             }
                         }
@@ -277,21 +278,21 @@ class InstallGameFragment : FragmentWithAnim(R.layout.fragment_install_game), Vi
                 }
                 Addon.FORGE -> {
                     taskMap[addon] = InstallTaskItem(taskPair.first, false, taskPair.second) {  activity, file ->
-                        installInGUITask(activity, taskPair.first) { intent, argUtils ->
+                        installInGUITask(activity, addon.addonName, taskPair.first) { intent, argUtils ->
                             argUtils.setForge(intent, file, customVersionName)
                         }
                     }
                 }
                 Addon.NEOFORGE -> {
                     taskMap[addon] = InstallTaskItem(taskPair.first, false, taskPair.second) {  activity, file ->
-                        installInGUITask(activity, taskPair.first) { intent, argUtils ->
+                        installInGUITask(activity, addon.addonName, taskPair.first) { intent, argUtils ->
                             argUtils.setNeoForge(intent, file, customVersionName)
                         }
                     }
                 }
                 Addon.FABRIC -> {
                     taskMap[addon] = InstallTaskItem(taskPair.first, false, taskPair.second) {  activity, file ->
-                        installInGUITask(activity, taskPair.first) { intent, argUtils ->
+                        installInGUITask(activity, addon.addonName, taskPair.first) { intent, argUtils ->
                             argUtils.setFabric(intent, file, customVersionName)
                         }
                     }
@@ -313,7 +314,7 @@ class InstallGameFragment : FragmentWithAnim(R.layout.fragment_install_game), Vi
      * @param activity **此处必须使用activity的上下文！不能调用Fragment的上下文！！因为调用到这里的时候，Fragment早就被销毁了！！！**
      */
     @Throws(Throwable::class)
-    private fun installInGUITask(activity: Activity, selectVersion: String, setArgs: (Intent, InstallArgsUtils) -> Unit) {
+    private fun installInGUITask(activity: Activity, addonName: String, selectVersion: String, setArgs: (Intent, InstallArgsUtils) -> Unit) {
         val intent = Intent(activity, JavaGUILauncherActivity::class.java)
 
         val argUtils = InstallArgsUtils(mcVersion, selectVersion)
@@ -326,16 +327,18 @@ class InstallGameFragment : FragmentWithAnim(R.layout.fragment_install_game), Vi
                     this.dismiss()
                     activity.startActivity(intent)
                 }
-                setTitleText(R.string.version_install_new)
+                setTitleText(activity.getString(R.string.version_install_new_modloader, addonName))
             }.show()
         }
     }
 
     override fun slideIn(animPlayer: AnimPlayer) {
-        animPlayer.apply(AnimPlayer.Entry(binding.root, Animations.BounceInUp))
+        animPlayer.apply(AnimPlayer.Entry(binding.nameLayout, Animations.BounceInDown))
+            .apply(AnimPlayer.Entry(binding.addonsLayout, Animations.BounceInUp))
     }
 
     override fun slideOut(animPlayer: AnimPlayer) {
-        animPlayer.apply(AnimPlayer.Entry(binding.root, Animations.FadeOutDown))
+        animPlayer.apply(AnimPlayer.Entry(binding.nameLayout, Animations.FadeOutUp))
+            .apply(AnimPlayer.Entry(binding.addonsLayout, Animations.FadeOutDown))
     }
 }

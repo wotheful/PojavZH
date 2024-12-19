@@ -43,7 +43,6 @@
                     android:textAllCaps="false"
                     android:background="@drawable/background_item"
                     android:drawableStart="@drawable/ic_about"
-                    android:text="@string/about_tab"
                     android:textColor="@color/primary_text" />
 
                 <com.kdt.mcgui.LauncherMenuButton
@@ -188,7 +187,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/_8sdp"
                     android:layout_marginBottom="@dimen/_8sdp"
-                    android:text="@string/main_play"
+                    android:text="@string/main_launch"
                     android:textAllCaps="true"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"

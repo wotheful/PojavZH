@@ -5,9 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.DocumentsContract
-import android.widget.EditText
 import com.movtery.zalithlauncher.R
-import com.movtery.zalithlauncher.feature.log.Logging
 import com.movtery.zalithlauncher.task.Task
 import com.movtery.zalithlauncher.ui.dialog.EditTextDialog
 import com.movtery.zalithlauncher.ui.dialog.EditTextDialog.ConfirmListener
@@ -37,20 +35,19 @@ class FileTools {
         }
 
         @JvmStatic
-        fun copyFileInBackground(context: Context, fileUri: Uri?, rootPath: String?): File {
+        fun copyFileInBackground(context: Context, fileUri: Uri, rootPath: String): File {
             val fileName = Tools.getFileName(context, fileUri)
             val outputFile = File(rootPath, fileName)
             return copyFileInBackground(context, fileUri, outputFile)
         }
 
         @JvmStatic
-        fun copyFileInBackground(context: Context, fileUri: Uri?, outputFile: File): File {
+        fun copyFileInBackground(context: Context, fileUri: Uri, outputFile: File): File {
             runCatching {
-                context.contentResolver.openInputStream(fileUri!!).use { inputStream ->
+                context.contentResolver.openInputStream(fileUri).use { inputStream ->
                     FileUtils.copyInputStreamToFile(inputStream, outputFile)
                 }
             }.getOrElse { e ->
-                Logging.e("CopyFileInBackground", Tools.printToString(e))
                 throw RuntimeException(e)
             }
 
@@ -125,7 +122,7 @@ class FileTools {
             EditTextDialog.Builder(context)
                 .setTitle(R.string.generic_rename)
                 .setEditText(getFileNameWithoutExtension(fileName, suffix))
-                .setConfirmListener(ConfirmListener { editBox: EditText ->
+                .setConfirmListener(ConfirmListener { editBox, _ ->
                     val newName = editBox.text.toString().replace("/", "")
                     if (fileName == newName) {
                         return@ConfirmListener true
@@ -159,15 +156,11 @@ class FileTools {
             EditTextDialog.Builder(context)
                 .setTitle(R.string.generic_rename)
                 .setEditText(fileName)
-                .setConfirmListener(ConfirmListener { editBox: EditText ->
+                .setAsRequired()
+                .setConfirmListener(ConfirmListener { editBox, _ ->
                     val newName = editBox.text.toString().replace("/", "")
                     if (fileName == newName) {
                         return@ConfirmListener true
-                    }
-
-                    if (newName.isEmpty()) {
-                        editBox.error = context.getString(R.string.file_rename_empty)
-                        return@ConfirmListener false
                     }
 
                     val newFile = File(fileParent, newName)

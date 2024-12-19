@@ -5,11 +5,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
+import com.movtery.zalithlauncher.InfoCenter
 import com.movtery.zalithlauncher.R
-import com.movtery.zalithlauncher.context.ContextExecutor
 import com.movtery.zalithlauncher.databinding.ActivityErrorBinding
 import com.movtery.zalithlauncher.feature.version.VersionsManager
-import com.movtery.zalithlauncher.utils.PathAndUrlManager
+import com.movtery.zalithlauncher.utils.path.PathManager
 import com.movtery.zalithlauncher.utils.file.FileTools.Companion.getLatestFile
 import com.movtery.zalithlauncher.utils.file.FileTools.Companion.shareFile
 import com.movtery.zalithlauncher.utils.stringutils.StringUtils
@@ -44,11 +44,6 @@ class ErrorActivity : BaseActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        ContextExecutor.setActivity(this)
-    }
-
     private fun showCrash(extras: Bundle) {
         val code = extras.getInt(BUNDLE_CODE, 0)
         if (code == 0) {
@@ -60,7 +55,7 @@ class ErrorActivity : BaseActivity() {
         binding.errorTitle.setText(R.string.generic_wrong_tip)
 
         val crashReportFile = getLatestFile(extras.getString(BUNDLE_CRASH_REPORTS_PATH), 15)
-        val logFile = File(PathAndUrlManager.DIR_GAME_HOME, "latestlog.txt")
+        val logFile = File(PathManager.DIR_GAME_HOME, "latestlog.txt")
 
         val message = if (extras.getBoolean(BUNDLE_IS_SIGNAL)) R.string.game_singnal_message else R.string.game_exit_message
 
@@ -82,6 +77,7 @@ class ErrorActivity : BaseActivity() {
     }
 
     private fun showError(extras: Bundle) {
+        binding.errorTitle.text = InfoCenter.replaceName(this, R.string.error_fatal)
         binding.crashButtons.visibility = View.GONE
 
         val throwable = extras.getSerializable(BUNDLE_THROWABLE) as Throwable?
