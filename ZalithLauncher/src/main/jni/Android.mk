@@ -34,7 +34,6 @@ LOCAL_SRC_FILES := \
     ctxbridges/virgl_bridge.c \
     environ/environ.c \
     input_bridge_v3.c \
-    jre_launcher.c \
     utils.c \
     stdio_is.c \
     driver_helper/nsbypass.c
