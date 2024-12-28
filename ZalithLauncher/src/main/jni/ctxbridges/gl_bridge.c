@@ -19,7 +19,7 @@ static const char* g_LogTag = "GLBridge";
 static __thread gl_render_window_t* currentBundle;
 static EGLDisplay g_EglDisplay;
 
-static void* __attribute__((used)) (*gl4es_dlopen)(const char*, void) = dlopen;
+static void* __attribute__((used)) (*gl4es_dlopen)(const char*, int) = dlopen;
 
 bool gl_init(void) {
     if(!dlsym_EGL()) return false;
