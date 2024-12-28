@@ -19,8 +19,6 @@ static const char* g_LogTag = "GLBridge";
 static __thread gl_render_window_t* currentBundle;
 static EGLDisplay g_EglDisplay;
 
-static void* __attribute__((used)) (*gl4es_dlopen)(const char*, int) = dlopen;
-
 bool gl_init(void) {
     if(!dlsym_EGL()) return false;
     g_EglDisplay = eglGetDisplay_p(EGL_DEFAULT_DISPLAY);
@@ -61,7 +59,7 @@ static bool already_initialized = false;
 static void gl_init_gl4es_internals(void) {
     if(already_initialized) return;
     already_initialized = true;
-    void* gl4es = gl4es_dlopen("libgl4es_114.so", RTLD_NOLOAD);
+    void* gl4es = dlopen("libgl4es_114.so", RTLD_NOLOAD);
     if(gl4es == NULL) return;
     void (*set_getmainfbsize)(void (*new_getMainFBSize)(int* width, int* height));
     set_getmainfbsize = dlsym(gl4es, "set_getmainfbsize");
