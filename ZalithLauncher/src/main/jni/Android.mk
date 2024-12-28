@@ -22,9 +22,6 @@ LOCAL_SHARED_LIBRARIES := bytehook
 LOCAL_SRC_FILES := \
     bigcoreaffinity.c \
     egl_bridge.c \
-    ctxbridges/common.c \
-    ctxbridges/bridge_tbl.c \
-    ctxbridges/renderer_config.c \
     ctxbridges/loader_dlopen.c \
     ctxbridges/gl_bridge.c \
     ctxbridges/osm_bridge.c \
