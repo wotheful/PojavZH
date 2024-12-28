@@ -19,6 +19,8 @@ static const char* g_LogTag = "GLBridge";
 static __thread gl_render_window_t* currentBundle;
 static EGLDisplay g_EglDisplay;
 
+static void* __attribute__((used)) (*gl4es_dlopen)(const char*, void) = dlopen;
+
 bool gl_init(void) {
     if(!dlsym_EGL()) return false;
     g_EglDisplay = eglGetDisplay_p(EGL_DEFAULT_DISPLAY);
@@ -40,6 +42,38 @@ bool gl_init(void) {
 
 gl_render_window_t* gl_get_current(void) {
     return currentBundle;
+}
+
+static void gl4esi_get_display_dimensions(int* width, int* height) {
+    if (currentBundle == NULL) goto zero;
+    EGLSurface surface = currentBundle->surface;
+    EGLBoolean result_width = eglQuerySurface_p(g_EglDisplay, surface, EGL_WIDTH, width);
+    EGLBoolean result_height = eglQuerySurface_p(g_EglDisplay, surface, EGL_HEIGHT, height);
+    if (!result_width || !result_height) goto zero;
+    return;
+
+    zero:
+    *width = 0;
+    *height = 0;
+}
+
+static bool already_initialized = false;
+static void gl_init_gl4es_internals(void) {
+    if(already_initialized) return;
+    already_initialized = true;
+    void* gl4es = gl4es_dlopen("libgl4es_114.so", RTLD_NOLOAD);
+    if(gl4es == NULL) return;
+    void (*set_getmainfbsize)(void (*new_getMainFBSize)(int* width, int* height));
+    set_getmainfbsize = dlsym(gl4es, "set_getmainfbsize");
+    if(set_getmainfbsize == NULL) goto warn;
+    set_getmainfbsize(gl4esi_get_display_dimensions);
+    goto cleanup;
+
+    warn:
+    printf("gl4esinternals warning: gl4es was found but internals not initialized. expect rendering issues.\n");
+    cleanup:
+    // dlclose just decreases a ref counter, so this is fine
+    dlclose(gl4es);
 }
 
 gl_render_window_t* gl_init_context(gl_render_window_t *share) {
