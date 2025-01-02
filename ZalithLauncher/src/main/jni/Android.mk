@@ -33,7 +33,6 @@ LOCAL_SRC_FILES := \
     ctxbridges/virgl_bridge.c \
     environ/environ.c \
     input_bridge_v3.c \
-    jre_launcher.c \
     utils.c \
     stdio_is.c \
     driver_helper/nsbypass.c
@@ -64,6 +63,16 @@ LOCAL_CFLAGS += -O2 -fPIC -DPIC -flto=thin -fwhole-program-vtables -mllvm -polly
 LOCAL_LDLAGS += --lto=thin -flto=thin -Wl,-plugin-opt=-emulated-tls -fuse-ld=lld
 include $(BUILD_SHARED_LIBRARY)
 
+include $(CLEAR_VARS)
+LOCAL_MODULE := jrelauncher
+LOCAL_SHARED_LIBRARIES := pojavexec
+LOCAL_LDLIBS := -llog -landroid
+LOCAL_SRC_FILES := \
+    jre_launcher.c
+LOCAL_CFLAGS += -O3 -fPIC -DPIC -flto=thin -fwhole-program-vtables -mllvm -polly -pthread -Weverything -DLLVM_USE_LINKER=lld -DBUILD_SHARED_LIBS
+LOCAL_LDLAGS += -flto=thin -Wl,-plugin-opt=-emulated-tls -fuse-ld=lld
+include $(BUILD_SHARED_LIBRARY)
+
 # Helper to get current thread
 # include $(CLEAR_VARS)
 # LOCAL_MODULE := thread64helper
@@ -84,5 +93,5 @@ LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)
 LOCAL_SHARED_LIBRARIES := awt_headless
 LOCAL_SRC_FILES := xawt_fake.c
 LOCAL_CFLAGS += -O2 -fPIC -DPIC -flto=thin -fwhole-program-vtables -mllvm -polly -pthread -pedantic -DLLVM_USE_LINKER=lld -DBUILD_SHARED_LIBS
-LOCAL_LDLAGS += --lto=thin -flto=thin -Wl,-plugin-opt=-emulated-tls -fuse-ld=lld
+LOCAL_LDLAGS += -flto=thin -Wl,-plugin-opt=-emulated-tls -fuse-ld=lld
 include $(BUILD_SHARED_LIBRARY)
