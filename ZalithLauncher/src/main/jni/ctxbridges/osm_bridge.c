@@ -17,7 +17,7 @@ static bool hasSetNoRendererBuffer = false;
 void setNativeWindowSwapInterval(struct ANativeWindow* nativeWindow, int swapInterval);
 
 bool osm_init() {
-    if(!dlsym_OSMesa()) return false;
+    dlsym_OSMesa();
     return true;
 }
 
