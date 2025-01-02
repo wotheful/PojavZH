@@ -22,9 +22,6 @@ LOCAL_SHARED_LIBRARIES := bytehook
 LOCAL_SRC_FILES := \
     bigcoreaffinity.c \
     egl_bridge.c \
-    ctxbridges/common.c \
-    ctxbridges/bridge_tbl.c \
-    ctxbridges/renderer_config.c \
     ctxbridges/loader_dlopen.c \
     ctxbridges/gl_bridge.c \
     ctxbridges/osm_bridge.c \
@@ -34,14 +31,13 @@ LOCAL_SRC_FILES := \
     ctxbridges/virgl_bridge.c \
     environ/environ.c \
     input_bridge_v3.c \
-    jre_launcher.c \
     utils.c \
     stdio_is.c \
     driver_helper/nsbypass.c
 
 ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
 LOCAL_CFLAGS += -DADRENO_POSSIBLE
-LOCAL_CFLAGS += -Ofast -fPIC -DPIC -flto=thin -fwhole-program-vtables -mllvm -polly -pthread -Wall -Weverything -pedantic -std=c2x -DLLVM_USE_LINKER=lld -DBUILD_SHARED_LIBS
+LOCAL_CFLAGS += -O3 -fPIC -DPIC -flto=thin -fwhole-program-vtables -mllvm -polly -pthread -Wall -Weverything -pedantic -std=c2x -DLLVM_USE_LINKER=lld -DBUILD_SHARED_LIBS
 LOCAL_LDLAGS += --lto=thin -flto=thin -Wl,-plugin-opt=-emulated-tls -fuse-ld=lld
 LOCAL_LDLIBS += -lEGL -lGLESv3
 endif
@@ -65,6 +61,16 @@ LOCAL_CFLAGS += -O2 -fPIC -DPIC -flto=thin -fwhole-program-vtables -mllvm -polly
 LOCAL_LDLAGS += --lto=thin -flto=thin -Wl,-plugin-opt=-emulated-tls -fuse-ld=lld
 include $(BUILD_SHARED_LIBRARY)
 
+include $(CLEAR_VARS)
+LOCAL_MODULE := jrelauncher
+LOCAL_SHARED_LIBRARIES := pojavexec
+LOCAL_LDLIBS := -llog -landroid
+LOCAL_SRC_FILES := \
+    jre_launcher.c
+LOCAL_CFLAGS += -O3 -fPIC -DPIC -flto=thin -fwhole-program-vtables -mllvm -polly -pthread -Weverything -DLLVM_USE_LINKER=lld -DBUILD_SHARED_LIBS
+LOCAL_LDLAGS += -flto=thin -Wl,-plugin-opt=-emulated-tls -fuse-ld=lld
+include $(BUILD_SHARED_LIBRARY)
+
 # Helper to get current thread
 # include $(CLEAR_VARS)
 # LOCAL_MODULE := thread64helper
@@ -85,5 +91,5 @@ LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)
 LOCAL_SHARED_LIBRARIES := awt_headless
 LOCAL_SRC_FILES := xawt_fake.c
 LOCAL_CFLAGS += -O2 -fPIC -DPIC -flto=thin -fwhole-program-vtables -mllvm -polly -pthread -pedantic -DLLVM_USE_LINKER=lld -DBUILD_SHARED_LIBS
-LOCAL_LDLAGS += --lto=thin -flto=thin -Wl,-plugin-opt=-emulated-tls -fuse-ld=lld
+LOCAL_LDLAGS += -flto=thin -Wl,-plugin-opt=-emulated-tls -fuse-ld=lld
 include $(BUILD_SHARED_LIBRARY)
