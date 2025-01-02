@@ -144,7 +144,6 @@ class LaunchArgs(
             val argsList: MutableList<String> = ArrayList()
 
             // Caciocavallo config AWT-enabled version
-            argsList.add("-Djava.awt.headless=false")
             argsList.add("-Dcacio.managed.screensize=" + AWTCanvasView.AWT_CANVAS_WIDTH + "x" + AWTCanvasView.AWT_CANVAS_HEIGHT)
             argsList.add("-Dcacio.font.fontmanager=sun.awt.X11FontManager")
             argsList.add("-Dcacio.font.fontscaler=sun.font.FreetypeFontScaler")
@@ -153,9 +152,9 @@ class LaunchArgs(
                 argsList.add("-Dawt.toolkit=net.java.openjdk.cacio.ctc.CTCToolkit")
                 argsList.add("-Djava.awt.graphicsenv=net.java.openjdk.cacio.ctc.CTCGraphicsEnvironment")
             } else {
-                argsList.add("-Dawt.toolkit=com.github.caciocavallosilano.cacio.ctc.CTCToolkit")
-                argsList.add("-Djava.awt.graphicsenv=com.github.caciocavallosilano.cacio.ctc.CTCGraphicsEnvironment")
-                argsList.add("-Djava.system.class.loader=com.github.caciocavallosilano.cacio.ctc.CTCPreloadClassLoader")
+                // argsList.add("-Dawt.toolkit=com.github.caciocavallosilano.cacio.ctc.CTCToolkit")
+                // argsList.add("-Djava.awt.graphicsenv=com.github.caciocavallosilano.cacio.ctc.CTCGraphicsEnvironment")
+                // argsList.add("-Djava.system.class.loader=com.github.caciocavallosilano.cacio.ctc.CTCPreloadClassLoader")
 
                 argsList.add("--add-exports=java.desktop/java.awt=ALL-UNNAMED")
                 argsList.add("--add-exports=java.desktop/java.awt.peer=ALL-UNNAMED")
@@ -166,7 +165,7 @@ class LaunchArgs(
                 argsList.add("--add-exports=java.desktop/sun.awt.event=ALL-UNNAMED")
                 argsList.add("--add-exports=java.desktop/sun.awt.datatransfer=ALL-UNNAMED")
                 argsList.add("--add-exports=java.desktop/sun.font=ALL-UNNAMED")
-                argsList.add("--add-exports=java.base/sun.security.action=ALL-UNNAMED")
+                // argsList.add("--add-exports=java.base/sun.security.action=ALL-UNNAMED")
                 argsList.add("--add-opens=java.base/java.util=ALL-UNNAMED")
                 argsList.add("--add-opens=java.desktop/java.awt=ALL-UNNAMED")
                 argsList.add("--add-opens=java.desktop/sun.font=ALL-UNNAMED")
@@ -184,7 +183,7 @@ class LaunchArgs(
                 if (it.name.endsWith(".jar")) cacioClassPath.append(":").append(it.absolutePath)
             }
 
-            argsList.add(cacioClassPath.toString())
+            // argsList.add(cacioClassPath.toString())
 
             return argsList
         }
