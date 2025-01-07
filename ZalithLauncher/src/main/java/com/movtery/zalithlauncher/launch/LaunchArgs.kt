@@ -140,7 +140,7 @@ class LaunchArgs(
 
     companion object {
         @JvmStatic
-        fun getCacioJavaArgs(isJava8: Boolean, isJava17: Boolean, boolean isJava21): List<String> {
+        fun getCacioJavaArgs(isJava8: Boolean, isJava17: Boolean, isJava21: Boolean): List<String> {
             val argsList: MutableList<String> = ArrayList()
 
             // Caciocavallo config AWT-enabled version
