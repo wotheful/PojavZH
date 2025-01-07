@@ -53,7 +53,7 @@ class LaunchArgs(
             }
         }
 
-        argsList.addAll(getCacioJavaArgs(runtime.javaVersion == 8))
+        argsList.addAll(getCacioJavaArgs(runtime.javaVersion == 8, runtime.javaVersion == 17, runtime.javaVersion == 21))
 
         val is7 = VersionNumber.compare(VersionNumber.asVersion(versionInfo.id ?: "0.0").canonical, "1.12") < 0
         val configFilePath = if (is7) LibPath.LOG4J_XML_1_7 else LibPath.LOG4J_XML_1_12
@@ -140,7 +140,7 @@ class LaunchArgs(
 
     companion object {
         @JvmStatic
-        fun getCacioJavaArgs(isJava8: Boolean): List<String> {
+        fun getCacioJavaArgs(isJava8: Boolean, isJava17: Boolean, boolean isJava21): List<String> {
             val argsList: MutableList<String> = ArrayList()
 
             // Caciocavallo config AWT-enabled version
@@ -158,7 +158,11 @@ class LaunchArgs(
                 argsList.add("-Djava.awt.graphicsenv=com.github.caciocavallosilano.cacio.ctc.CTCGraphicsEnvironment")
                 argsList.add("-Djava.system.class.loader=com.github.caciocavallosilano.cacio.ctc.CTCPreloadClassLoader")
                 }
-
+                if (isJava21) {
+                argsList.add("-Dawt.toolkit=com.github.caciocavallosilano.cacio.ctc.CTCToolkit")
+                argsList.add("-Djava.awt.graphicsenv=com.github.caciocavallosilano.cacio.ctc.CTCGraphicsEnvironment")
+                argsList.add("-Djava.system.class.loader=com.github.caciocavallosilano.cacio.ctc.CTCPreloadClassLoader")
+                }
                 argsList.add("--add-exports=java.desktop/java.awt=ALL-UNNAMED")
                 argsList.add("--add-exports=java.desktop/java.awt.peer=ALL-UNNAMED")
                 argsList.add("--add-exports=java.desktop/sun.awt.image=ALL-UNNAMED")
@@ -186,10 +190,18 @@ class LaunchArgs(
                 if (it.name.endsWith(".jar")) cacioClassPath.append(":").append(it.absolutePath)
             }
 
-            if (isJava17) {
-            argsList.add(cacioClassPath.toString())
+            if (isJava8) {
+               argsList.add(cacioClassPath.toString())
             }
 
+            if (isJava17) {
+               argsList.add(cacioClassPath.toString())
+            }
+
+            if (isJava21) {
+               argsList.add(cacioClassPath.toString())
+            }
+            
             return argsList
         }
     }
