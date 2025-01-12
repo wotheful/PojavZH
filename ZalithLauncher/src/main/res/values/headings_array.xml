@@ -11,7 +11,7 @@
     </string-array>
 
     <string-array name="renderer_values">
-        <item>opengles2</item> <!-- gl4es_extra 1.1.4 with OpenGL ES 2/"3" -->
+        <item>opengles3</item> <!-- gl4es_extra 1.1.4 with OpenGL ES 2/"3" -->
         <item>vulkan_zink</item> <!-- zink renderer with vulkan -->
         <item>gallium_virgl</item> <!-- virgl renderer with OpenGL ES 3 -->
         <item>gallium_freedreno</item> <!-- freedreno with Adreno GPU -->

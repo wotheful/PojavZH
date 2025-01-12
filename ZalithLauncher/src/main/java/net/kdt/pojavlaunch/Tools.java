@@ -381,12 +381,11 @@ public final class Tools {
                 // we have libjnidispatch 5.13.0 in jniLibs directory
                 if (Integer.parseInt(version[0]) >= 5 && Integer.parseInt(version[1]) >= 13)
                     continue;
-                Logging.d(InfoCenter.LAUNCHER_NAME, "Library " + libItem.name + " has been changed to version 5.13.0");
+                Logging.d(InfoCenter.LAUNCHER_NAME, "Library " + libItem.name + " has been changed to version 5.15.0");
                 createLibraryInfo(libItem);
-                libItem.name = "net.java.dev.jna:jna:5.13.0";
-                libItem.downloads.artifact.path = "net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar";
-                libItem.downloads.artifact.sha1 = "1200e7ebeedbe0d10062093f32925a912020e747";
-                libItem.downloads.artifact.url = "https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar";
+                libItem.name = "net.java.dev.jna:jna:5.15.0";
+                libItem.downloads.artifact.path = "net/java/dev/jna/jna/5.15.0/jna-5.15.0.jar";
+                libItem.downloads.artifact.url = "https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.15.0/jna-5.15.0.jar";
             } else if (libItem.name.startsWith("com.github.oshi:oshi-core:")) {
                 //if (Integer.parseInt(version[0]) >= 6 && Integer.parseInt(version[1]) >= 3) return;
                 // FIXME: ensure compatibility
@@ -404,13 +403,12 @@ public final class Tools {
                 // Java 8, which is not supported by old ASM versions. Mod loaders like Forge, which depend on this
                 // library, often include lwjgl in their class transformations, which causes errors with old ASM versions.
                 if (Integer.parseInt(version[0]) >= 5) continue;
-                Logging.d(InfoCenter.LAUNCHER_NAME, "Library " + libItem.name + " has been changed to version 5.0.4");
+                Logging.d(InfoCenter.LAUNCHER_NAME, "Library " + libItem.name + " has been changed to version 5.2");
                 createLibraryInfo(libItem);
-                libItem.name = "org.ow2.asm:asm-all:5.0.4";
+                libItem.name = "org.ow2.asm:asm-all:5.2";
                 libItem.url = null;
-                libItem.downloads.artifact.path = "org/ow2/asm/asm-all/5.0.4/asm-all-5.0.4.jar";
-                libItem.downloads.artifact.sha1 = "e6244859997b3d4237a552669279780876228909";
-                libItem.downloads.artifact.url = "https://repo1.maven.org/maven2/org/ow2/asm/asm-all/5.0.4/asm-all-5.0.4.jar";
+                libItem.downloads.artifact.path = "org/ow2/asm/asm-all/5.2/asm-all-5.2.jar";
+                libItem.downloads.artifact.url = "https://repo1.maven.org/maven2/org/ow2/asm/asm-all/5.2/asm-all-5.2.jar";
             }
         }
     }
@@ -661,10 +659,6 @@ public final class Tools {
     }
 
     public static void installMod(Activity activity, boolean customJavaArgs) {
-        if (MultiRTUtils.getExactJreName(8) == null) {
-            Toast.makeText(activity, R.string.multirt_nojava8rt, Toast.LENGTH_LONG).show();
-            return;
-        }
 
         if(!customJavaArgs){ // Launch the intent to get the jar file
             if(!(activity instanceof LauncherActivity))

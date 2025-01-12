@@ -7,6 +7,7 @@
 #include "environ/environ.h"
 #include "osmesa_loader.h"
 #include "renderer_config.h"
+#include "loader_dlopen.h"
 
 GLboolean (*OSMesaMakeCurrent_p) (OSMesaContext ctx, void *buffer, GLenum type,
                                          GLsizei width, GLsizei height);
@@ -19,20 +20,18 @@ void (*glFinish_p) (void);
 void (*glClearColor_p) (GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha);
 void (*glClear_p) (GLbitfield mask);
 void (*glReadPixels_p) (GLint x, GLint y, GLsizei width, GLsizei height, GLenum format, GLenum type, void * data);
+void* (*OSMesaGetProcAddress_p)(const char* funcName);
 
-void dlsym_OSMesa() {
-    char* main_path = NULL;
+bool dlsym_OSMesa() {
     char* mesa_library = getenv("MESA_LIBRARY");
-    if (pojav_environ->config_renderer == RENDERER_VK_ZINK
-     || pojav_environ->config_renderer == RENDERER_VIRGL)
-    {
-        if (asprintf(&main_path, "%s/%s", getenv("POJAV_NATIVEDIR"), mesa_library) == -1)
-            abort();
+    void* dl_handle = dlopen(mesa_library, RTLD_LOCAL | RTLD_LAZY);
+    if(dl_handle == NULL) return false;
+    OSMesaGetProcAddress_p = dlsym(dl_handle, "OSMesaGetProcAddress");
+
+    if(OSMesaGetProcAddress_p == NULL) {
+        printf("%s\n", dlerror());
+        return false;
     }
-    void* dl_handle = NULL;
-    dl_handle = dlopen(main_path, RTLD_GLOBAL);
-    free(main_path);
-    if (dl_handle == NULL) abort();
     OSMesaMakeCurrent_p = dlsym(dl_handle, "OSMesaMakeCurrent");
     OSMesaGetCurrentContext_p = dlsym(dl_handle,"OSMesaGetCurrentContext");
     OSMesaCreateContext_p = dlsym(dl_handle, "OSMesaCreateContext");
@@ -43,4 +42,5 @@ void dlsym_OSMesa() {
     glClear_p = dlsym(dl_handle,"glClear");
     glFinish_p = dlsym(dl_handle,"glFinish");
     glReadPixels_p = dlsym(dl_handle,"glReadPixels");
+    return true;
 }

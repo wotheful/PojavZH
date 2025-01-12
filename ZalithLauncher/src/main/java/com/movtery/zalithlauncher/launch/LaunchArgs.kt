@@ -53,7 +53,7 @@ class LaunchArgs(
             }
         }
 
-        argsList.addAll(getCacioJavaArgs(runtime.javaVersion == 8))
+        argsList.addAll(getCacioJavaArgs(runtime.javaVersion == 8, runtime.javaVersion == 17, runtime.javaVersion == 21))
 
         val is7 = VersionNumber.compare(VersionNumber.asVersion(versionInfo.id ?: "0.0").canonical, "1.12") < 0
         val configFilePath = if (is7) LibPath.LOG4J_XML_1_7 else LibPath.LOG4J_XML_1_12
@@ -140,11 +140,10 @@ class LaunchArgs(
 
     companion object {
         @JvmStatic
-        fun getCacioJavaArgs(isJava8: Boolean): List<String> {
+        fun getCacioJavaArgs(isJava8: Boolean, isJava17: Boolean, isJava21: Boolean): List<String> {
             val argsList: MutableList<String> = ArrayList()
 
             // Caciocavallo config AWT-enabled version
-            argsList.add("-Djava.awt.headless=false")
             argsList.add("-Dcacio.managed.screensize=" + AWTCanvasView.AWT_CANVAS_WIDTH + "x" + AWTCanvasView.AWT_CANVAS_HEIGHT)
             argsList.add("-Dcacio.font.fontmanager=sun.awt.X11FontManager")
             argsList.add("-Dcacio.font.fontscaler=sun.font.FreetypeFontScaler")
@@ -152,11 +151,20 @@ class LaunchArgs(
             if (isJava8) {
                 argsList.add("-Dawt.toolkit=net.java.openjdk.cacio.ctc.CTCToolkit")
                 argsList.add("-Djava.awt.graphicsenv=net.java.openjdk.cacio.ctc.CTCGraphicsEnvironment")
+                argsList.add("-Djava.awt.headless=false")
             } else {
+                if (isJava17) {
                 argsList.add("-Dawt.toolkit=com.github.caciocavallosilano.cacio.ctc.CTCToolkit")
                 argsList.add("-Djava.awt.graphicsenv=com.github.caciocavallosilano.cacio.ctc.CTCGraphicsEnvironment")
                 argsList.add("-Djava.system.class.loader=com.github.caciocavallosilano.cacio.ctc.CTCPreloadClassLoader")
-
+                argsList.add("-Djava.awt.headless=false")
+                }
+                if (isJava21) {
+                argsList.add("-Dawt.toolkit=com.github.caciocavallosilano.cacio.ctc.CTCToolkit")
+                argsList.add("-Djava.awt.graphicsenv=com.github.caciocavallosilano.cacio.ctc.CTCGraphicsEnvironment")
+                argsList.add("-Djava.system.class.loader=com.github.caciocavallosilano.cacio.ctc.CTCPreloadClassLoader")
+                argsList.add("-Djava.awt.headless=false")
+                }
                 argsList.add("--add-exports=java.desktop/java.awt=ALL-UNNAMED")
                 argsList.add("--add-exports=java.desktop/java.awt.peer=ALL-UNNAMED")
                 argsList.add("--add-exports=java.desktop/sun.awt.image=ALL-UNNAMED")
@@ -184,8 +192,18 @@ class LaunchArgs(
                 if (it.name.endsWith(".jar")) cacioClassPath.append(":").append(it.absolutePath)
             }
 
-            argsList.add(cacioClassPath.toString())
+            if (isJava8) {
+               argsList.add(cacioClassPath.toString())
+            }
 
+            if (isJava17) {
+               argsList.add(cacioClassPath.toString())
+            }
+
+            if (isJava21) {
+               argsList.add(cacioClassPath.toString())
+            }
+            
             return argsList
         }
     }

@@ -2,8 +2,8 @@
 // Created by maks on 24.09.2022.
 //
 
-#ifndef POJAVLAUNCHER_ENVIRON_H
-#define POJAVLAUNCHER_ENVIRON_H
+#ifndef __POJAVLAUNCHER_ENVIRON_H_
+#define __POJAVLAUNCHER_ENVIRON_H_
 
 #include <ctxbridges/common.h>
 #include <stdatomic.h>
@@ -60,18 +60,18 @@ struct pojav_environ_s {
     int savedWidth, savedHeight;
 #define ADD_CALLBACK_WWIN(NAME) \
     GLFW_invoke_##NAME##_func* GLFW_invoke_##NAME;
-    ADD_CALLBACK_WWIN(Char);
-    ADD_CALLBACK_WWIN(CharMods);
-    ADD_CALLBACK_WWIN(CursorEnter);
-    ADD_CALLBACK_WWIN(CursorPos);
-    ADD_CALLBACK_WWIN(FramebufferSize);
-    ADD_CALLBACK_WWIN(Key);
-    ADD_CALLBACK_WWIN(MouseButton);
-    ADD_CALLBACK_WWIN(Scroll);
-    ADD_CALLBACK_WWIN(WindowSize);
+    ADD_CALLBACK_WWIN(Char)
+    ADD_CALLBACK_WWIN(CharMods)
+    ADD_CALLBACK_WWIN(CursorEnter)
+    ADD_CALLBACK_WWIN(CursorPos)
+    ADD_CALLBACK_WWIN(FramebufferSize)
+    ADD_CALLBACK_WWIN(Key)
+    ADD_CALLBACK_WWIN(MouseButton)
+    ADD_CALLBACK_WWIN(Scroll)
+    ADD_CALLBACK_WWIN(WindowSize)
 
 #undef ADD_CALLBACK_WWIN
 };
 extern struct pojav_environ_s *pojav_environ;
 
-#endif //POJAVLAUNCHER_ENVIRON_H
+#endif //__POJAVLAUNCHER_ENVIRON_H_
