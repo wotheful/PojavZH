@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Zalith Launcher -->
+    <string name="generic_open">فتح</string>
     <string name="generic_close">إغلاق</string>
     <string name="generic_return">عودة</string>
     <string name="generic_edit">تعديل</string>
@@ -45,6 +46,7 @@
     <string name="generic_input_too_small">القيمة المدخلة صغيرة جدًا، يجب أن تكون على الأقل %s</string>
     <string name="generic_input_too_big">القيمة المدخلة كبيرة جدًا، يجب أن تكون على الأكثر %s</string>
     <string name="generic_copied">تم النسخ</string>
+    <string name="generic_saved">حفظ</string>
     <string name="generic_release">الإصدار الرسمي</string>
     <string name="generic_debug">إصدار تجريبي</string>
     <string name="generic_pre_release">إصدار ما قبل النشر</string>
@@ -69,7 +71,7 @@
     <string name="option_hotbar_width">عرض إطار التحديد</string>
     <string name="option_hotbar_height">ارتفاع إطار التحديد</string>
     <string name="customctrl_editor_exit_title">هل تريد الخروج؟</string>
-    <string name="customctrl_editor_exit_msg">هل أنت متأكد من الخروج؟</string>
+    <string name="customctrl_editor_exit_msg">لن يتم حفظ التعديلات الحالية. هل أنت متأكد أنك تريد الخروج مباشرة؟</string>
     <string name="customctrl_editor_exit">الخروج من المحرر</string>
     <string name="global_save_and_exit">حفظ والخروج</string>
     <string name="version_snapshot">الإصدار المبدئي</string>
@@ -89,7 +91,6 @@
     <string name="microsoft_login_retry_later">لقد قمت بالكثير من المحاولات، يرجى المحاولة مرة أخرى لاحقًا</string>
     <string name="storage_required">%s يتطلب الاتصال بالتخزين الخارجي، يرجى إعادة الاتصال وإعادة تشغيل البرنامج</string>
     <string name="dialog_select_jar">اختيار ملف Jar</string>
-    <string name="percent_format">%d%%</string>
     <string name="version_select_hint">اختيار الإصدار</string>
     <string name="notif_error_occured">حدث خطأ</string>
     <string name="notif_error_occured_desc">انقر لعرض التفاصيل</string>
@@ -109,6 +110,7 @@
     <string name="newdl_starting">قراءة بيانات اللعبة…</string>
     <string name="newdl_downloading_metadata">تنزيل بيانات اللعبة (%s)</string>
     <string name="newdl_downloading_game_files">تنزيل ملفات اللعبة… (%d/%d, %.2f MB)</string>
+    <string name="newdl_downloading_game_files_size">جارٍ تنزيل ملفات اللعبة… (%.2f/%.2f ميجابايت، %.2f ميجابايت/ثانية)</string>
     <string name="log_view_button_scroll_off">التمرير التلقائي: مغلق</string>
     <string name="log_view_button_scroll_on">التمرير التلقائي: مفتوح</string>
     <string name="log_view_button_output_off">الإخراج: مغلق</string>
@@ -143,7 +145,7 @@
     <string name="customctrl_addbutton_joystick">إضافة عصا تحكم</string>
     <string name="customctrl_addsubbutton">إضافة زر فرعي</string>
     <string name="customctrl_selectdefault">اختيار تخطيط التحكم الافتراضي</string>
-    <string name="customctrl_export">تصدير تخطيط التحكم</string>
+    <string name="customctrl_export">حفظ ومشاركة</string>
     <string name="customctrl_passthru">تمرير الماوس</string>
     <string name="customctrl_swipeable">قابل للتمرير</string>
     <string name="customctrl_forward_lock">قفل التقدم</string>
@@ -210,6 +212,7 @@
     <string name="version_install_type_version">تحميل وتثبيت كإصدار</string>
     <string name="version_install_type_mod">تحميل وتثبيت كـ Mod</string>
     <string name="version_install_optifine_and_forge">قد لا تعمل بعض إصدارات OptiFine مع Forge، في حالة حدوث تعطل أو مشاكل توافق، يرجى النظر أولاً في إزالة OptiFine!</string>
+    <string name="version_install_log_flood_warning">إذا تسببت سجلات التثبيت في إغراق الشاشة وتأخير الجهاز، انقر هنا لإغلاق السجلات!</string>
     <string name="version_manager_shortcuts">الاختصارات</string>
     <string name="version_manager_shortcuts_mods">إدارة Mod</string>
     <string name="version_manager_shortcuts_version_path">مجلد مسار اللعبة</string>
@@ -229,6 +232,7 @@
     <string name="version_manager_task_in_progress">المهمة قيد التنفيذ، وظيفة إدارة الإصدارات غير متاحة مؤقتًا</string>
     <string name="version_manager_invalid">هذه النسخة غير صالحة</string>
     <string name="version_manager_no_installed_version">المُحَرّك لم يجد أي Minecraft مُثبّت!</string>
+    <string name="version_manager_isolation_type_follow_global">اتبع إعدادات المشغل</string>
     <!-- Profiles Path -->
     <string name="permissions_manage_external_storage">%s يحتاج إلى إمكانية التحكم في جميع ملفات الجهاز لاستخدام هذه الميزة بشكل صحيح، يرجى تمكين الإذن!</string>
     <string name="permissions_write_external_storage">يتطلب %s إذن إدارة التخزين. إذا لم يتم تمكين الإذن، فقد يؤدي ذلك إلى مشاكل مثل فشل حفظ ملفات اللعبة أو فك ضغطها بشكل صحيح. يرجى منح الإذن لضمان عمل الوظائف بشكل صحيح.</string>
@@ -243,6 +247,7 @@
     <!-- Profile -->
     <string name="pedit_isolation_enabled">تمكين عزل الإصدارات</string>
     <string name="pedit_reset_icon">سيتم إعادة تعيين الرمز المخصص الذي قمت بتحديده، وهذه العملية لا يمكن التراجع عنها. هل أنت متأكد أنك تريد إعادة تعيين رمز النسخة؟</string>
+    <string name="pedit_unsaved_tip">لقد قمت بتعديل تكوين هذا الإصدار. العودة مباشرة ستؤدي إلى فقدان هذه التغييرات. هل أنت متأكد من أنك تريد العودة مباشرة؟</string>
     <string name="pedit_control">تخطيط التحكم</string>
     <string name="pedit_custom_path">مسار مخصص</string>
     <string name="pedit_default">(استخدام القيمة الافتراضية العامة)</string>
@@ -262,7 +267,7 @@
     <string name="account_microsoft_xerr_unauthorized">يبدو أن معلومات تسجيل الدخول إلى حساب مايكروسوفت الخاص بك قد انتهت، هذا الأمر شائع عند تغيير كلمة مرور الحساب، يرجى إزالة الحساب الحالي وإعادة تسجيل الدخول لإعادة تعيين معلومات تسجيل الدخول الخاصة بك.</string>
     <string name="account_local_account">حساب في وضع عدم الاتصال</string>
     <string name="account_local_account_empty">اسم المستخدم لا يمكن أن يكون فارغًا!</string>
-    <string name="account_local_account_invalid">الأسماء صحيحة للمستخدمين تدعم فقط الحروف الإنجليزية (كبيرة وصغيرة) والأرقام والخطوط السفلية. يجب أن يكون طولها بين 3 و 16 حرفا، وإلا فقد يفشل تشغيل اللعبة.\nأمثلة على الأسماء صحيحة: Name, Name_, Name123\nأمثلة على أسماء خاطئة: Name@, N ame, name_name_name_name\nلكن إذا كنت قد استخدمت مودز أو إضافات ذات صلة لتفويض هذا القيد، فيمكنك الاستمرار في استخدام هذا الاسم. وإلا، يرجى إعادة التسمية!</string>
+    <string name="account_local_account_invalid">اسم المستخدم الصحيح يدعم فقط الأحرف الإنجليزية (بأحرف كبيرة وصغيرة)، الأرقام، والشرطات السفلية. يجب أن يتراوح طول اسم المستخدم بين 3 و16 حرفًا. [RED;BOLD]وإلا فقد يتسبب ذلك في عدم عمل اللعبة بشكل صحيح.[/RED;BOLD]\nأمثلة على أسماء مستخدمين صحيحة: Name، Name_، Name123\nأمثلة على أسماء مستخدمين غير صحيحة: Name@، N ame، name_name_name_name\nولكن إذا كنت تستخدم مودات أو إضافات تزيل هذا القيد، يمكنك متابعة استخدام هذا الاسم. خلاف ذلك، يرجى إعادة تسميته!</string>
     <string name="account_login_local_name">اسم المستخدم</string>
     <string name="account_login_start">بدء تسجيل الدخول!</string>
     <string name="account_login_microsoft_progress">جاري تسجيل الدخول إلى حساب Microsoft: %s</string>
@@ -336,7 +341,6 @@
     <string name="file_delete_dir_message">عند حذف المجلد، سيتم حذف جميع الملفات الموجودة داخله أيضًا، إذا كان هذا المجلد يحتوي على ملفات مهمة، فالرجاء إلغاء هذه العملية!</string>
     <string name="file_delete_multiple_items_title">هل أنت متأكد أنك تريد حذف العناصر المحددة؟</string>
     <string name="file_delete_multiple_items_message">ستؤدي هذه العملية إلى حذف جميع العناصر المحددة بشكل دائم، يرجى التأكد من العملية بحذر!</string>
-    <string name="file_rename_empty">لا يمكن أن يكون اسم الملف فارغًا!</string>
     <string name="file_rename_exitis">اسم الملف يتعارض مع ملف موجود!</string>
     <string name="file_external_storage">دليل التخزين الخارجي</string>
     <string name="file_software_private">دليل خاص بالبرنامج</string>
@@ -355,9 +359,6 @@
     <string name="main_install_jar_file">تنفيذ ملف .jar</string>
     <string name="main_share_logs">مشاركة ملفات السجل</string>
     <string name="main_share_crash_report">مشاركة تقرير الانهيار</string>
-    <string name="main_share_log_title">الرجاء تحديد نوع ملف السجل</string>
-    <string name="main_share_launcher_log">ملف سجل المشغل</string>
-    <string name="main_share_game_log">سجل تشغيل اللعبة الأخير</string>
     <string name="main_launch">إطلاق اللعبة</string>
     <string name="setting_category_control">إعدادات التحكم</string>
     <string name="setting_category_virtual_mouse">الماوس الافتراضي</string>
@@ -365,17 +366,19 @@
     <string name="setting_category_controller_settings">إعدادات الجهاز التحكم</string>
     <string name="setting_category_java_tweaks">ضبط Java</string>
     <string name="setting_category_video">إعدادات الفيديو</string>
-    <string name="setting_category_version">الإصدار</string>
+    <string name="setting_category_version">إعدادات الإصدار</string>
     <string name="setting_category_language">اللغة</string>
     <string name="setting_category_personalization">التخصيص</string>
     <string name="setting_category_download">التنزيل</string>
     <string name="setting_category_game">إعدادات اللعبة</string>
-    <string name="setting_category_launcher">المشغل</string>
+    <string name="setting_category_launcher">إعدادات المشغل</string>
     <string name="setting_category_game_menu">قائمة اللعبة</string>
-    <string name="setting_category_experimental">تجريبي</string>
+    <string name="setting_category_experimental">إعدادات تجريبية</string>
     <string name="setting_category_experimental_patches">تصحيحات تجريبية</string>
+    <string name="setting_category_support">الدعم الخارجي</string>
     <string name="setting_renderer_title">العارض</string>
-    <string name="setting_renderer_name_ltw">LTW (للإصدار 1.17+ فقط)</string>
+    <string name="setting_renderer_name_ltw">LTW (للإصدارات 1.17+ فقط)</string>
+    <string name="setting_renderer_name_angle">Angle (للإصدارات 1.17+ فقط)</string>
     <string name="setting_ignore_notch_title">وضع ملء الشاشة</string>
     <string name="setting_ignore_notch_desc">تجاهل الشق وتمد المحتوى إلى كامل الشاشة لتجربة غامرة أكثر تكاملاً</string>
     <string name="setting_resolution_scaler_title">ضبط الدقة</string>
@@ -383,9 +386,8 @@
     <string name="setting_use_surface_view_title">استخدام عرض سطح بديل</string>
     <string name="setting_use_surface_view_desc">قد يساعد في تحسين الأداء المقيد بقدرات وحدة معالجة الرسومات</string>
     <string name="setting_sustained_performance_title">تمكين وضع الأداء المستمر</string>
-    <string name="setting_sustained_performance_desc">يحد من الأداء القصوى لمنع الانخفاض الحراري</string>
     <string name="setting_force_vsync_title">فرض تمكين المزامنة العمودية</string>
-    <string name="setting_force_vsync_description">يحد من الأداء القصوى لمنع الانخفاض الحراري</string>
+    <string name="setting_limit_overheating_throttling">منع خفض التردد بسبب الحرارة الزائدة عن طريق تحديد الأداء الأقصى</string>
     <string name="setting_vsync_in_zink_title">السماح بالمزامنة العمودية مع Zink</string>
     <string name="setting_vsync_in_zink_desc">يسمح للمشغل باستخدام واجهة برمجة تطبيقات النظام الداخلية لتمكين المزامنة العمودية لـ Zink</string>
     <string name="setting_vulkan_driver_system_title">استخدام برنامج تشغيل Vulkan الخاص بالنظام</string>
@@ -393,7 +395,7 @@
     <string name="setting_longpress_trigger_title">تأخير تشغيل الضغط الطويل</string>
     <string name="setting_longpress_trigger_desc">تغيير تأخير تشغيل الضغط الطويل لتدمير الكتل وإفلات العناصر</string>
     <string name="setting_button_scale_title">تحجيم تخطيط التحكم</string>
-    <string name="setting_button_scale_desc">إذا كانت الأزرار صغيرة جدًا، يمكنك تكبيرها</string>
+    <string name="setting_button_scale_desc">اضبط مقياس تخطيط التحكم بشكل عام. إذا كانت الأزرار صغيرة جدًا، يمكنك تكبيرها.</string>
     <string name="setting_mouse_scale_desc">تعديل حجم الماوس الافتراضي</string>
     <string name="setting_mouse_speed_desc">تعديل سرعة الماوس الافتراضي</string>
     <string name="setting_mouse_start_title">فتح الماوس الافتراضي بشكل افتراضي عند بدء اللعبة</string>
@@ -425,6 +427,10 @@
     <string name="setting_deadzone_scale_desc">إذا كان المؤشر ينحرف، يرجى زيادة هذا الخيار</string>
     <string name="setting_java_multirt_title">مدير بيئة التشغيل</string>
     <string name="setting_java_multirt_desc">إدارة البيئات التشغيلية المثبتة لـ Java</string>
+    <string name="setting_java_select_runtime_title">اختيار بيئة التشغيل قبل التنفيذ</string>
+    <string name="setting_java_select_runtime_desc">بيئة تشغيل Java التي سيتم استخدامها قبل الدخول إلى بيئة التنفيذ</string>
+    <string name="setting_java_select_runtime_ask_me">دعني أختار مؤقتًا</string>
+    <string name="setting_java_select_runtime_default">بيئة التشغيل الافتراضية الحالية</string>
     <string name="setting_java_args_title">معلمات بدء تشغيل JVM</string>
     <string name="setting_java_args_desc">المعلمات الإضافية لـ JVM التي يتم إضافتها عند بدء تشغيل Minecraft، لا ينصح بتعديلها بدون معرفة، لأن ذلك قد يؤدي إلى تعطل اللعبة</string>
     <string name="setting_java_memory_title">تخصيص الذاكرة</string>
@@ -439,16 +445,24 @@
     <string name="setting_shader_dump_desc">تسجيل المزج المحول إلى ملفات السجل</string>
     <string name="setting_force_big_core_title">فرض تشغيل العارض على النواة الكبيرة</string>
     <string name="setting_force_big_core_desc">فرض تشغيل مؤشر ترابط عارض Minecraft على النواة التي تعمل بأعلى تردد</string>
+    <string name="setting_use_controller_proxy_title">تمكين وكيل التحكم</string>
+    <string name="setting_use_controller_proxy_desc">تمكين عميل الوكيل المحلي للتحكم عند بدء تشغيل اللعبة للتواصل مع مود TouchController، لضمان التشغيل الصحيح لوظائف التحكم باللمس.</string>
+    <string name="setting_touch_controller_vibrate_duration_title">مدة اهتزاز مود TouchController</string>
+    <string name="setting_touch_controller_vibrate_duration_desc">قم بتعيين مدة الاهتزاز لهذا المود ليتناسب مع احتياجات الاستخدام المختلفة.</string>
     <string name="setting_verify_manifest_title">التحقق من قائمة نسخ اللعبة</string>
     <string name="setting_verify_manifest_desc">عند التمكين، سيقوم المشغل بالتحقق من قائمة نسخ اللعبة والمكتبات</string>
     <string name="setting_resource_image_cache_title">تخزين صور الموارد مؤقتًا</string>
     <string name="setting_resource_image_cache_desc">عند التفعيل، سيقوم المشغل بتخزين صور غلاف الموارد ولقطات الشاشة مؤقتًا لتحميلها بشكل أسرع في المرة القادمة</string>
+    <string name="setting_resource_full_name_title">بادئة الاسم الكامل للمورد</string>
+    <string name="setting_resource_full_name_desc">عند تنزيل ملفات الموارد، هل يجب إضافة الاسم الكامل للمورد كبادئة لاسم الملف المخصص</string>
     <string name="setting_download_source_title">مصدر تنزيل اللعبة</string>
     <string name="setting_download_source_desc">اختيار مصدر تنزيل مرآة بدلاً من استخدام المصدر الرسمي</string>
     <string name="setting_max_download_threads_title">عدد الحلقات الأقصى لتنزيل الملفات</string>
     <string name="setting_max_download_threads_desc">عدد الحد الأقصى لتنزيلات متزامنة عند تنزيل عدة ملفات في وقت واحد، لكن الكثير من الخيوط سيؤدي إلى تباطؤ البداية. 64 خيط كافية!</string>
-    <string name="setting_version_isolation_title">عزل الإصدار الافتراضي</string>
-    <string name="setting_version_isolation_desc">عند تثبيت إصدار جديد، هل يجب اختيار العزل الافتراضي للإصدار؟</string>
+    <string name="setting_version_isolation_title">عزل الإصدار</string>
+    <string name="setting_version_isolation_desc">تمكين عزل الإصدار لإصدار اللعبة\nعند إيقاف تشغيله، سيكون مسار اللعبة هو .minecraft/\nعند تشغيله، سيتغير مسار اللعبة إلى .minecraft/versions/&lt;اسم الإصدار&gt;/</string>
+    <string name="setting_version_custom_info_title">معلومات مخصصة</string>
+    <string name="setting_version_custom_info_desc">سيتم عرض المعلومات المخصصة في الزاوية السفلى اليسرى من القائمة الرئيسية للعبة وفي الزاوية العليا اليسرى من شاشة التصحيح F3. بعد إضافة حقل [zl_version]، سيستبدل المشغل به رقم إصدار المشغل.</string>
     <string name="setting_set_game_language_title">ضبط لغة اللعبة تلقائيًا</string>
     <string name="setting_set_game_language_desc">ضبط لغة اللعبة تلقائيًا على اللغة المحددة عند بدء تشغيل اللعبة</string>
     <string name="setting_set_game_language_list">ضبط لغة اللعبة</string>
@@ -534,6 +548,7 @@
     <string name="download_install_dependencies_tool">أداة</string>
     <string name="download_install_dependencies_include">يتضمن</string>
     <string name="download_install">تنزيل %s</string>
+    <string name="download_install_is_adapt">الإصدار الحالي %s متاح</string>
     <string name="download_install_unpack_world_error">تعذر التعرف على هيكل الملف، فشل فك الضغط التلقائي، يرجى معالجة الملف يدويًا!</string>
     <!-- ModPack -->
     <string name="select_modpack_local_tip">الرجاء تحديد ملف حزمة يدعمه المشغل للاستيراد!</string>
@@ -632,6 +647,7 @@
     <string name="newbie_guide_mod_search">انقر لاستدعاء مربع البحث، واستخدمه للعثور على الوحدة النمطية التي تبحث عنها بسرعة.</string>
     <string name="newbie_guide_mod_import">حدد ملف وحدة نمطية في مدير الملفات الأصلي لاستيراده إلى مجلد الوحدات النمطية الحالي.</string>
     <string name="newbie_guide_mod_download">انقر للدخول إلى صفحة تنزيل الوحدات النمطية، حيث يمكنك البحث عن الوحدات النمطية وتنزيلها عبر الإنترنت.</string>
+    <string name="newbie_guide_game_menu">يمكنك سحب نافذة القائمة العائمة إلى أي مكان على الشاشة.</string>
     <!-- Sponsorship Related -->
     <string name="request_sponsorship_title">دعم تطويري</string>
     <string name="request_sponsorship_message">تم تطوير وصيانة معظم محتويات هذا البرنامج بواسطتي وحدي. إذا كنت تجد هذا البرنامج مفيدًا بالنسبة لك وكان بإمكانك، أرجو أن تفكر في رعايتي لإعطائي المزيد من الدافع لمواصلة التطوير والتحسين، شكرًا لدعمك!</string>

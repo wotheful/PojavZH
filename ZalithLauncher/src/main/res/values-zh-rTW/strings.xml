@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Zalith Launcher -->
+    <string name="generic_open">開啟</string>
     <string name="generic_close">關閉</string>
     <string name="generic_return">返回</string>
     <string name="generic_edit">編輯</string>
@@ -45,6 +46,7 @@
     <string name="generic_input_too_small">填寫的數值過小，至少需為 %s</string>
     <string name="generic_input_too_big">填寫的數值過大，最多只能為 %s</string>
     <string name="generic_copied">已複製</string>
+    <string name="generic_saved">已儲存</string>
     <string name="generic_release">正式版</string>
     <string name="generic_debug">測試版</string>
     <string name="generic_pre_release">預發布版</string>
@@ -69,7 +71,7 @@
     <string name="option_hotbar_width">判定框寬度</string>
     <string name="option_hotbar_height">判定框高度</string>
     <string name="customctrl_editor_exit_title">是否離開？</string>
-    <string name="customctrl_editor_exit_msg">你是否確認退出？</string>
+    <string name="customctrl_editor_exit_msg">當前已進行的修改將不被保存，你確定要直接退出嗎？</string>
     <string name="customctrl_editor_exit">退出編輯器</string>
     <string name="global_save_and_exit">儲存並退出</string>
     <string name="version_snapshot">快照版</string>
@@ -89,7 +91,6 @@
     <string name="microsoft_login_retry_later">你的操作過於頻繁，請稍後再試</string>
     <string name="storage_required">%s 需要連接外部儲存，請重新連接並重新啟動軟體</string>
     <string name="dialog_select_jar">選擇 Jar 檔案</string>
-    <string name="percent_format">%d%%</string>
     <string name="version_select_hint">選擇版本</string>
     <string name="notif_error_occured">發生了一個錯誤</string>
     <string name="notif_error_occured_desc">點擊查看詳細資訊</string>
@@ -109,6 +110,7 @@
     <string name="newdl_starting">讀取遊戲元數據中…</string>
     <string name="newdl_downloading_metadata">下載遊戲元數據中 (%s)</string>
     <string name="newdl_downloading_game_files">下載遊戲檔案中… (%d/%d, %.2f MB)</string>
+    <string name="newdl_downloading_game_files_size">下載遊戲文件中… (%.2f/%.2f MB, %.2f MB/s)</string>
     <string name="log_view_button_scroll_off">自動滾動: 關閉</string>
     <string name="log_view_button_scroll_on">自動滾動: 開啟</string>
     <string name="log_view_button_output_off">輸出: 關閉</string>
@@ -143,7 +145,7 @@
     <string name="customctrl_addbutton_joystick">添加搖桿</string>
     <string name="customctrl_addsubbutton">添加子按鍵</string>
     <string name="customctrl_selectdefault">選擇預設控制佈局</string>
-    <string name="customctrl_export">匯出控制佈局</string>
+    <string name="customctrl_export">保存並分享</string>
     <string name="customctrl_passthru">滑鼠透傳</string>
     <string name="customctrl_swipeable">可滑動</string>
     <string name="customctrl_forward_lock">鎖定前進</string>
@@ -210,6 +212,7 @@
     <string name="version_install_type_version">作為版本下載並安裝</string>
     <string name="version_install_type_mod">作為模組下載並安裝</string>
     <string name="version_install_optifine_and_forge">OptiFine 的某些版本在 Forge 上可能無法運行，如果出現崩潰或相容性問題，請優先考慮刪除 OptiFine！</string>
+    <string name="version_install_log_flood_warning">安裝過程中如果日誌刷屏導致設備卡頓，可點擊這裡關閉日誌！</string>
     <string name="version_manager_shortcuts">快捷功能</string>
     <string name="version_manager_shortcuts_mods">模組管理</string>
     <string name="version_manager_shortcuts_version_path">遊戲路徑資料夾</string>
@@ -229,6 +232,7 @@
     <string name="version_manager_task_in_progress">任務執行中，暫時無法使用版本管理功能</string>
     <string name="version_manager_invalid">該版本無效</string>
     <string name="version_manager_no_installed_version">啟動器未找到已安裝的 Minecraft！</string>
+    <string name="version_manager_isolation_type_follow_global">跟隨啟動器設定</string>
     <!-- Profiles Path -->
     <string name="permissions_manage_external_storage">%s 需要管理裝置所有檔案的權限，以便正常使用這個功能，請開啟權限！</string>
     <string name="permissions_write_external_storage">%s 需要授予存儲管理權限。如果未開啟權限，可能會導致遊戲文件無法正常保存、解壓等問題。請授予權限，以確保功能正常運行。</string>
@@ -243,6 +247,7 @@
     <!-- Profile -->
     <string name="pedit_isolation_enabled">啟用版本隔離</string>
     <string name="pedit_reset_icon">這將會重置你設定的自訂圖示，且操作不可逆，你確定要重置版本圖示嗎？</string>
+    <string name="pedit_unsaved_tip">您已對這個版本配置進行了修改，直接返回將會丢失這些更改。您確定要直接返回嗎？</string>
     <string name="pedit_control">控制佈局</string>
     <string name="pedit_custom_path">自訂路徑</string>
     <string name="pedit_default">（使用全域預設值）</string>
@@ -262,7 +267,7 @@
     <string name="account_microsoft_xerr_unauthorized">你的微軟帳號登入資訊貌似已過期，這種情況常出現在帳號密碼被修改之後，請移除當前帳號並重新登入你的帳號，以重置你的登入資訊。</string>
     <string name="account_local_account">離線帳號</string>
     <string name="account_local_account_empty">使用者名稱不能為空！</string>
-    <string name="account_local_account_invalid">有效的使用者名稱僅支援英文大小寫字母、數字及下劃線。長度需在3至16個字元之間，否則遊戲可能無法正常運行。\n正確的使用者名稱範例：Name、Name_、Name123\n錯誤的使用者名稱範例：Name@、N ame、name_name_name_name\n但如果您已使用相關模組或插件來解除這項限制，則可繼續使用該名稱。否則，請重新命名！</string>
+    <string name="account_local_account_invalid">正常的使用者名稱僅支援英文字母（大小寫均可）、數字以及底線作為使用者名稱，長度不允許少於 3 字元，超過 16 字元，[RED;BOLD]否則可能將導致遊戲無法正常運行。[/RED;BOLD]\n正確的使用者名稱舉例：Name、Name_、Name123\n錯誤的使用者名稱舉例：Name@、N ame、name_name_name_name\n但如果你使用了相關模組或者插件能夠解除這一機制，那麼你可以繼續使用這個名字，否則請重新命名！</string>
     <string name="account_login_local_name">使用者名稱</string>
     <string name="account_login_start">開始登入！</string>
     <string name="account_login_microsoft_progress">正在登入 Microsoft 帳號：%s</string>
@@ -336,7 +341,6 @@
     <string name="file_delete_dir_message">刪除資料夾時，會將此資料夾內部全部檔案一併刪除，如果這個資料夾內含有重要的檔案，請取消此操作！</string>
     <string name="file_delete_multiple_items_title">你確定要刪除已選的項目嗎？</string>
     <string name="file_delete_multiple_items_message">此操作將永久刪除全部已選擇的項目，請謹慎操作！</string>
-    <string name="file_rename_empty">檔名不能為空！</string>
     <string name="file_rename_exitis">檔名與現有檔案衝突！</string>
     <string name="file_external_storage">外部儲存目錄</string>
     <string name="file_software_private">軟體私有目錄</string>
@@ -355,9 +359,6 @@
     <string name="main_install_jar_file">執行 .jar 檔案</string>
     <string name="main_share_logs">分享日誌檔案</string>
     <string name="main_share_crash_report">分享崩潰報告</string>
-    <string name="main_share_log_title">請選擇日誌檔案類型</string>
-    <string name="main_share_launcher_log">啟動器日誌檔案</string>
-    <string name="main_share_game_log">上一次遊戲運行日誌</string>
     <string name="main_launch">啟動遊戲</string>
     <string name="setting_category_control">控制設定</string>
     <string name="setting_category_virtual_mouse">虛擬滑鼠</string>
@@ -365,27 +366,28 @@
     <string name="setting_category_controller_settings">手把設定</string>
     <string name="setting_category_java_tweaks">Java 調整</string>
     <string name="setting_category_video">影片設定</string>
-    <string name="setting_category_version">版本</string>
+    <string name="setting_category_version">版本設定</string>
     <string name="setting_category_language">語言</string>
     <string name="setting_category_personalization">個性化</string>
     <string name="setting_category_download">下載</string>
     <string name="setting_category_game">遊戲設定</string>
-    <string name="setting_category_launcher">啟動器</string>
+    <string name="setting_category_launcher">啟動器設定</string>
     <string name="setting_category_game_menu">遊戲選單</string>
-    <string name="setting_category_experimental">實驗性</string>
+    <string name="setting_category_experimental">實驗性設定</string>
     <string name="setting_category_experimental_patches">實驗性補丁</string>
+    <string name="setting_category_support">外部支援</string>
     <string name="setting_renderer_title">渲染器</string>
     <string name="setting_renderer_name_ltw">LTW (僅限 1.17+)</string>
+    <string name="setting_renderer_name_angle">Angle (僅限 1.17+)</string>
     <string name="setting_ignore_notch_title">全螢幕模式</string>
     <string name="setting_ignore_notch_desc">忽略劉海屏並將螢幕內容擴展至全螢幕，給你更完整的沉浸感</string>
     <string name="setting_resolution_scaler_title">解析度調整</string>
     <string name="setting_resolution_scaler_desc">允許調整遊戲畫面解析度，原生解析度為 100%</string>
-    <string name="setting_use_surface_view_title">使用備用表面渲染</string>
+    <string name="setting_use_surface_view_title">使用備用 Surface 渲染</string>
     <string name="setting_use_surface_view_desc">可能有助於提升受 GPU 功能限制的效能</string>
     <string name="setting_sustained_performance_title">啟用持續效能模式</string>
-    <string name="setting_sustained_performance_desc">通過限制峰值效能來限制過熱降頻</string>
     <string name="setting_force_vsync_title">強制啟用垂直同步</string>
-    <string name="setting_force_vsync_description">通過限制峰值效能來限制過熱降頻</string>
+    <string name="setting_limit_overheating_throttling">透過限制峰值性能來防止過熱降頻</string>
     <string name="setting_vsync_in_zink_title">允許與 Zink 進行垂直同步</string>
     <string name="setting_vsync_in_zink_desc">允許啟動器使用內部系統 API 為 Zink 啟用垂直同步</string>
     <string name="setting_vulkan_driver_system_title">使用系統 Vulkan 驅動</string>
@@ -393,7 +395,7 @@
     <string name="setting_longpress_trigger_title">觸發長按延遲</string>
     <string name="setting_longpress_trigger_desc">更改長按摧毀方塊、丟棄物品的觸發延遲</string>
     <string name="setting_button_scale_title">控制佈局縮放</string>
-    <string name="setting_button_scale_desc">如果按鍵太小，可以將其放大</string>
+    <string name="setting_button_scale_desc">調整控制佈局整體的縮放比例，如果按鍵太小，可以將其放大</string>
     <string name="setting_mouse_scale_desc">修改虛擬鼠標的大小</string>
     <string name="setting_mouse_speed_desc">修改虛擬鼠標的移動速度</string>
     <string name="setting_mouse_start_title">啟動遊戲時預設開啟虛擬鼠標</string>
@@ -425,6 +427,10 @@
     <string name="setting_deadzone_scale_desc">若搖桿偏移，請調高此選項</string>
     <string name="setting_java_multirt_title">運行環境管理器</string>
     <string name="setting_java_multirt_desc">管理已安裝的 Java 運行環境</string>
+    <string name="setting_java_select_runtime_title">執行前選擇運行環境</string>
+    <string name="setting_java_select_runtime_desc">在進入執行環境前，將會使用的 Java 運行環境</string>
+    <string name="setting_java_select_runtime_ask_me">讓我臨時選擇</string>
+    <string name="setting_java_select_runtime_default">當前的預設運行環境</string>
     <string name="setting_java_args_title">JVM 啟動參數</string>
     <string name="setting_java_args_desc">啟動 Minecraft 時，額外添加的 JVM 參數，不建議在沒有把握的情況下進行修改，因為這很有可能導致遊戲崩潰</string>
     <string name="setting_java_memory_title">記憶體分配</string>
@@ -439,16 +445,24 @@
     <string name="setting_shader_dump_desc">記錄轉換的著色器到日誌檔案</string>
     <string name="setting_force_big_core_title">強制渲染器在大核上運行</string>
     <string name="setting_force_big_core_desc">強制 Minecraft 渲染執行緒在最高頻率的核心運行</string>
+    <string name="setting_use_controller_proxy_title">啟用控制代理</string>
+    <string name="setting_use_controller_proxy_desc">在啟動遊戲時啟用本地控制代理客戶端，用於與 TouchController 模組進行通信，確保觸控螢幕控制功能的正常使用</string>
+    <string name="setting_touch_controller_vibrate_duration_title">TouchController 模組震動持續時間</string>
+    <string name="setting_touch_controller_vibrate_duration_desc">設定該模組的震動持續時間，以適應不同的使用需求</string>
     <string name="setting_verify_manifest_title">遊戲版本列表檢查</string>
     <string name="setting_verify_manifest_desc">啟用後，啟動器將檢查遊戲版本列表以及庫</string>
     <string name="setting_resource_image_cache_title">快取資源圖片</string>
     <string name="setting_resource_image_cache_desc">啟用後，啟動器將會快取資源的封面圖片與截圖，方便下次更快速載入</string>
+    <string name="setting_resource_full_name_title">資源完整名稱前綴</string>
+    <string name="setting_resource_full_name_desc">下載資源檔案時，是否在自訂檔案名前添加資源的完整名稱</string>
     <string name="setting_download_source_title">遊戲下載源</string>
     <string name="setting_download_source_desc">選擇鏡像下載源，而不是使用官方下載源</string>
     <string name="setting_max_download_threads_title">檔案下載最大執行緒數</string>
     <string name="setting_max_download_threads_desc">同時下載多個檔案時的最大並發數，但線程數量過多將會導致啟動器卡頓，64 個線程已經足夠使用囉！</string>
-    <string name="setting_version_isolation_title">預設版本隔離</string>
-    <string name="setting_version_isolation_desc">安裝新版本時，是否預設選擇版本隔離</string>
+    <string name="setting_version_isolation_title">版本隔離</string>
+    <string name="setting_version_isolation_desc">是否為遊戲版本開啟版本隔離\n關閉時，版本的遊戲路徑為 .minecraft/\n開啟後，版本的遊戲路徑將會變更為 .minecraft/versions/&lt;版本名稱&gt;/</string>
+    <string name="setting_version_custom_info_title">自訂資訊</string>
+    <string name="setting_version_custom_info_desc">自訂資訊將顯示在遊戲的主選單左下角和 F3 調試螢幕的左上角。添加 [zl_version] 欄位後，啟動器會將其替換為啟動器版本號</string>
     <string name="setting_set_game_language_title">自動設定遊戲語言</string>
     <string name="setting_set_game_language_desc">在遊戲啟動時，自動設定遊戲語言為選定的語言</string>
     <string name="setting_set_game_language_list">設定遊戲語言</string>
@@ -534,6 +548,7 @@
     <string name="download_install_dependencies_tool">工具</string>
     <string name="download_install_dependencies_include">包括</string>
     <string name="download_install">下載 %s</string>
+    <string name="download_install_is_adapt">當前版本 %s 可用</string>
     <string name="download_install_unpack_world_error">無法識別文件結構，自動解壓失敗，請自行處理此文件！</string>
     <!-- ModPack -->
     <string name="select_modpack_local_tip">請選擇一個啟動器支持導入的模組包檔案！</string>
@@ -632,6 +647,7 @@
     <string name="newbie_guide_mod_search">點擊可召喚搜尋框，使用它可以快速搜尋到你想要尋找的模組。</string>
     <string name="newbie_guide_mod_import">在原生的檔案管理器內選擇一個模組檔案，可將其匯入當前模組資料夾。</string>
     <string name="newbie_guide_mod_download">點擊可以進入模組下載頁面，你可以在那裡線上搜尋與下載模組。</string>
+    <string name="newbie_guide_game_menu">可以拖動遊戲選單浮動視窗至螢幕的任意位置。</string>
     <!-- Sponsorship Related -->
     <string name="request_sponsorship_title">支持我的開發</string>
     <string name="request_sponsorship_message">這款軟體的大部分內容都是我一個人開發和維護的。如果你覺得這款軟體對你有幫助，並且條件允許的話，希望你能考慮贊助我，讓我有更多動力繼續開發和改進，謝謝你的支持！</string>

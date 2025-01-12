@@ -19,13 +19,14 @@ import java.util.Properties
 
 object BackgroundManager {
     private val FILE_BACKGROUND_PROPERTIES: File = File(PathManager.DIR_DATA, "background.properties")
+    const val NULL: String = "null"
 
     private val defaultProperties: Properties
         get() {
             val properties = Properties()
-            properties.setProperty(BackgroundType.MAIN_MENU.name, "null")
-            properties.setProperty(BackgroundType.CUSTOM_CONTROLS.name, "null")
-            properties.setProperty(BackgroundType.IN_GAME.name, "null")
+            properties.setProperty(BackgroundType.MAIN_MENU.name, NULL)
+            properties.setProperty(BackgroundType.CUSTOM_CONTROLS.name, NULL)
+            properties.setProperty(BackgroundType.IN_GAME.name, NULL)
             return properties
         }
 
@@ -70,9 +71,17 @@ object BackgroundManager {
             .into(DrawableImageViewTarget(backgroundView))
     }
 
+    @JvmStatic
+    fun clearBackgroundImage(
+        backgroundView: ImageView
+    ) {
+        backgroundView.background = null
+        backgroundView.setImageDrawable(null)
+    }
+
     fun getBackgroundImage(backgroundType: BackgroundType): File? {
         val pngName = properties[backgroundType.name] as String?
-        if (pngName == null || pngName == "null") return null
+        if (pngName == null || pngName == NULL) return null
 
         val backgroundImage = File(PathManager.DIR_BACKGROUND, pngName)
         if (!backgroundImage.exists() || !isImage(backgroundImage)) return null
@@ -92,19 +101,19 @@ object BackgroundManager {
         }.getOrElse { e -> Logging.e("saveProperties", Tools.printToString(e)) }
     }
 
-    fun saveProperties(map: Map<BackgroundType?, String?>) {
+    fun saveProperties(map: Map<BackgroundType, String>) {
         val properties = Properties()
         properties.setProperty(
             BackgroundType.MAIN_MENU.name,
-            map[BackgroundType.MAIN_MENU] ?: "null"
+            map[BackgroundType.MAIN_MENU] ?: NULL
         )
         properties.setProperty(
             BackgroundType.CUSTOM_CONTROLS.name,
-            map[BackgroundType.CUSTOM_CONTROLS] ?: "null"
+            map[BackgroundType.CUSTOM_CONTROLS] ?: NULL
         )
         properties.setProperty(
             BackgroundType.IN_GAME.name,
-            map[BackgroundType.IN_GAME] ?: "null"
+            map[BackgroundType.IN_GAME] ?: NULL
         )
 
         saveProperties(properties)

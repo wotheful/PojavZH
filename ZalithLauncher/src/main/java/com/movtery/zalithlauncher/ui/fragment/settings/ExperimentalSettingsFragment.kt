@@ -9,6 +9,7 @@ import com.movtery.anim.animations.Animations
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.databinding.SettingsFragmentExperimentalBinding
 import com.movtery.zalithlauncher.setting.AllSettings
+import com.movtery.zalithlauncher.ui.fragment.settings.wrapper.SeekBarSettingsWrapper
 import com.movtery.zalithlauncher.ui.fragment.settings.wrapper.SwitchSettingsWrapper
 
 class ExperimentalSettingsFragment :
@@ -40,6 +41,35 @@ class ExperimentalSettingsFragment :
             binding.bigCoreAffinityLayout,
             binding.bigCoreAffinity
         )
+
+        SwitchSettingsWrapper(
+            context,
+            AllSettings.useControllerProxy,
+            binding.useControllerProxyLayout,
+            binding.useControllerProxy
+        )
+
+        SeekBarSettingsWrapper(
+            context,
+            AllSettings.tcVibrateDuration,
+            binding.tcVibrateDurationLayout,
+            binding.tcVibrateDurationTitle,
+            binding.tcVibrateDurationSummary,
+            binding.tcVibrateDurationValue,
+            binding.tcVibrateDuration,
+            "ms"
+        )
+
+        refreshTouchControllerSettings()
+    }
+
+    private fun refreshTouchControllerSettings() {
+        binding.tcVibrateDurationLayout.visibility = if (AllSettings.useControllerProxy.getValue()) View.VISIBLE else View.GONE
+    }
+
+    override fun onChange() {
+        super.onChange()
+        refreshTouchControllerSettings()
     }
 
     override fun slideIn(animPlayer: AnimPlayer) {

@@ -14,7 +14,6 @@ import net.kdt.pojavlaunch.Tools
 import org.apache.commons.io.FileUtils
 import java.io.File
 import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.io.FilenameFilter
 import java.io.IOException
 import java.io.InputStream
@@ -43,14 +42,9 @@ class FileTools {
 
         @JvmStatic
         fun copyFileInBackground(context: Context, fileUri: Uri, outputFile: File): File {
-            runCatching {
-                context.contentResolver.openInputStream(fileUri).use { inputStream ->
-                    FileUtils.copyInputStreamToFile(inputStream, outputFile)
-                }
-            }.getOrElse { e ->
-                throw RuntimeException(e)
+            context.contentResolver.openInputStream(fileUri).use { inputStream ->
+                FileUtils.copyInputStreamToFile(inputStream, outputFile)
             }
-
             return outputFile
         }
 
@@ -122,15 +116,17 @@ class FileTools {
             EditTextDialog.Builder(context)
                 .setTitle(R.string.generic_rename)
                 .setEditText(getFileNameWithoutExtension(fileName, suffix))
+                .setAsRequired()
                 .setConfirmListener(ConfirmListener { editBox, _ ->
-                    val newName = editBox.text.toString().replace("/", "")
-                    if (fileName == newName) {
-                        return@ConfirmListener true
+                    val newName = editBox.text.toString()
+
+                    if (newName.contains("/")) {
+                        editBox.error = context.getString(R.string.generic_input_invalid_character, "/")
+                        return@ConfirmListener false
                     }
 
-                    if (newName.isEmpty()) {
-                        editBox.error = context.getString(R.string.file_rename_empty)
-                        return@ConfirmListener false
+                    if (fileName == newName) {
+                        return@ConfirmListener true
                     }
 
                     val newFile = File(fileParent, newName + suffix)
@@ -158,7 +154,13 @@ class FileTools {
                 .setEditText(fileName)
                 .setAsRequired()
                 .setConfirmListener(ConfirmListener { editBox, _ ->
-                    val newName = editBox.text.toString().replace("/", "")
+                    val newName = editBox.text.toString()
+
+                    if (newName.contains("/")) {
+                        editBox.error = context.getString(R.string.generic_input_invalid_character, "/")
+                        return@ConfirmListener false
+                    }
+
                     if (fileName == newName) {
                         return@ConfirmListener true
                     }
@@ -220,23 +222,33 @@ class FileTools {
             return String.format("%.2f %s", value, units[unitIndex])
         }
 
+        @JvmStatic
         @Throws(IOException::class)
-        fun packZip(files: Array<File>, outputZipFile: File?) {
-            if (files.isEmpty()) return
-
-            FileOutputStream(outputZipFile).use { fos ->
-                ZipOutputStream(fos).use { zos ->
-                    files.forEach { file ->
-                        FileInputStream(file).use { fis ->
-                            val zipEntry = ZipEntry(file.name).apply {
-                                time = file.lastModified() //保留原始文件的修改时间
-                            }
-                            zos.putNextEntry(zipEntry)
-                            fis.copyTo(zos, bufferSize = 1024)
-                            zos.closeEntry()
-                        }
-                    }
+        fun zipDirectory(folder: File, parentPath: String, filter: (File) -> Boolean, zos: ZipOutputStream) {
+            val files = folder.listFiles()?.filter(filter) ?: return
+            for (file in files) {
+                if (file.isDirectory) {
+                    zipDirectory(file, parentPath + file.name + "/", filter, zos)
+                } else {
+                    zipFile(file, parentPath + file.name, zos)
                 }
+            }
+        }
+
+        @JvmStatic
+        @Throws(IOException::class)
+        fun zipFile(file: File, entryName: String, zos: ZipOutputStream) {
+            FileInputStream(file).use { fis ->
+                val zipEntry = ZipEntry(entryName)
+                zipEntry.time = file.lastModified() //保留文件的修改时间
+                zos.putNextEntry(zipEntry)
+
+                val buffer = ByteArray(4096)
+                var length: Int
+                while ((fis.read(buffer).also { length = it }) >= 0) {
+                    zos.write(buffer, 0, length)
+                }
+                zos.closeEntry()
             }
         }
 

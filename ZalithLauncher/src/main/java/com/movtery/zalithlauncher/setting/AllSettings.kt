@@ -1,5 +1,6 @@
 package com.movtery.zalithlauncher.setting
 
+import com.movtery.zalithlauncher.InfoCenter
 import com.movtery.zalithlauncher.context.ContextExecutor
 import com.movtery.zalithlauncher.setting.unit.BooleanSettingUnit
 import com.movtery.zalithlauncher.setting.unit.IntSettingUnit
@@ -90,6 +91,9 @@ class AllSettings {
         val versionIsolation = BooleanSettingUnit("versionIsolation", false)
 
         @JvmStatic
+        val versionCustomInfo = StringSettingUnit("versionCustomInfo", "${InfoCenter.LAUNCHER_NAME}[zl_version]")
+
+        @JvmStatic
         val autoSetGameLanguage = BooleanSettingUnit("autoSetGameLanguage", true)
 
         @JvmStatic
@@ -97,6 +101,9 @@ class AllSettings {
 
         @JvmStatic
         val setGameLanguage = StringSettingUnit("setGameLanguage", "system")
+
+        @JvmStatic
+        val selectRuntimeMode = StringSettingUnit("selectRuntimeMode", "auto")
 
         @JvmStatic
         val javaArgs = StringSettingUnit("javaArgs", "")
@@ -133,6 +140,9 @@ class AllSettings {
         val resourceImageCache = BooleanSettingUnit("resourceImageCache", false)
 
         @JvmStatic
+        val addFullResourceName = BooleanSettingUnit("addFullResourceName", true)
+
+        @JvmStatic
         val downloadSource = StringSettingUnit("downloadSource", "default")
 
         @JvmStatic
@@ -162,6 +172,12 @@ class AllSettings {
 
         @JvmStatic
         val bigCoreAffinity = BooleanSettingUnit("bigCoreAffinity", false)
+
+        @JvmStatic
+        val useControllerProxy = BooleanSettingUnit("useControllerProxy", false)
+
+        @JvmStatic
+        val tcVibrateDuration = IntSettingUnit("tcVibrateDuration", 100)
 
         // Other
         @JvmStatic

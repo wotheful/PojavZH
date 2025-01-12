@@ -12,6 +12,8 @@ import androidx.annotation.Nullable;
 
 import com.movtery.zalithlauncher.R;
 
+import net.kdt.pojavlaunch.Tools;
+
 import fr.spse.extended_view.ExtendedButton;
 
 public class LauncherMenuButton extends ExtendedButton {
@@ -31,7 +33,8 @@ public class LauncherMenuButton extends ExtendedButton {
         post(() -> {
             setPivotX(getWidth() / 2f);
             setPivotY(getHeight() / 2f);
-            setStateListAnimator(AnimatorInflater.loadStateListAnimator(getContext(), R.xml.anim_scale_with_shadow));
+            setStateListAnimator(AnimatorInflater.loadStateListAnimator(getContext(), R.xml.anim_scale));
+            setTranslationZ(Tools.dpToPx(4f));
         });
     }
 
@@ -39,7 +42,7 @@ public class LauncherMenuButton extends ExtendedButton {
     private void setSettings(){
         Resources resources = getContext().getResources();
 
-        int padding = resources.getDimensionPixelSize(R.dimen._22sdp);
+        int padding = resources.getDimensionPixelSize(R.dimen._18sdp);
         setCompoundDrawablePadding(padding);
         setPaddingRelative(padding, 0, padding, 0);
         setGravity(Gravity.CENTER_VERTICAL);
@@ -48,7 +51,7 @@ public class LauncherMenuButton extends ExtendedButton {
 
         // Set drawable size
         int[] sizes = getExtendedViewData().getSizeCompounds();
-        sizes[0] = resources.getDimensionPixelSize(R.dimen._30sdp);
+        sizes[0] = resources.getDimensionPixelSize(R.dimen._24sdp);
         getExtendedViewData().setSizeCompounds(sizes);
         postProcessDrawables();
     }

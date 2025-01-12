@@ -5,12 +5,12 @@
 #ifndef __VIRGL_BRIDGE_H_
 #define __VIRGL_BRIDGE_H_
 
-void* virglGetCurrentContext();
-void loadSymbolsVirGL();
+bool loadSymbolsVirGL();
 int virglInit();
-void virglSwapBuffers();
-void virglMakeCurrent(void* window);
 void* virglCreateContext(void* contextSrc);
+void* virglGetCurrentContext();
+void virglMakeCurrent(void* window);
+void virglSwapBuffers();
 void virglSwapInterval(int interval);
 
 #endif //__VIRGL_BRIDGE_H_

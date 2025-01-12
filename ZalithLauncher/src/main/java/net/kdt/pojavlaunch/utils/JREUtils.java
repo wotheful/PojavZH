@@ -246,6 +246,11 @@ public class JREUtils {
             envMap.put("POJAVEXEC_EGL", "libltw.so");
         }
 
+        if (LOCAL_RENDERER.equals("opengles3_angle")) {
+            envMap.put("LIBGL_ES", "3");
+            envMap.put("POJAVEXEC_EGL", "libEGL_angle.so");
+        }
+
         if (LOCAL_RENDERER.equals("gallium_virgl"))
             envMap.put("VTEST_SOCKET_NAME", new File(PathManager.DIR_CACHE, ".virgl_test").getAbsolutePath());
 
@@ -256,6 +261,11 @@ public class JREUtils {
             envMap.put("allow_higher_compat_version", "true");
             envMap.put("allow_glsl_extension_directive_midshader", "true");
             envMap.put("MESA_LIBRARY", loadGraphicsLibrary());
+        }
+
+        if (LOCAL_RENDERER.equals("vulkan_zink")) {
+            envMap.put("MESA_GL_VERSION_OVERRIDE", "4.6");
+            envMap.put("MESA_GLSL_VERSION_OVERRIDE", "460");
         }
 
         envMap.put("POJAV_RENDERER", LOCAL_RENDERER);
@@ -333,6 +343,13 @@ public class JREUtils {
         userArgs.add("-Xms" + AllSettings.getRamAllocation().getValue().getValue() + "M");
         userArgs.add("-Xmx" + AllSettings.getRamAllocation().getValue().getValue() + "M");
         if (LOCAL_RENDERER != null) userArgs.add("-Dorg.lwjgl.opengl.libname=" + loadGraphicsLibrary());
+
+        // Force LWJGL to use the Freetype library intended for it, instead of using the one
+        // that we ship with Java (since it may be older than what's needed)
+        userArgs.add("-Dorg.lwjgl.freetype.libname="+ DIR_NATIVE_LIB +"/libfreetype.so");
+
+        // Some phones are not using the right number of cores, fix that
+        userArgs.add("-XX:ActiveProcessorCount=" + java.lang.Runtime.getRuntime().availableProcessors());
 
         userArgs.addAll(JVMArgs);
         activity.runOnUiThread(() -> Toast.makeText(activity, activity.getString(R.string.autoram_info_msg, AllSettings.getRamAllocation().getValue().getValue()), Toast.LENGTH_SHORT).show());
@@ -496,6 +513,9 @@ public class JREUtils {
                 break;
             case "gallium_panfrost":
                 renderLibrary = "libOSMesa_2300d.so";
+                break;
+            case "opengles3_angle":
+                renderLibrary = "libAngle.so";
                 break;
             case "opengles3_ltw":
                 renderLibrary = "libltw.so";

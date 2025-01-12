@@ -82,24 +82,13 @@ public class ProgressLayout extends ConstraintLayout implements View.OnClickList
         setOnClickListener(this);
     }
 
-
-    /** Update the progress bar content */
-    public static void setProgress(String progressKey, int progress){
-        ProgressKeeper.submitProgress(progressKey, progress, -1, (Object)null);
-    }
-
     /** Update the text and progress content */
     public static void setProgress(String progressKey, int progress, @StringRes int resource, Object... message){
         ProgressKeeper.submitProgress(progressKey, progress, resource, message);
     }
 
     /** Update the text and progress content */
-    public static void setProgress(String progressKey, int progress, String message){
-        setProgress(progressKey,progress, -1, message);
-    }
-
-    /** Update the text and progress content */
-    public static void clearProgress(String progressKey){
+    public static void clearProgress(String progressKey) {
         setProgress(progressKey, -1, -1);
     }
 
@@ -144,11 +133,14 @@ public class ProgressLayout extends ConstraintLayout implements View.OnClickList
 
         @Override
         public void onProgressUpdated(int progress, int resid, Object... va) {
-            post(()-> {
+            post(() -> {
                 textView.setProgress(progress);
-                if(resid != -1) textView.setText(getContext().getString(resid, va));
-                else if(va.length > 0 && va[0] != null)textView.setText((String)va[0]);
-                else textView.setText("");
+                try {
+                    if (resid != -1) textView.setText(getContext().getString(resid, va));
+                    else if (va.length > 0 && va[0] != null) textView.setText((String) va[0]);
+                    else textView.setText("");
+                } catch (Throwable ignored) {
+                }
             });
         }
 

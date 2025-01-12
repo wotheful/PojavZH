@@ -1,38 +1,53 @@
 package com.movtery.zalithlauncher.feature.version
 
+import android.content.Context
 import android.os.Parcel
 import android.os.Parcelable
+import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.feature.log.Logging
+import com.movtery.zalithlauncher.setting.AllSettings
+import com.movtery.zalithlauncher.utils.stringutils.StringUtils.getStringNotNull
 import net.kdt.pojavlaunch.Tools
 import java.io.File
 import java.io.FileWriter
 
 class VersionConfig(private var versionPath: File) : Parcelable {
-    private var isolation: Boolean = false
+    private var isolationType: IsolationType = IsolationType.FOLLOW_GLOBAL
     private var javaDir: String = ""
     private var javaArgs: String = ""
     private var renderer: String = ""
     private var control: String = ""
     private var customPath: String = ""
+    private var customInfo: String = ""
 
     constructor(
         filePath: File,
-        isolation: Boolean = false,
+        isolationType: IsolationType = IsolationType.FOLLOW_GLOBAL,
         javaDir: String = "",
         javaArgs: String = "",
         renderer: String = "",
         control: String = "",
-        customPath: String = ""
+        customPath: String = "",
+        customInfo: String = ""
     ) : this(filePath) {
-        this.isolation = isolation
+        this.isolationType = isolationType
         this.javaDir = javaDir
         this.javaArgs = javaArgs
         this.renderer = renderer
         this.control = control
         this.customPath = customPath
+        this.customInfo = customInfo
     }
 
-    fun copy(): VersionConfig = VersionConfig(versionPath, isolation, javaDir, javaArgs, renderer, control, customPath)
+    fun copy(): VersionConfig = VersionConfig(versionPath,
+        getIsolationTypeNotNull(isolationType),
+        getStringNotNull(javaDir),
+        getStringNotNull(javaArgs),
+        getStringNotNull(renderer),
+        getStringNotNull(control),
+        getStringNotNull(customPath),
+        getStringNotNull(customInfo)
+    )
 
     fun save() {
         runCatching {
@@ -62,68 +77,110 @@ class VersionConfig(private var versionPath: File) : Parcelable {
         this.versionPath = versionPath
     }
 
-    fun isIsolation() = isolation
-
-    fun setIsolation(isolation: Boolean) {
-        this.isolation = isolation
+    fun isIsolation(): Boolean = when(getIsolationTypeNotNull(isolationType)) {
+        IsolationType.FOLLOW_GLOBAL -> AllSettings.versionIsolation.getValue()
+        IsolationType.ENABLE -> true
+        IsolationType.DISABLE -> false
     }
 
-    fun getJavaDir() = javaDir
+    fun getIsolationType() = getIsolationTypeNotNull(isolationType)
+
+    fun setIsolationType(isolationType: IsolationType) { this.isolationType = isolationType }
+
+    fun getJavaDir(): String = getStringNotNull(javaDir)
 
     fun setJavaDir(dir: String) { this.javaDir = dir }
 
-    fun getJavaArgs() = javaArgs
+    fun getJavaArgs(): String = getStringNotNull(javaArgs)
 
     fun setJavaArgs(args: String) { this.javaArgs = args }
 
-    fun getRenderer() = renderer
+    fun getRenderer(): String = getStringNotNull(renderer)
 
     fun setRenderer(renderer: String) { this.renderer = renderer }
 
-    fun getControl() = control
+    fun getControl(): String = getStringNotNull(control)
 
     fun setControl(control: String) { this.control = control }
 
-    fun getCustomPath() = customPath
+    fun getCustomPath(): String = getStringNotNull(customPath)
 
     fun setCustomPath(customPath: String) { this.customPath = customPath }
 
+    fun getCustomInfo(): String = getStringNotNull(customInfo)
+
+    fun setCustomInfo(customInfo: String) { this.customInfo = customInfo }
+
+    fun checkDifferent(otherConfig: VersionConfig): Boolean {
+        return !(this.getIsolationType() == otherConfig.getIsolationType() &&
+                this.getJavaDir() == otherConfig.getJavaDir() &&
+                this.getJavaArgs() == otherConfig.getJavaArgs() &&
+                this.getRenderer() == otherConfig.getRenderer() &&
+                this.getControl() == otherConfig.getControl() &&
+                this.getCustomPath() == otherConfig.getCustomPath() &&
+                this.getCustomInfo() == otherConfig.getCustomInfo())
+    }
+
+    private fun getIsolationTypeNotNull(type: IsolationType?) = type ?: IsolationType.FOLLOW_GLOBAL
+
     override fun toString(): String {
-        return "VersionConfig{isolation=$isolation, versionPath='$versionPath', javaDir='$javaDir', javaArgs='$javaArgs', renderer='$renderer', control='$control', customPath='$customPath'}"
+        return "VersionConfig{" +
+                "isolationType=${getIsolationTypeNotNull(isolationType)}, " +
+                "versionPath='$versionPath', " +
+                "javaDir='${getStringNotNull(javaDir)}', " +
+                "javaArgs='${getStringNotNull(javaArgs)}', " +
+                "renderer='${getStringNotNull(renderer)}', " +
+                "control='${getStringNotNull(control)}', " +
+                "customPath='${getStringNotNull(customPath)}', " +
+                "customInfo='${getStringNotNull(customInfo)}'}"
     }
 
     override fun describeContents(): Int = 0
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
         dest.writeString(versionPath.absolutePath)
-        dest.writeInt(if (isolation) 1 else 0)
-        dest.writeString(javaDir)
-        dest.writeString(javaArgs)
-        dest.writeString(renderer)
-        dest.writeString(control)
-        dest.writeString(customPath)
+        dest.writeInt(getIsolationTypeNotNull(isolationType).ordinal)
+        dest.writeString(getStringNotNull(javaDir))
+        dest.writeString(getStringNotNull(javaArgs))
+        dest.writeString(getStringNotNull(renderer))
+        dest.writeString(getStringNotNull(control))
+        dest.writeString(getStringNotNull(customPath))
+        dest.writeString(getStringNotNull(customInfo))
     }
 
     companion object CREATOR : Parcelable.Creator<VersionConfig> {
         override fun createFromParcel(parcel: Parcel): VersionConfig {
             val versionPath = File(parcel.readString().orEmpty())
-            val isolation = parcel.readInt() > 0
+            val isolationType = IsolationType.entries.getOrNull(parcel.readInt()) ?: IsolationType.FOLLOW_GLOBAL
             val javaDir = parcel.readString().orEmpty()
             val javaArgs = parcel.readString().orEmpty()
             val renderer = parcel.readString().orEmpty()
             val control = parcel.readString().orEmpty()
             val customPath = parcel.readString().orEmpty()
-            return VersionConfig(versionPath, isolation, javaDir, javaArgs, renderer, control, customPath)
+            val customInfo = parcel.readString().orEmpty()
+            return VersionConfig(versionPath, isolationType, javaDir, javaArgs, renderer, control, customPath, customInfo)
         }
 
         override fun newArray(size: Int): Array<VersionConfig?> {
             return arrayOfNulls(size)
         }
 
+        @JvmStatic
         fun createIsolation(versionPath: File): VersionConfig {
             val config = VersionConfig(versionPath)
-            config.setIsolation(true)
+            config.setIsolationType(IsolationType.ENABLE)
             return config
         }
+
+        @JvmStatic
+        fun getIsolationString(context: Context, type: IsolationType): String = when (type) {
+            IsolationType.FOLLOW_GLOBAL -> context.getString(R.string.version_manager_isolation_type_follow_global)
+            IsolationType.ENABLE -> context.getString(R.string.generic_open)
+            IsolationType.DISABLE -> context.getString(R.string.generic_close)
+        }
+    }
+
+    enum class IsolationType {
+        FOLLOW_GLOBAL, ENABLE, DISABLE
     }
 }

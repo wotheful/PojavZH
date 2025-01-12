@@ -37,14 +37,13 @@ import com.movtery.zalithlauncher.context.ContextExecutor;
 import com.movtery.zalithlauncher.feature.customprofilepath.ProfilePathHome;
 import com.movtery.zalithlauncher.feature.log.Logging;
 import com.movtery.zalithlauncher.feature.version.Version;
-import com.movtery.zalithlauncher.setting.AllSettings;
 import com.movtery.zalithlauncher.task.Task;
 import com.movtery.zalithlauncher.ui.activity.BaseActivity;
 import com.movtery.zalithlauncher.ui.dialog.EditTextDialog;
-import com.movtery.zalithlauncher.ui.dialog.SelectRuntimeDialog;
 import com.movtery.zalithlauncher.utils.path.PathManager;
 import com.movtery.zalithlauncher.utils.ZHTools;
 import com.movtery.zalithlauncher.utils.file.FileTools;
+import com.movtery.zalithlauncher.utils.runtime.SelectRuntimeUtils;
 import com.movtery.zalithlauncher.utils.stringutils.StringUtils;
 
 import net.kdt.pojavlaunch.fragments.MainMenuFragment;
@@ -52,8 +51,6 @@ import net.kdt.pojavlaunch.lifecycle.ContextExecutorTask;
 import net.kdt.pojavlaunch.memory.MemoryHoleFinder;
 import net.kdt.pojavlaunch.memory.SelfMapsParser;
 import net.kdt.pojavlaunch.multirt.MultiRTUtils;
-import net.kdt.pojavlaunch.multirt.Runtime;
-import net.kdt.pojavlaunch.utils.DownloadUtils;
 import net.kdt.pojavlaunch.utils.FileUtils;
 import net.kdt.pojavlaunch.value.DependentLibrary;
 import net.kdt.pojavlaunch.value.MinecraftLibraryArtifact;
@@ -89,14 +86,6 @@ public final class Tools {
     // New since 3.0.0
     public static String DIRNAME_HOME_JRE = "lib";
     private static RenderersList sCompatibleRenderers;
-
-    public static File getPojavStorageRoot(Context ctx) {
-        if(SDK_INT >= 29) {
-            return ctx.getExternalFilesDir(null);
-        }else{
-            return new File(Environment.getExternalStorageDirectory(),"games/ZalithLauncher");
-        }
-    }
 
     /**
      * Checks if the Pojav's storage root is accessible and read-writable
@@ -578,10 +567,6 @@ public final class Tools {
         }
     }
 
-    public static void downloadFile(String urlInput, String nameOutput) throws IOException {
-        File file = new File(nameOutput);
-        DownloadUtils.downloadFile(urlInput, file);
-    }
     public interface DownloaderFeedback {
         void updateProgress(int curr, int max);
     }
@@ -691,13 +676,10 @@ public final class Tools {
                 .setConfirmListener((editBox, checked) -> {
                     Intent intent = new Intent(activity, JavaGUILauncherActivity.class);
                     intent.putExtra("javaArgs", editBox.getText().toString());
-                    SelectRuntimeDialog selectRuntimeDialog = new SelectRuntimeDialog(activity);
-                    selectRuntimeDialog.setListener(jreName -> {
+                    SelectRuntimeUtils.selectRuntime(activity, null, jreName -> {
                         intent.putExtra(JavaGUILauncherActivity.EXTRAS_JRE_NAME, jreName);
-                        selectRuntimeDialog.dismiss();
                         activity.startActivity(intent);
                     });
-                    selectRuntimeDialog.show();
 
                     return true;
                 }).buildDialog();
@@ -709,13 +691,10 @@ public final class Tools {
     public static void launchModInstaller(Activity activity, @NonNull Uri uri){
         Intent intent = new Intent(activity, JavaGUILauncherActivity.class);
         intent.putExtra("modUri", uri);
-        SelectRuntimeDialog selectRuntimeDialog = new SelectRuntimeDialog(activity);
-        selectRuntimeDialog.setListener(jreName -> {
+        SelectRuntimeUtils.selectRuntime(activity, null, jreName -> {
             intent.putExtra(JavaGUILauncherActivity.EXTRAS_JRE_NAME, jreName);
-            selectRuntimeDialog.dismiss();
             activity.startActivity(intent);
         });
-        selectRuntimeDialog.show();
     }
 
 
@@ -744,37 +723,6 @@ public final class Tools {
 
     public static boolean isValidString(String string) {
         return string != null && !string.isEmpty();
-    }
-
-    public static String getRuntimeName(String prefixedName) {
-        if(prefixedName == null) return null;
-        if(!prefixedName.startsWith(Tools.LAUNCHERPROFILES_RTPREFIX)) return null;
-        return prefixedName.substring(Tools.LAUNCHERPROFILES_RTPREFIX.length());
-    }
-
-    public static String getSelectedRuntime(Version version) {
-        String runtime = AllSettings.getDefaultRuntime().getValue();
-        String versionRuntime = getRuntimeName(version.getJavaDir());
-        if (versionRuntime != null) {
-            if (MultiRTUtils.forceReread(versionRuntime).versionString != null) {
-                runtime = versionRuntime;
-            }
-        }
-        return runtime;
-    }
-
-    public static @NonNull String pickRuntime(Activity activity, Version version, int targetJavaVersion) {
-        String runtime = getSelectedRuntime(version);
-        Runtime pickedRuntime = MultiRTUtils.read(runtime);
-        if (pickedRuntime.javaVersion == 0 || pickedRuntime.javaVersion < targetJavaVersion) {
-            String settingsRuntime = MultiRTUtils.getNearestJreName(targetJavaVersion);
-            if (settingsRuntime == null) {
-                activity.runOnUiThread(() -> Toast.makeText(activity, activity.getString(R.string.game_autopick_runtime_failed), Toast.LENGTH_LONG).show());
-                return runtime; //返回选择的runtime
-            }
-            runtime = settingsRuntime;
-        }
-        return runtime;
     }
 
     /**

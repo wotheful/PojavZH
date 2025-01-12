@@ -224,12 +224,9 @@ class FilesFragment : FragmentWithAnim(R.layout.fragment_files) {
                 closeMultiSelect()
                 EditTextDialog.Builder(requireContext())
                     .setTitle(R.string.file_folder_dialog_insert_name)
+                    .setAsRequired()
                     .setConfirmListener { editBox, _ ->
-                        val name = editBox.text.toString().replace("/", "")
-                        if (name.isEmpty()) {
-                            editBox.error = getString(R.string.file_rename_empty)
-                            return@setConfirmListener false
-                        }
+                        val name = editBox.text.toString()
 
                         val folder = File(fileRecyclerView.fullPath, name)
 
@@ -238,9 +235,9 @@ class FilesFragment : FragmentWithAnim(R.layout.fragment_files) {
                             return@setConfirmListener false
                         }
 
-                        val success = folder.mkdir()
+                        val success = folder.mkdirs()
                         if (success) {
-                            fileRecyclerView.listFileAt(File(fileRecyclerView.fullPath, name))
+                            fileRecyclerView.listFileAt(folder)
                         } else {
                             fileRecyclerView.refreshPath()
                         }
@@ -401,7 +398,6 @@ class FilesFragment : FragmentWithAnim(R.layout.fragment_files) {
         binding.apply {
             animPlayer.apply(AnimPlayer.Entry(filesLayout, Animations.BounceInDown))
                 .apply(AnimPlayer.Entry(operateLayout, Animations.BounceInLeft))
-                .apply(AnimPlayer.Entry(operateButtonsLayout, Animations.FadeInLeft))
         }
     }
 
@@ -409,7 +405,6 @@ class FilesFragment : FragmentWithAnim(R.layout.fragment_files) {
         binding.apply {
             animPlayer.apply(AnimPlayer.Entry(filesLayout, Animations.FadeOutUp))
                 .apply(AnimPlayer.Entry(operateLayout, Animations.FadeOutRight))
-                .apply(AnimPlayer.Entry(operateButtonsLayout, Animations.BounceShrink))
         }
     }
 }

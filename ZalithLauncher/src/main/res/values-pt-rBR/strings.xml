@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Zalith Launcher -->
+    <string name="generic_open">Abrir</string>
     <string name="generic_close">Fechar</string>
     <string name="generic_return">Voltar</string>
     <string name="generic_edit">Editar</string>
@@ -45,6 +46,7 @@
     <string name="generic_input_too_small">O valor preenchido é muito pequeno, deve ser pelo menos %s</string>
     <string name="generic_input_too_big">O valor preenchido é muito grande, o máximo é %s</string>
     <string name="generic_copied">Copiado</string>
+    <string name="generic_saved">Salvo</string>
     <string name="generic_release">Versão oficial</string>
     <string name="generic_debug">Versão de teste</string>
     <string name="generic_pre_release">Versão preliminar</string>
@@ -69,7 +71,7 @@
     <string name="option_hotbar_width">Largura da Caixa de Detecção</string>
     <string name="option_hotbar_height">Altura da Caixa de Detecção</string>
     <string name="customctrl_editor_exit_title">Sair?</string>
-    <string name="customctrl_editor_exit_msg">Tem certeza de que deseja sair?</string>
+    <string name="customctrl_editor_exit_msg">As alterações atuais não serão salvas. Tem certeza de que deseja sair diretamente?</string>
     <string name="customctrl_editor_exit">Sair do Editor</string>
     <string name="global_save_and_exit">Salvar e Sair</string>
     <string name="version_snapshot">Versão Snapshot</string>
@@ -89,7 +91,6 @@
     <string name="microsoft_login_retry_later">Suas ações estão sendo realizadas com muita frequência, tente novamente mais tarde</string>
     <string name="storage_required">O %s requer armazenamento externo, reconecte e reinicie o software</string>
     <string name="dialog_select_jar">Selecionar Arquivo Jar</string>
-    <string name="percent_format">%d%%</string>
     <string name="version_select_hint">Selecionar Versão</string>
     <string name="notif_error_occured">Ocorreu um erro</string>
     <string name="notif_error_occured_desc">Clique para ver detalhes</string>
@@ -109,6 +110,7 @@
     <string name="newdl_starting">Lendo metadados do jogo…</string>
     <string name="newdl_downloading_metadata">Baixando metadados do jogo (%s)</string>
     <string name="newdl_downloading_game_files">Baixando arquivos do jogo… (%d/%d, %.2f MB)</string>
+    <string name="newdl_downloading_game_files_size">Baixando arquivos do jogo… (%.2f/%.2f MB, %.2f MB/s)</string>
     <string name="log_view_button_scroll_off">Rolagem automática: Desligada</string>
     <string name="log_view_button_scroll_on">Rolagem automática: Ligada</string>
     <string name="log_view_button_output_off">Saída: Desligada</string>
@@ -143,7 +145,7 @@
     <string name="customctrl_addbutton_joystick">Adicionar joystick</string>
     <string name="customctrl_addsubbutton">Adicionar subbotão</string>
     <string name="customctrl_selectdefault">Selecionar layout de controle padrão</string>
-    <string name="customctrl_export">Exportar layout de controle</string>
+    <string name="customctrl_export">Salvar e Compartilhar</string>
     <string name="customctrl_passthru">Passagem do mouse</string>
     <string name="customctrl_swipeable">Deslizável</string>
     <string name="customctrl_forward_lock">Bloquear avanço</string>
@@ -210,6 +212,7 @@
     <string name="version_install_type_version">Baixar e instalar como versão</string>
     <string name="version_install_type_mod">Baixar e instalar como Mod</string>
     <string name="version_install_optifine_and_forge">Algumas versões do OptiFine podem não funcionar no Forge, se ocorrer uma falha ou problemas de compatibilidade, considere remover o OptiFine primeiro!</string>
+    <string name="version_install_log_flood_warning">Se os logs lotarem a tela e causarem lentidão no dispositivo durante a instalação, clique aqui para fechar os logs!</string>
     <string name="version_manager_shortcuts">Atalhos</string>
     <string name="version_manager_shortcuts_mods">Gerenciamento de Mods</string>
     <string name="version_manager_shortcuts_version_path">Pasta do caminho do jogo</string>
@@ -229,6 +232,7 @@
     <string name="version_manager_task_in_progress">Tarefa em andamento, gerenciamento de versões temporariamente indisponível</string>
     <string name="version_manager_invalid">Esta versão é inválida</string>
     <string name="version_manager_no_installed_version">O lançador não encontrou nenhum Minecraft instalado!</string>
+    <string name="version_manager_isolation_type_follow_global">Seguir as Configurações do Launcher</string>
     <!-- Profiles Path -->
     <string name="permissions_manage_external_storage">%s precisa da permissão para gerenciar todos os arquivos do dispositivo para usar esta funcionalidade corretamente, por favor, habilite a permissão!</string>
     <string name="permissions_write_external_storage">O %s requer permissão de gerenciamento de armazenamento. Se a permissão não estiver ativada, podem ocorrer problemas como falha ao salvar ou descompactar os arquivos do jogo. Conceda a permissão para garantir o funcionamento correto.</string>
@@ -243,6 +247,7 @@
     <!-- Profile -->
     <string name="pedit_isolation_enabled">Habilitar Isolamento de Versão</string>
     <string name="pedit_reset_icon">Isso irá redefinir o ícone personalizado que você configurou, e a operação não pode ser desfeita. Tem certeza de que deseja redefinir o ícone da versão?</string>
+    <string name="pedit_unsaved_tip">Você fez alterações na configuração desta versão. Retornar diretamente irá perder essas alterações. Você tem certeza que quer retornar diretamente?</string>
     <string name="pedit_control">Layout de Controle</string>
     <string name="pedit_custom_path">Caminho personalizado</string>
     <string name="pedit_default">(Usar valor padrão global)</string>
@@ -262,7 +267,7 @@
     <string name="account_microsoft_xerr_unauthorized">As informações de login da sua conta Microsoft parecem estar expiradas. Isso geralmente acontece quando a senha da conta foi alterada. Por favor, remova a conta atual e faça login novamente para redefinir suas informações de login.</string>
     <string name="account_local_account">Conta offline</string>
     <string name="account_local_account_empty">O nome de usuário não pode estar vazio!</string>
-    <string name="account_local_account_invalid">Nomes de usuário válidos só podem conter letras inglesas (maiúsculas e minúsculas), números e underscores. Seu comprimento deve ser entre 3 e 16 caracteres, caso contrário, o jogo pode não funcionar corretamente.\nExemplos de nomes de usuário corretos: Name, Name_, Name123\nExemplos de nomes de usuário incorretos: Name@, N ame, name_name_name_name\nMas, se você usou mods ou plugins relevantes para ignorar essa regra, pode continuar usando esse nome. Caso contrário, por favor, renomeie-o!</string>
+    <string name="account_local_account_invalid">Um nome de usuário válido aceita apenas letras em inglês (maiúsculas e minúsculas), números e sublinhados. O comprimento do nome de usuário deve estar entre 3 e 16 caracteres. [RED;BOLD]Caso contrário, o jogo pode não funcionar corretamente.[/RED;BOLD]\nExemplos de nomes de usuário válidos: Name, Name_, Name123\nExemplos de nomes de usuário inválidos: Name@, N ame, name_name_name_name\nNo entanto, se você estiver usando mods ou plugins que removem essa restrição, pode continuar usando este nome. Caso contrário, renomeie-o!</string>
     <string name="account_login_local_name">Nome de usuário</string>
     <string name="account_login_start">Iniciar login!</string>
     <string name="account_login_microsoft_progress">Fazendo login na conta Microsoft: %s</string>
@@ -336,7 +341,6 @@
     <string name="file_delete_dir_message">Ao excluir a pasta, todos os arquivos dentro dela serão excluídos juntos. Se esta pasta contiver arquivos importantes, cancele esta operação!</string>
     <string name="file_delete_multiple_items_title">Tem certeza de que deseja excluir os itens selecionados?</string>
     <string name="file_delete_multiple_items_message">Esta ação excluirá permanentemente todos os itens selecionados. Proceda com cautela!</string>
-    <string name="file_rename_empty">O nome do arquivo não pode estar vazio!</string>
     <string name="file_rename_exitis">O nome do arquivo está em conflito com um arquivo existente!</string>
     <string name="file_external_storage">Diretório de armazenamento externo</string>
     <string name="file_software_private">Diretório privado do software</string>
@@ -355,9 +359,6 @@
     <string name="main_install_jar_file">Executar arquivo .jar</string>
     <string name="main_share_logs">Compartilhar arquivos de log</string>
     <string name="main_share_crash_report">Compartilhar relatório de falha</string>
-    <string name="main_share_log_title">Selecione o tipo de arquivo de log</string>
-    <string name="main_share_launcher_log">Arquivo de log do launcher</string>
-    <string name="main_share_game_log">Log da última execução do jogo</string>
     <string name="main_launch">Iniciar Jogo</string>
     <string name="setting_category_control">Configurações de controle</string>
     <string name="setting_category_virtual_mouse">Mouse virtual</string>
@@ -365,27 +366,28 @@
     <string name="setting_category_controller_settings">Configurações do controle</string>
     <string name="setting_category_java_tweaks">Ajustes do Java</string>
     <string name="setting_category_video">Configurações de vídeo</string>
-    <string name="setting_category_version">Versão</string>
+    <string name="setting_category_version">Configurações de Versão</string>
     <string name="setting_category_language">Idioma</string>
     <string name="setting_category_personalization">Personalização</string>
     <string name="setting_category_download">Download</string>
     <string name="setting_category_game">Configurações do jogo</string>
-    <string name="setting_category_launcher">Launcher</string>
-    <string name="setting_category_game_menu">Menu do jogo</string>
-    <string name="setting_category_experimental">Experimental</string>
+    <string name="setting_category_launcher">Configurações do Launcher</string>
+    <string name="setting_category_game_menu">Menu do Jogo</string>
+    <string name="setting_category_experimental">Configurações Experimentais</string>
     <string name="setting_category_experimental_patches">Patches experimentais</string>
+    <string name="setting_category_support">Suporte Externo</string>
     <string name="setting_renderer_title">Renderizador</string>
-    <string name="setting_renderer_name_ltw">LTW (Apenas para 1.17+)</string>
+    <string name="setting_renderer_name_ltw">LTW (apenas para 1.17+)</string>
+    <string name="setting_renderer_name_angle">Angle (apenas para 1.17+)</string>
     <string name="setting_ignore_notch_title">Modo Tela Cheia</string>
     <string name="setting_ignore_notch_desc">Ignorar o entalhe e expandir o conteúdo da tela para tela cheia, proporcionando uma experiência mais imersiva</string>
     <string name="setting_resolution_scaler_title">Ajuste de Resolução</string>
     <string name="setting_resolution_scaler_desc">Permite ajustar a resolução da tela do jogo, a resolução nativa é 100%</string>
-    <string name="setting_use_surface_view_title">Usar Renderização de Superfície Alternativa</string>
+    <string name="setting_use_surface_view_title">Usar renderização de superfície alternativa</string>
     <string name="setting_use_surface_view_desc">Pode ajudar a melhorar o desempenho limitado pela capacidade da GPU</string>
     <string name="setting_sustained_performance_title">Habilitar Modo de Desempenho Sustentado</string>
-    <string name="setting_sustained_performance_desc">Limita o desempenho máximo para evitar redução de frequência devido ao superaquecimento</string>
     <string name="setting_force_vsync_title">Forçar V-Sync</string>
-    <string name="setting_force_vsync_description">Limita o desempenho máximo para evitar redução de frequência devido ao superaquecimento</string>
+    <string name="setting_limit_overheating_throttling">Prevenir o redução de desempenho devido ao superaquecimento limitando o desempenho máximo</string>
     <string name="setting_vsync_in_zink_title">Permitir V-Sync com Zink</string>
     <string name="setting_vsync_in_zink_desc">Permite que o launcher use a API do sistema interno para habilitar V-Sync com Zink</string>
     <string name="setting_vulkan_driver_system_title">Usar Driver Vulkan do Sistema</string>
@@ -393,7 +395,7 @@
     <string name="setting_longpress_trigger_title">Atraso de Acionamento de Toque Longo</string>
     <string name="setting_longpress_trigger_desc">Altera o atraso para acionar o toque longo para destruir blocos, descartar itens</string>
     <string name="setting_button_scale_title">Escala de Layout de Controle</string>
-    <string name="setting_button_scale_desc">Se os botões forem muito pequenos, você pode aumentá-los</string>
+    <string name="setting_button_scale_desc">Ajuste a escala geral do layout de controle. Se os botões estiverem muito pequenos, você pode aumentá-los.</string>
     <string name="setting_mouse_scale_desc">Modifica o tamanho do mouse virtual</string>
     <string name="setting_mouse_speed_desc">Modifica a velocidade do mouse virtual</string>
     <string name="setting_mouse_start_title">Mostrar Mouse Virtual ao Iniciar o Jogo</string>
@@ -425,6 +427,10 @@
     <string name="setting_deadzone_scale_desc">Aumente esta opção se o joystick estiver deslocado</string>
     <string name="setting_java_multirt_title">Gerenciador de Ambiente de Execução</string>
     <string name="setting_java_multirt_desc">Gerenciar os ambientes de execução Java instalados</string>
+    <string name="setting_java_select_runtime_title">Selecionar Ambiente de Execução Antes da Execução</string>
+    <string name="setting_java_select_runtime_desc">O ambiente de execução Java a ser utilizado antes de entrar no ambiente de execução</string>
+    <string name="setting_java_select_runtime_ask_me">Deixe-me escolher temporariamente</string>
+    <string name="setting_java_select_runtime_default">Ambiente de execução padrão atual</string>
     <string name="setting_java_args_title">Parâmetros de Inicialização da JVM</string>
     <string name="setting_java_args_desc">Parâmetros adicionais da JVM ao iniciar o Minecraft. Não é recomendado modificar sem certeza, pois isso pode causar falhas no jogo.</string>
     <string name="setting_java_memory_title">Alocação de Memória</string>
@@ -439,16 +445,24 @@
     <string name="setting_shader_dump_desc">Registrar os shaders convertidos em um arquivo de log</string>
     <string name="setting_force_big_core_title">Forçar o Renderizador a Rodar em Núcleos Grandes</string>
     <string name="setting_force_big_core_desc">Forçar a thread de renderização do Minecraft a rodar nos núcleos de maior frequência</string>
+    <string name="setting_use_controller_proxy_title">Ativar Proxy de Controle</string>
+    <string name="setting_use_controller_proxy_desc">Ative o cliente proxy do controlador local ao iniciar o jogo para se comunicar com o mod TouchController, garantindo o funcionamento adequado dos controles de tela sensível ao toque.</string>
+    <string name="setting_touch_controller_vibrate_duration_title">Duração da vibração do mod TouchController</string>
+    <string name="setting_touch_controller_vibrate_duration_desc">Defina a duração da vibração para este mod para atender a diferentes necessidades de uso.</string>
     <string name="setting_verify_manifest_title">Verificação da Lista de Versões do Jogo</string>
     <string name="setting_verify_manifest_desc">Quando habilitado, o lançador verificará a lista de versões do jogo e as bibliotecas</string>
     <string name="setting_resource_image_cache_title">Cachear imagens de recursos</string>
     <string name="setting_resource_image_cache_desc">Quando ativado, o launcher armazenará em cache as imagens de capa e capturas de tela dos recursos para carregar mais rapidamente da próxima vez</string>
+    <string name="setting_resource_full_name_title">Prefixo do nome completo do recurso</string>
+    <string name="setting_resource_full_name_desc">Ao baixar arquivos de recursos, se o nome completo do recurso deve ser adicionado como prefixo ao nome do arquivo personalizado</string>
     <string name="setting_download_source_title">Fonte de Download do Jogo</string>
     <string name="setting_download_source_desc">Selecionar fonte de download em espelho em vez de usar a fonte oficial de download</string>
     <string name="setting_max_download_threads_title">Número máximo de threads de download</string>
     <string name="setting_max_download_threads_desc">Número máximo de downloads concorrentes ao baixar vários arquivos simultaneamente, mas muitos threads podem causar lentidão no lançador. 64 threads são suficientes!</string>
-    <string name="setting_version_isolation_title">Isolamento de versão padrão</string>
-    <string name="setting_version_isolation_desc">Ao instalar uma nova versão, deve-se selecionar o isolamento de versão por padrão?</string>
+    <string name="setting_version_isolation_title">Isolamento de Versão</string>
+    <string name="setting_version_isolation_desc">Ativar isolamento de versão para a versão do jogo\nQuando desativado, o caminho do jogo será .minecraft/\nQuando ativado, o caminho do jogo será alterado para .minecraft/versions/&lt;nome da versão&gt;/</string>
+    <string name="setting_version_custom_info_title">Informações personalizadas</string>
+    <string name="setting_version_custom_info_desc">As informações personalizadas serão exibidas no canto inferior esquerdo do menu principal do jogo e no canto superior esquerdo da tela de depuração F3. Após adicionar o campo [zl_version], o lançador o substituirá pelo número da versão do lançador.</string>
     <string name="setting_set_game_language_title">Definir Idioma do Jogo Automaticamente</string>
     <string name="setting_set_game_language_desc">Ao iniciar o jogo, definir automaticamente o idioma do jogo para o idioma selecionado</string>
     <string name="setting_set_game_language_list">Definir Idioma do Jogo</string>
@@ -534,6 +548,7 @@
     <string name="download_install_dependencies_tool">Ferramenta</string>
     <string name="download_install_dependencies_include">Inclui</string>
     <string name="download_install">Baixando %s</string>
+    <string name="download_install_is_adapt">A versão atual %s está disponível</string>
     <string name="download_install_unpack_world_error">Não foi possível reconhecer a estrutura do arquivo, falha ao descompactar automaticamente, por favor, manuseie o arquivo manualmente!</string>
     <!-- ModPack -->
     <string name="select_modpack_local_tip">Por favor, selecione um arquivo de pacote compatível com o launcher para importação!</string>
@@ -632,6 +647,7 @@
     <string name="newbie_guide_mod_search">Clique para convocar a caixa de pesquisa e use-a para encontrar rapidamente o Mod que você deseja.</string>
     <string name="newbie_guide_mod_import">Selecione um arquivo Mod no gerenciador de arquivos nativo para importá-lo para a pasta de Mods atual.</string>
     <string name="newbie_guide_mod_download">Clique para acessar a página de download de Mods, onde você pode pesquisar e baixar Mods online.</string>
+    <string name="newbie_guide_game_menu">Você pode arrastar a janela flutuante do menu do jogo para qualquer posição na tela.</string>
     <!-- Sponsorship Related -->
     <string name="request_sponsorship_title">Apoie o meu desenvolvimento</string>
     <string name="request_sponsorship_message">A maior parte deste software foi desenvolvida e mantida por mim sozinho. Se você acha que este software é útil para você e se suas condições permitirem, espero que considere me patrocinar para que eu possa ter mais motivação para continuar desenvolvendo e melhorando, obrigado pelo seu apoio!</string>

@@ -19,6 +19,7 @@ import com.movtery.zalithlauncher.event.value.DownloadRecyclerEnableEvent
 import com.movtery.zalithlauncher.feature.download.InfoViewModel
 import com.movtery.zalithlauncher.feature.download.ScreenshotAdapter
 import com.movtery.zalithlauncher.feature.download.VersionAdapter
+import com.movtery.zalithlauncher.feature.download.enums.Classify
 import com.movtery.zalithlauncher.feature.download.enums.ModLoader
 import com.movtery.zalithlauncher.feature.download.item.InfoItem
 import com.movtery.zalithlauncher.feature.download.item.ModVersionItem
@@ -26,6 +27,7 @@ import com.movtery.zalithlauncher.feature.download.item.ScreenshotItem
 import com.movtery.zalithlauncher.feature.download.item.VersionItem
 import com.movtery.zalithlauncher.feature.download.platform.AbstractPlatformHelper
 import com.movtery.zalithlauncher.feature.log.Logging
+import com.movtery.zalithlauncher.feature.version.VersionsManager
 import com.movtery.zalithlauncher.setting.AllSettings
 import com.movtery.zalithlauncher.task.Task
 import com.movtery.zalithlauncher.task.TaskExecutors
@@ -40,6 +42,7 @@ import net.kdt.pojavlaunch.Tools
 import org.greenrobot.eventbus.EventBus
 import org.jackhuang.hmcl.ui.versions.ModTranslations
 import org.jackhuang.hmcl.util.versioning.VersionNumber
+import java.util.Objects
 import java.util.concurrent.Future
 import java.util.function.Consumer
 
@@ -138,18 +141,62 @@ class DownloadModFragment : ModListFragment() {
 
         currentTask?.apply { if (isCancelled) return }
 
+        val currentVersion = VersionsManager.getCurrentVersion()
+        //定位首次适配的版本，并记录其索引，在加载完成之后，RecyclerView 会滚动到这个索引处
+        var firstAdaptIndex: Int? = null
+
         val mData: MutableList<ModListItemBean> = ArrayList()
         mModVersionsByMinecraftVersion.entries
             .sortedWith { entry1, entry2 ->
-                -VersionNumber.compare(entry1.key.first, entry2.key.first)
+                val mcVersionComparison = -VersionNumber.compare(entry1.key.first, entry2.key.first)
+                if (mcVersionComparison != 0) {
+                    mcVersionComparison
+                } else {
+                    val name1 = entry1.key.second?.name ?: ""
+                    val name2 = entry2.key.second?.name ?: ""
+                    //保证有ModLoader的版本在前
+                    if (name1.isEmpty() && name2.isNotEmpty()) 1
+                    else if (name1.isNotEmpty() && name2.isEmpty()) -1
+                    else name1.compareTo(name2)
+                }
             }
-            .forEach { entry: Map.Entry<Pair<String, ModLoader?>, List<VersionItem>> ->
+            .forEachIndexed { index: Int, entry: Map.Entry<Pair<String, ModLoader?>, List<VersionItem>> ->
                 currentTask?.apply { if (isCancelled) return }
+
+                val isAdapt: Boolean = when (mInfoItem.classify) {
+                    Classify.MODPACK -> false
+                    else -> currentVersion?.let { version ->
+                        val itemVersion = VersionNumber.asVersion(entry.key.first).canonical
+                        val currentVersionString = VersionNumber.asVersion(version.getVersionInfo()?.minecraftVersion ?: "").canonical
+
+                        if (!Objects.equals(itemVersion, currentVersionString)) return@let false
+
+                        val modloader = entry.key.second
+                        val loaderInfo = version.getVersionInfo()?.loaderInfo
+
+                        when {
+                            //资源没有模组加载器信息，直接判定适配
+                            modloader == null -> true
+                            //资源有模组加载器，但当前版本没有模组加载器信息，不适配
+                            //（不装模组加载器你想装什么模组？）
+                            loaderInfo == null -> false
+                            //匹配模组加载器
+                            else -> loaderInfo.any { loader -> Objects.equals(modloader.loaderName, loader.name) }
+                        }
+                    } ?: false
+                }
+
+                if (isAdapt) {
+                    firstAdaptIndex ?: run {
+                        firstAdaptIndex = index
+                    }
+                }
 
                 mData.add(
                     ModListItemBean(
                         entry.key.first,
                         entry.key.second,
+                        isAdapt,
                         VersionAdapter(this, mInfoItem, platformHelper, entry.value)
                     )
                 )
@@ -158,22 +205,31 @@ class DownloadModFragment : ModListFragment() {
         currentTask?.apply { if (isCancelled) return }
 
         Task.runTask(TaskExecutors.getAndroidUI()) {
-            val modVersionView = recyclerView
             runCatching {
-                var mModAdapter = modVersionView.adapter as ModListAdapter?
-                mModAdapter ?: run {
-                    mModAdapter = ModListAdapter(this, mData)
-                    modVersionView.layoutManager = LinearLayoutManager(fragmentActivity!!)
-                    modVersionView.adapter = mModAdapter
+                var modAdapter = recyclerView.adapter as ModListAdapter?
+                modAdapter ?: run {
+                    modAdapter = ModListAdapter(this, mData)
+                    recyclerView.layoutManager = LinearLayoutManager(fragmentActivity!!)
+                    recyclerView.adapter = modAdapter
                     return@runCatching
                 }
-                mModAdapter?.updateData(mData)
+                modAdapter?.updateData(mData)
             }.getOrElse { e ->
                 Logging.e("Set Adapter", Tools.printToString(e))
             }
 
             componentProcessing(false)
-            modVersionView.scheduleLayoutAnimation()
+            recyclerView.scheduleLayoutAnimation()
+
+            firstAdaptIndex?.let {
+                recyclerView.postDelayed(
+                    {
+                        //直接滚动到先前获取到的“首次适配”的索引，并且往下偏移两个索引
+                        recyclerView.smoothScrollToPosition((it + 2).coerceAtMost(mData.size - 1))
+                    },
+                    500
+                )
+            }
         }.execute()
     }
 

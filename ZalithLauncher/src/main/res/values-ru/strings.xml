@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Zalith Launcher -->
+    <string name="generic_open">Открыть</string>
     <string name="generic_close">Закрыть</string>
     <string name="generic_return">Вернуться</string>
     <string name="generic_edit">Редактировать</string>
@@ -45,6 +46,7 @@
     <string name="generic_input_too_small">Введенное значение слишком маленькое, минимум %s</string>
     <string name="generic_input_too_big">Введенное значение слишком большое, максимум %s</string>
     <string name="generic_copied">Скопировано</string>
+    <string name="generic_saved">Сохранено</string>
     <string name="generic_release">Официальная версия</string>
     <string name="generic_debug">Тестовая версия</string>
     <string name="generic_pre_release">Предрелизная версия</string>
@@ -69,7 +71,7 @@
     <string name="option_hotbar_width">Ширина коробки обнаружения</string>
     <string name="option_hotbar_height">Высота коробки обнаружения</string>
     <string name="customctrl_editor_exit_title">Выйти?</string>
-    <string name="customctrl_editor_exit_msg">Вы уверены, что хотите выйти?</string>
+    <string name="customctrl_editor_exit_msg">Текущие изменения не будут сохранены. Вы уверены, что хотите выйти прямо сейчас?</string>
     <string name="customctrl_editor_exit">Выйти из редактора</string>
     <string name="global_save_and_exit">Сохранить и выйти</string>
     <string name="version_snapshot">Снимок</string>
@@ -89,7 +91,6 @@
     <string name="microsoft_login_retry_later">Ваши действия слишком часты, попробуйте позже</string>
     <string name="storage_required">%s требует подключения внешнего хранилища, пожалуйста, подключите его и перезапустите программу</string>
     <string name="dialog_select_jar">Выбрать файл Jar</string>
-    <string name="percent_format">%d%%</string>
     <string name="version_select_hint">Выберите версию</string>
     <string name="notif_error_occured">Произошла ошибка</string>
     <string name="notif_error_occured_desc">Нажмите, чтобы увидеть подробности</string>
@@ -109,6 +110,7 @@
     <string name="newdl_starting">Чтение метаданных игры…</string>
     <string name="newdl_downloading_metadata">Загрузка метаданных игры (%s)</string>
     <string name="newdl_downloading_game_files">Загрузка файлов игры… (%d/%d, %.2f MB)</string>
+    <string name="newdl_downloading_game_files_size">Загрузка игровых файлов… (%.2f/%.2f МБ, %.2f МБ/с)</string>
     <string name="log_view_button_scroll_off">Автопрокрутка: Выкл</string>
     <string name="log_view_button_scroll_on">Автопрокрутка: Вкл</string>
     <string name="log_view_button_output_off">Вывод: Выкл</string>
@@ -143,7 +145,7 @@
     <string name="customctrl_addbutton_joystick">Добавить джойстик</string>
     <string name="customctrl_addsubbutton">Добавить под кнопку</string>
     <string name="customctrl_selectdefault">Выбрать раскладку управления по умолчанию</string>
-    <string name="customctrl_export">Экспорт раскладки управления</string>
+    <string name="customctrl_export">Сохранить и поделиться</string>
     <string name="customctrl_passthru">Прямой проход мыши</string>
     <string name="customctrl_swipeable">Прокручиваемый</string>
     <string name="customctrl_forward_lock">Блокировка движения вперед</string>
@@ -210,6 +212,7 @@
     <string name="version_install_type_version">Загрузить и установить как версию</string>
     <string name="version_install_type_mod">Загрузить и установить как мод</string>
     <string name="version_install_optifine_and_forge">Некоторые версии OptiFine могут не работать на Forge, если возникнут сбои или проблемы совместимости, пожалуйста, рассмотрите возможность удаления OptiFine в первую очередь!</string>
+    <string name="version_install_log_flood_warning">Если логи перегружают экран и вызывают зависание устройства во время установки, нажмите здесь, чтобы закрыть логи!</string>
     <string name="version_manager_shortcuts">Ярлыки</string>
     <string name="version_manager_shortcuts_mods">Управление модами</string>
     <string name="version_manager_shortcuts_version_path">Папка пути игры</string>
@@ -229,6 +232,7 @@
     <string name="version_manager_task_in_progress">Задача в процессе, управление версиями временно недоступно</string>
     <string name="version_manager_invalid">Эта версия недействительна</string>
     <string name="version_manager_no_installed_version">Запускатель не нашёл установленную версию Minecraft!</string>
+    <string name="version_manager_isolation_type_follow_global">Следовать настройкам лаунчера</string>
     <!-- Profiles Path -->
     <string name="permissions_manage_external_storage">%s требует разрешения на управление всеми файлами устройства для правильной работы этой функции, пожалуйста, включите разрешение!</string>
     <string name="permissions_write_external_storage">Для работы %s требуется разрешение на управление хранилищем. Если разрешение не предоставлено, могут возникнуть проблемы, такие как невозможность сохранения или распаковки игровых файлов. Пожалуйста, предоставьте разрешение для обеспечения корректной работы.</string>
@@ -243,6 +247,7 @@
     <!-- Profile -->
     <string name="pedit_isolation_enabled">Включить изоляцию версий</string>
     <string name="pedit_reset_icon">Это сбросит установленную вами пользовательскую иконку, и операция необратима. Вы уверены, что хотите сбросить иконку версии?</string>
+    <string name="pedit_unsaved_tip">Вы внесли изменения в конфигурацию этой версии. Прямой возврат приведет к потере этих изменений. Вы уверены, что хотите непосредственно вернуться?</string>
     <string name="pedit_control">Раскладка управления</string>
     <string name="pedit_custom_path">Пользовательский путь</string>
     <string name="pedit_default">(Использовать глобальное значение по умолчанию)</string>
@@ -262,7 +267,7 @@
     <string name="account_microsoft_xerr_unauthorized">Ваша информация для входа в аккаунт Microsoft, похоже, устарела. Это часто происходит, когда пароль аккаунта был изменён. Пожалуйста, удалите текущий аккаунт и войдите в свой аккаунт снова, чтобы сбросить вашу информацию для входа.</string>
     <string name="account_local_account">Локальный аккаунт</string>
     <string name="account_local_account_empty">Имя пользователя не может быть пустым!</string>
-    <string name="account_local_account_invalid">Допустимые имена пользователей поддерживают только английские буквы (большие и малые), цифры и подчеркивания. Длина должна быть не менее 3 и не более 16 символов, иначе игра может не запуститься.\nПримеры правильных имен: Name, Name_, Name123\nПримеры неправильных имен: Name@, N ame, name_name_name_name\nОднако, если вы использовали соответствующие моды или плагины, чтобы обойти этот механизм, то можете продолжать использовать это имя. В противном случае, попробуйте переименовать!</string>
+    <string name="account_local_account_invalid">Допустимое имя пользователя может содержать только английские буквы (в любом регистре), цифры и символы подчеркивания. Длина имени должна быть от 3 до 16 символов. [RED;BOLD]В противном случае игра может работать некорректно.[/RED;BOLD]\nПримеры допустимых имен: Name, Name_, Name123\nПримеры недопустимых имен: Name@, N ame, name_name_name_name\nОднако, если вы используете моды или плагины, снимающие это ограничение, вы можете продолжить использовать это имя. В противном случае, пожалуйста, переименуйте его!</string>
     <string name="account_login_local_name">Имя пользователя</string>
     <string name="account_login_start">Начать вход!</string>
     <string name="account_login_microsoft_progress">Вход в учетную запись Microsoft: %s</string>
@@ -336,7 +341,6 @@
     <string name="file_delete_dir_message">При удалении папки будут удалены все файлы внутри неё. Если в этой папке есть важные файлы, отмените эту операцию!</string>
     <string name="file_delete_multiple_items_title">Вы уверены, что хотите удалить выбранные элементы?</string>
     <string name="file_delete_multiple_items_message">Это действие навсегда удалит все выбранные элементы. Действуйте осторожно!</string>
-    <string name="file_rename_empty">Имя файла не может быть пустым!</string>
     <string name="file_rename_exitis">Имя файла конфликтует с существующим файлом!</string>
     <string name="file_external_storage">Внешнее хранилище</string>
     <string name="file_software_private">Приватная папка программы</string>
@@ -355,9 +359,6 @@
     <string name="main_install_jar_file">Запустить .jar файл</string>
     <string name="main_share_logs">Поделиться файлами логов</string>
     <string name="main_share_crash_report">Поделиться отчетом о сбое</string>
-    <string name="main_share_log_title">Выберите тип файла логов</string>
-    <string name="main_share_launcher_log">Лог запуска программы</string>
-    <string name="main_share_game_log">Лог последнего запуска игры</string>
     <string name="main_launch">Запустить игру</string>
     <string name="setting_category_control">Настройки управления</string>
     <string name="setting_category_virtual_mouse">Виртуальная мышь</string>
@@ -365,27 +366,28 @@
     <string name="setting_category_controller_settings">Настройки контроллера</string>
     <string name="setting_category_java_tweaks">Настройки Java</string>
     <string name="setting_category_video">Настройки видео</string>
-    <string name="setting_category_version">Версия</string>
+    <string name="setting_category_version">Настройки версии</string>
     <string name="setting_category_language">Язык</string>
     <string name="setting_category_personalization">Персонализация</string>
     <string name="setting_category_download">Загрузки</string>
     <string name="setting_category_game">Настройки игры</string>
-    <string name="setting_category_launcher">Запуск программы</string>
+    <string name="setting_category_launcher">Настройки лаунчера</string>
     <string name="setting_category_game_menu">Игровое меню</string>
-    <string name="setting_category_experimental">Экспериментальные</string>
+    <string name="setting_category_experimental">Экспериментальные настройки</string>
     <string name="setting_category_experimental_patches">Экспериментальные патчи</string>
+    <string name="setting_category_support">Внешняя поддержка</string>
     <string name="setting_renderer_title">Рендерер</string>
-    <string name="setting_renderer_name_ltw">LTW (Только для 1.17+)</string>
+    <string name="setting_renderer_name_ltw">LTW (только для 1.17+)</string>
+    <string name="setting_renderer_name_angle">Angle (только для 1.17+)</string>
     <string name="setting_ignore_notch_title">Полноэкранный режим</string>
     <string name="setting_ignore_notch_desc">Игнорировать вырез и расширить контент на весь экран для более полного погружения</string>
     <string name="setting_resolution_scaler_title">Масштабирование разрешения</string>
     <string name="setting_resolution_scaler_desc">Позволяет изменять разрешение игрового экрана, нативным разрешением является 100%</string>
-    <string name="setting_use_surface_view_title">Использовать альтернативный поверхностный рендеринг</string>
+    <string name="setting_use_surface_view_title">Использовать альтернативное отображение Surface</string>
     <string name="setting_use_surface_view_desc">Может помочь улучшить производительность, ограниченную возможностями GPU</string>
     <string name="setting_sustained_performance_title">Включить режим постоянного уровня производительности</string>
-    <string name="setting_sustained_performance_desc">Ограничивает пиковую производительность для предотвращения перегрева и снижения частоты</string>
     <string name="setting_force_vsync_title">Принудительно включить вертикальную синхронизацию</string>
-    <string name="setting_force_vsync_description">Ограничивает пиковую производительность для предотвращения перегрева и снижения частоты</string>
+    <string name="setting_limit_overheating_throttling">Предотвращение троттлинга из-за перегрева путем ограничения пиковой производительности</string>
     <string name="setting_vsync_in_zink_title">Разрешить вертикальную синхронизацию с Zink</string>
     <string name="setting_vsync_in_zink_desc">Позволяет лаунчеру использовать внутренние системные API для включения вертикальной синхронизации с Zink</string>
     <string name="setting_vulkan_driver_system_title">Использовать системный драйвер Vulkan</string>
@@ -393,7 +395,7 @@
     <string name="setting_longpress_trigger_title">Задержка длинного нажатия</string>
     <string name="setting_longpress_trigger_desc">Изменяет задержку для активации длинного нажатия для разрушения блоков и выбрасывания предметов</string>
     <string name="setting_button_scale_title">Масштабирование раскладки управления</string>
-    <string name="setting_button_scale_desc">Если кнопки слишком маленькие, их можно увеличить</string>
+    <string name="setting_button_scale_desc">Настройте общий масштаб макета управления. Если кнопки слишком маленькие, их можно увеличить.</string>
     <string name="setting_mouse_scale_desc">Изменить размер виртуальной мыши</string>
     <string name="setting_mouse_speed_desc">Изменить скорость перемещения виртуальной мыши</string>
     <string name="setting_mouse_start_title">Показывать виртуальную мышь при запуске игры</string>
@@ -425,6 +427,10 @@
     <string name="setting_deadzone_scale_desc">Увеличьте этот параметр, если джойстик смещается</string>
     <string name="setting_java_multirt_title">Менеджер среды выполнения</string>
     <string name="setting_java_multirt_desc">Управление установленными средами выполнения Java</string>
+    <string name="setting_java_select_runtime_title">Выбор среды выполнения перед выполнением</string>
+    <string name="setting_java_select_runtime_desc">Среда выполнения Java, которая будет использоваться перед входом в среду выполнения</string>
+    <string name="setting_java_select_runtime_ask_me">Позвольте мне выбрать временно</string>
+    <string name="setting_java_select_runtime_default">Текущая среда выполнения по умолчанию</string>
     <string name="setting_java_args_title">Параметры запуска JVM</string>
     <string name="setting_java_args_desc">Дополнительные параметры JVM, добавляемые при запуске Minecraft. Не рекомендуется изменять без уверенности, так как это может привести к сбоям игры.</string>
     <string name="setting_java_memory_title">Выделение памяти</string>
@@ -439,16 +445,24 @@
     <string name="setting_shader_dump_desc">Записывать преобразованные шейдеры в файл журнала</string>
     <string name="setting_force_big_core_title">Принудительное выполнение на больших ядрах</string>
     <string name="setting_force_big_core_desc">Принудительно запускать потоки рендеринга Minecraft на ядре с максимальной частотой</string>
+    <string name="setting_use_controller_proxy_title">Включить прокси-контроллер</string>
+    <string name="setting_use_controller_proxy_desc">Включите локальный клиент прокси-контроллера при запуске игры для связи с модом TouchController, чтобы обеспечить правильную работу сенсорного управления.</string>
+    <string name="setting_touch_controller_vibrate_duration_title">Продолжительность вибрации мода TouchController</string>
+    <string name="setting_touch_controller_vibrate_duration_desc">Настройте продолжительность вибрации для этого мода в зависимости от различных потребностей использования.</string>
     <string name="setting_verify_manifest_title">Проверка списка версий игры</string>
     <string name="setting_verify_manifest_desc">После включения лаунчер будет проверять список версий игры и библиотек</string>
     <string name="setting_resource_image_cache_title">Кэшировать изображения ресурсов</string>
     <string name="setting_resource_image_cache_desc">При включении лаунчер будет кэшировать обложки и скриншоты ресурсов для более быстрого загрузки в следующий раз</string>
+    <string name="setting_resource_full_name_title">Префикс полного имени ресурса</string>
+    <string name="setting_resource_full_name_desc">При загрузке файлов ресурсов, нужно ли добавлять полное имя ресурса в качестве префикса к пользовательскому имени файла</string>
     <string name="setting_download_source_title">Источник загрузки игры</string>
     <string name="setting_download_source_desc">Выберите зеркальный источник загрузки вместо официального</string>
     <string name="setting_max_download_threads_title">Максимальное количество потоков для загрузки</string>
     <string name="setting_max_download_threads_desc">При одновременной загрузке нескольких файлов максимальное количество параллельных потоков, но слишком много потоков может привести к затормозкам запуска. 64 потока достаточно!</string>
-    <string name="setting_version_isolation_title">Изоляция версии по умолчанию</string>
-    <string name="setting_version_isolation_desc">При установке новой версии следует ли по умолчанию выбирать изоляцию версии?</string>
+    <string name="setting_version_isolation_title">Изоляция версии</string>
+    <string name="setting_version_isolation_desc">Включить изоляцию версий для игры\nПри отключении путь к игре будет .minecraft/\nПри включении путь к игре изменится на .minecraft/versions/&lt;имя версии&gt;/</string>
+    <string name="setting_version_custom_info_title">Пользовательская информация</string>
+    <string name="setting_version_custom_info_desc">Пользовательская информация будет отображаться в нижнем левом углу главного меню игры и в верхнем левом углу экрана отладки F3. После добавления поля [zl_version] загрузчик заменит его на номер версии загрузчика.</string>
     <string name="setting_set_game_language_title">Автоматическая настройка языка игры</string>
     <string name="setting_set_game_language_desc">При запуске игры автоматически устанавливать язык игры на выбранный</string>
     <string name="setting_set_game_language_list">Установить язык игры</string>
@@ -534,6 +548,7 @@
     <string name="download_install_dependencies_tool">Инструмент</string>
     <string name="download_install_dependencies_include">Включает</string>
     <string name="download_install">Скачивание %s</string>
+    <string name="download_install_is_adapt">Текущая версия %s доступна</string>
     <string name="download_install_unpack_world_error">Не удалось распознать структуру файла, автоматическая распаковка не удалась, пожалуйста, обработайте файл вручную!</string>
     <!-- ModPack -->
     <string name="select_modpack_local_tip">Пожалуйста, выберите файл модпака, который поддерживается лаунчером для импорта!</string>
@@ -632,6 +647,7 @@
     <string name="newbie_guide_mod_search">Нажмите, чтобы вызвать панель поиска, с её помощью вы сможете быстро найти нужный вам мод.</string>
     <string name="newbie_guide_mod_import">Выберите файл мода в нативный файловом менеджере, чтобы импортировать его в текущую папку модов.</string>
     <string name="newbie_guide_mod_download">Нажмите, чтобы перейти на страницу загрузки модов, где вы можете искать и загружать моды онлайн.</string>
+    <string name="newbie_guide_game_menu">Вы можете переместить плавающее окно игрового меню в любое место на экране.</string>
     <!-- Sponsorship Related -->
     <string name="request_sponsorship_title">Поддержите мою разработку</string>
     <string name="request_sponsorship_message">Большую часть этого программного обеспечения разработал и поддерживаю только я. Если вы считаете, что это программное обеспечение полезно для вас и у вас есть возможность, пожалуйста, рассмотрите возможность поддержки меня, чтобы у меня было больше мотивации продолжать разработку и улучшение. Спасибо за вашу поддержку!</string>

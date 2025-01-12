@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 
+import com.movtery.zalithlauncher.event.single.RefreshHotbarEvent;
 import com.movtery.zalithlauncher.feature.log.Logging;
 import com.movtery.zalithlauncher.setting.AllSettings;
 import com.movtery.zalithlauncher.setting.AllStaticSettings;
@@ -38,6 +39,7 @@ import net.kdt.pojavlaunch.customcontrols.mouse.TouchEventProcessor;
 import net.kdt.pojavlaunch.utils.JREUtils;
 import net.kdt.pojavlaunch.utils.MCOptionUtils;
 
+import org.greenrobot.eventbus.EventBus;
 import org.lwjgl.glfw.CallbackBridge;
 
 import fr.spse.gamepad_remapper.RemapperManager;
@@ -80,6 +82,9 @@ public class MinecraftGLSurface extends View implements GrabListener {
     private TouchEventProcessor mCurrentTouchProcessor = mInGUIProcessor;
     private AndroidPointerCapture mPointerCapture;
     private boolean mLastGrabState = false;
+
+    private OnRenderingStartedListener mOnRenderingStartedListener = null;
+    private boolean mIsRenderingStarted = false;
 
     public MinecraftGLSurface(Context context) {
         this(context, null);
@@ -131,7 +136,7 @@ public class MinecraftGLSurface extends View implements GrabListener {
             });
 
             ((ViewGroup)getParent()).addView(surfaceView);
-        }else{
+        } else {
             TextureView textureView = new TextureView(getContext());
             textureView.setOpaque(true);
             textureView.setAlpha(1.0f);
@@ -162,7 +167,13 @@ public class MinecraftGLSurface extends View implements GrabListener {
                 }
 
                 @Override
-                public void onSurfaceTextureUpdated(@NonNull SurfaceTexture surface) {}
+                public void onSurfaceTextureUpdated(@NonNull SurfaceTexture surface) {
+                    if (!mIsRenderingStarted) {
+                        mIsRenderingStarted = true;
+                        //在正式渲染画面的时候，调用这个监听器，关闭启动器背景图像，防止一些设备的半透明问题
+                        if (mOnRenderingStartedListener != null) mOnRenderingStartedListener.isStarted();
+                    }
+                }
             });
 
             ((ViewGroup)getParent()).addView(textureView);
@@ -246,6 +257,14 @@ public class MinecraftGLSurface extends View implements GrabListener {
             default:
                 return false;
         }
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        if (mCurrentTouchProcessor != null) {
+            mCurrentTouchProcessor.dispatchTouchEvent(event, this);
+        }
+        return super.dispatchTouchEvent(event);
     }
 
     /** The event for keyboard/ gamepad button inputs */
@@ -347,7 +366,7 @@ public class MinecraftGLSurface extends View implements GrabListener {
         }
 
         CallbackBridge.sendUpdateWindowSize(windowWidth, windowHeight);
-
+        EventBus.getDefault().post(new RefreshHotbarEvent());
     }
 
     private void realStart(Surface surface){
@@ -404,5 +423,13 @@ public class MinecraftGLSurface extends View implements GrabListener {
             mSurfaceReadyListener = listener;
             mSurfaceReadyListenerLock.notifyAll();
         }
+    }
+
+    public interface OnRenderingStartedListener {
+        void isStarted();
+    }
+
+    public void setOnRenderingStartedListener(OnRenderingStartedListener listener) {
+        mOnRenderingStartedListener = listener;
     }
 }

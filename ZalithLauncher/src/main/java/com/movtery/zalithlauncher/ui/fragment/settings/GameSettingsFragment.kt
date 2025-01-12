@@ -59,6 +59,12 @@ class GameSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragment
             binding.versionIsolation
         )
 
+        EditTextSettingsWrapper(
+            AllSettings.versionCustomInfo,
+            binding.versionCustomInfoLayout,
+            binding.versionCustomInfoEdittext
+        )
+
         SwitchSettingsWrapper(
             context,
             AllSettings.autoSetGameLanguage,
@@ -90,6 +96,15 @@ class GameSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragment
                 prepare(context, mVmInstallLauncher)
             }.show()
         }
+
+        ListSettingsWrapper(
+            context,
+            AllSettings.selectRuntimeMode,
+            binding.selectRuntimeModeLayout,
+            binding.selectRuntimeModeTitle,
+            binding.selectRuntimeModeValue,
+            R.array.select_java_runtime_names, R.array.select_java_runtime_values
+        )
 
         EditTextSettingsWrapper(
             AllSettings.javaArgs,

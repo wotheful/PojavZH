@@ -109,7 +109,6 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
 
     private ViewGameMenuBinding mGameMenuBinding;
     private ViewControlMenuBinding mControlSettingsBinding;
-    private GameService.LocalBinder mServiceBinder;
     boolean isInEditor;
 
     private SimpleTextWatcher mInputWatcher;
@@ -152,7 +151,7 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
         ControlLayout controlLayout = binding.mainControlLayout;
         mControlSettingsBinding = ViewControlMenuBinding.inflate(getLayoutInflater());
         new ControlMenu(this, this, mControlSettingsBinding, controlLayout, false);
-        mControlSettingsBinding.export.setVisibility(View.GONE);
+        mControlSettingsBinding.saveAndExport.setVisibility(View.GONE);
 
         binding.mainControlLayout.setModifiable(false);
 
@@ -219,10 +218,17 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
                     if (AllSettings.getVirtualMouseStart().getValue()) {
                         binding.mainTouchpad.post(() -> binding.mainTouchpad.switchState());
                     }
-                    LaunchGame.runGame(this, mServiceBinder, minecraftVersion, mVersionInfo);
+                    LaunchGame.runGame(this, minecraftVersion, mVersionInfo);
                 } catch (Throwable e) {
                     Tools.showErrorRemote(e);
                 }
+            });
+
+            binding.mainGameRenderView.setOnRenderingStartedListener(() -> {
+                //彻底清除背景图片，确保一些设备不再出现“半透明渲染”的问题
+                BackgroundManager.clearBackgroundImage(binding.backgroundView);
+                Logging.i("Rendering Game", "The game rendering has started, " +
+                        "and the background image has been cleared to prevent certain issues from occurring.");
             });
 
             if (AllSettings.getEnableLogOutput().getValue()) binding.mainLoggerView.setVisibilityWithAnim(true);
@@ -499,10 +505,8 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
 
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
-        GameService.LocalBinder localBinder = (GameService.LocalBinder) service;
-        mServiceBinder = localBinder;
-        binding.mainGameRenderView.start(localBinder.isActive, binding.mainTouchpad);
-        localBinder.isActive = true;
+        binding.mainGameRenderView.start(GameService.isActive(), binding.mainTouchpad);
+        GameService.setActive(true);
     }
 
     @Override
@@ -631,6 +635,7 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
                 } catch (IOException ignored) {}
                 dialog.dismiss();
             });
+            dialog.setTitleText(R.string.replacement_customcontrol);
             dialog.show();
         }
 
@@ -679,9 +684,6 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
 
                 AllStaticSettings.scaleFactor = progress / 100f;
                 MainActivity.binding.mainGameRenderView.refreshSize();
-
-                //当分辨率缩放的时候，需要刷新一下Hotbar的判定
-                EventBus.getDefault().post(new RefreshHotbarEvent());
             } else if (s == binding.timeLongPressTrigger) {
                 AllSettings.getTimeLongPressTrigger().put(progress).save();
 

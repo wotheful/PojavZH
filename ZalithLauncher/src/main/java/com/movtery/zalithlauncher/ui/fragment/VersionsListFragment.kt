@@ -14,6 +14,8 @@ import com.movtery.anim.animations.Animations
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.databinding.FragmentVersionsListBinding
 import com.movtery.zalithlauncher.event.single.RefreshVersionsEvent
+import com.movtery.zalithlauncher.event.single.RefreshVersionsEvent.MODE.END
+import com.movtery.zalithlauncher.event.single.RefreshVersionsEvent.MODE.START
 import com.movtery.zalithlauncher.event.sticky.FileSelectorEvent
 import com.movtery.zalithlauncher.feature.customprofilepath.ProfilePathJsonObject
 import com.movtery.zalithlauncher.feature.customprofilepath.ProfilePathManager.Companion.save
@@ -81,7 +83,6 @@ class VersionsListFragment : FragmentWithAnim(R.layout.fragment_versions_list) {
             versionsAdapter = VersionAdapter(this@VersionsListFragment, object : VersionAdapter.OnVersionItemClickListener {
                 override fun onVersionClick(version: Version) {
                     VersionsManager.saveCurrentVersion(version.getVersionName())
-                    Tools.backToMainMenu(requireActivity())
                 }
 
                 override fun onCreateVersion() {
@@ -164,7 +165,22 @@ class VersionsListFragment : FragmentWithAnim(R.layout.fragment_versions_list) {
 
     @Subscribe
     fun event(event: RefreshVersionsEvent) {
-        TaskExecutors.runInUIThread { refreshVersions() }
+        TaskExecutors.runInUIThread {
+            when (event.mode) {
+                START -> binding.versions.isEnabled = false
+                END -> {
+                    refreshVersions()
+                    binding.versions.isEnabled = true
+                }
+            }
+            //无论刷新进度，都应该关闭所有的操作弹窗
+            closeAllPopupWindow()
+        }
+    }
+
+    private fun closeAllPopupWindow() {
+        versionsAdapter?.closePopupWindow()
+        profilePathAdapter?.closePopupWindow()
     }
 
     override fun onStart() {
@@ -184,15 +200,13 @@ class VersionsListFragment : FragmentWithAnim(R.layout.fragment_versions_list) {
 
     override fun onPause() {
         super.onPause()
-        versionsAdapter?.closeAllPopupWindow()
-        profilePathAdapter?.closeAllPopupWindow()
+        closeAllPopupWindow()
     }
 
     override fun slideIn(animPlayer: AnimPlayer) {
         binding.apply {
             animPlayer.apply(AnimPlayer.Entry(versionLayout, Animations.BounceInDown))
                 .apply(AnimPlayer.Entry(operateLayout, Animations.BounceInLeft))
-                .apply(AnimPlayer.Entry(operateView, Animations.FadeInLeft))
         }
     }
 

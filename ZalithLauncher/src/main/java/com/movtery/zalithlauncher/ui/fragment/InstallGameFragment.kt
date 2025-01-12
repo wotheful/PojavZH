@@ -23,10 +23,16 @@ import com.movtery.zalithlauncher.feature.version.InstallTask
 import com.movtery.zalithlauncher.feature.version.InstallTaskItem
 import com.movtery.zalithlauncher.feature.version.VersionsManager
 import com.movtery.zalithlauncher.setting.AllSettings
-import com.movtery.zalithlauncher.task.TaskExecutors
-import com.movtery.zalithlauncher.ui.dialog.SelectRuntimeDialog
 import com.movtery.zalithlauncher.ui.dialog.TipDialog
+import com.movtery.zalithlauncher.ui.fragment.download.addon.DownloadFabricApiFragment
+import com.movtery.zalithlauncher.ui.fragment.download.addon.DownloadFabricFragment
+import com.movtery.zalithlauncher.ui.fragment.download.addon.DownloadForgeFragment
+import com.movtery.zalithlauncher.ui.fragment.download.addon.DownloadNeoForgeFragment
+import com.movtery.zalithlauncher.ui.fragment.download.addon.DownloadOptiFineFragment
+import com.movtery.zalithlauncher.ui.fragment.download.addon.DownloadQuiltApiFragment
+import com.movtery.zalithlauncher.ui.fragment.download.addon.DownloadQuiltFragment
 import com.movtery.zalithlauncher.utils.ZHTools
+import com.movtery.zalithlauncher.utils.runtime.SelectRuntimeUtils
 import net.kdt.pojavlaunch.JavaGUILauncherActivity
 import net.kdt.pojavlaunch.Tools
 import org.apache.commons.io.FileUtils
@@ -82,7 +88,6 @@ class InstallGameFragment : FragmentWithAnim(R.layout.fragment_install_game), Vi
 
             back.setOnClickListener(clickListener)
             install.setOnClickListener(clickListener)
-            isolation.isChecked = AllSettings.versionIsolation.getValue()
         }
     }
 
@@ -183,10 +188,6 @@ class InstallGameFragment : FragmentWithAnim(R.layout.fragment_install_game), Vi
         checkIncompatible()
     }
 
-    private fun isolation(): Boolean {
-        return binding.isolation.isChecked
-    }
-
     override fun onClick(v: View) {
         val activity = requireActivity()
 
@@ -215,6 +216,11 @@ class InstallGameFragment : FragmentWithAnim(R.layout.fragment_install_game), Vi
                         return
                     }
 
+                    if (string.contains("/")) {
+                        nameEdit.error = getString(R.string.generic_input_invalid_character, "/")
+                        return
+                    }
+
                     if (VersionsManager.isVersionExists(string, true)) {
                         nameEdit.error = getString(R.string.version_install_exists)
                         return
@@ -226,7 +232,7 @@ class InstallGameFragment : FragmentWithAnim(R.layout.fragment_install_game), Vi
                     }
 
                     fun install() {
-                        EventBus.getDefault().post(InstallGameEvent(mcVersion, string, isolation(), organizeInstallationTasks(string)))
+                        EventBus.getDefault().post(InstallGameEvent(mcVersion, string, organizeInstallationTasks(string)))
                         Tools.backToMainMenu(activity)
                     }
 
@@ -252,7 +258,7 @@ class InstallGameFragment : FragmentWithAnim(R.layout.fragment_install_game), Vi
         val taskMap: MutableMap<Addon, InstallTaskItem> = EnumMap(Addon::class.java)
 
         fun getModPath(): File {
-            return if (isolation()) //启用版本隔离
+            return if (AllSettings.versionIsolation.getValue()) //启用了版本隔离
                 File(
                     ProfilePathHome.gameHome,
                     "versions${File.separator}$customVersionName${File.separator}mods"
@@ -320,15 +326,9 @@ class InstallGameFragment : FragmentWithAnim(R.layout.fragment_install_game), Vi
         val argUtils = InstallArgsUtils(mcVersion, selectVersion)
         setArgs(intent, argUtils)
 
-        TaskExecutors.runInUIThread {
-            SelectRuntimeDialog(activity).apply {
-                setListener { jreName: String? ->
-                    intent.putExtra(JavaGUILauncherActivity.EXTRAS_JRE_NAME, jreName)
-                    this.dismiss()
-                    activity.startActivity(intent)
-                }
-                setTitleText(activity.getString(R.string.version_install_new_modloader, addonName))
-            }.show()
+        SelectRuntimeUtils.selectRuntime(activity, activity.getString(R.string.version_install_new_modloader, addonName)) { jreName ->
+            intent.putExtra(JavaGUILauncherActivity.EXTRAS_JRE_NAME, jreName)
+            activity.startActivity(intent)
         }
     }
 

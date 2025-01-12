@@ -5,11 +5,15 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.pm.ServiceInfo;
-import android.os.Binder;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
+import android.os.Messenger;
 import android.os.Process;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
@@ -21,7 +25,16 @@ import net.kdt.pojavlaunch.Tools;
 import net.kdt.pojavlaunch.utils.NotificationUtils;
 
 public class GameService extends Service {
-    private final LocalBinder mLocalBinder = new LocalBinder();
+    private final Messenger mMessenger = new Messenger(new IncomingHandler());
+    private static boolean isActive;
+
+    public static boolean isActive() {
+        return isActive;
+    }
+
+    public static void setActive(boolean active) {
+        isActive = active;
+    }
 
     @Override
     public void onCreate() {
@@ -69,10 +82,16 @@ public class GameService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return mLocalBinder;
+        return mMessenger.getBinder();
     }
 
-    public static class LocalBinder extends Binder {
-        public boolean isActive;
+    private static class IncomingHandler extends Handler {
+        IncomingHandler() {
+            super(Looper.getMainLooper());
+        }
+
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+        }
     }
 }

@@ -1,6 +1,7 @@
 package net.kdt.pojavlaunch;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import static com.movtery.zalithlauncher.utils.ZHTools.getVersionCode;
 import static com.movtery.zalithlauncher.utils.ZHTools.getVersionName;
 
 import android.app.Application;
@@ -18,6 +19,7 @@ import androidx.core.app.ActivityCompat;
 import com.movtery.zalithlauncher.InfoCenter;
 import com.movtery.zalithlauncher.context.ContextExecutor;
 import com.movtery.zalithlauncher.context.LocaleHelper;
+import com.movtery.zalithlauncher.feature.customprofilepath.ProfilePathHome;
 import com.movtery.zalithlauncher.feature.log.Logging;
 import com.movtery.zalithlauncher.setting.AllSettings;
 import com.movtery.zalithlauncher.setting.LegacySettingsSync;
@@ -53,7 +55,7 @@ public class PojavApplication extends Application {
 				crashStream.append(" - Device: ").append(Build.PRODUCT).append(" ").append(Build.MODEL).append("\n");
 				crashStream.append(" - Android version: ").append(Build.VERSION.RELEASE).append("\n");
 				crashStream.append(" - Crash stack trace:\n");
-				crashStream.append(" - Launcher version: ").append(getVersionName()).append("\n");
+				crashStream.append(" - Launcher version: ").append(getVersionName()).append(" (").append(String.valueOf(getVersionCode())).append(")").append("\n");
 				crashStream.append(Log.getStackTraceString(th));
 				crashStream.close();
 			} catch (Throwable throwable) {

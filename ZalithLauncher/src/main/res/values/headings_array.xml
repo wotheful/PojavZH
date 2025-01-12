@@ -7,6 +7,7 @@
         <item name="4">Freedreno (Adreno)</item>
         <item name="5">Panfrost (Mali)</item>
         <item name="6">@string/setting_renderer_name_ltw</item>
+        <item name="7">@string/setting_renderer_name_angle</item>
     </string-array>
 
     <string-array name="renderer_values">
@@ -16,6 +17,7 @@
         <item>gallium_freedreno</item> <!-- freedreno with Adreno GPU -->
         <item>gallium_panfrost</item> <!-- panfrost with Mali GPU -->
         <item>opengles3_ltw</item> <!-- tinywrapper with OpenGL ES 3 -->
+        <item>opengles3_angle</item> <!-- Angle with OpenGL 3 -->
     </string-array>
 
     <string-array name="download_source_names">
@@ -25,6 +27,18 @@
     <string-array name="download_source_values">
         <item>default</item>
         <item>bmclapi</item>
+    </string-array>
+
+    <string-array name="select_java_runtime_names">
+        <item>@string/setting_java_select_runtime_ask_me</item>
+        <item>@string/setting_java_select_runtime_default</item>
+        <item>@string/install_auto_select</item>
+    </string-array>
+
+    <string-array name="select_java_runtime_values">
+        <item>ask_me</item>
+        <item>default</item>
+        <item>auto</item>
     </string-array>
 
     <string-array name="launcher_theme_names">

@@ -1,8 +1,12 @@
 package com.movtery.zalithlauncher.feature.version
 
 import android.content.Context
+import com.google.gson.JsonParser
+import com.movtery.zalithlauncher.InfoCenter
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.event.single.RefreshVersionsEvent
+import com.movtery.zalithlauncher.event.single.RefreshVersionsEvent.MODE.END
+import com.movtery.zalithlauncher.event.single.RefreshVersionsEvent.MODE.START
 import com.movtery.zalithlauncher.event.sticky.InstallingVersionEvent
 import com.movtery.zalithlauncher.feature.customprofilepath.ProfilePathHome
 import com.movtery.zalithlauncher.feature.log.Logging
@@ -61,6 +65,8 @@ object VersionsManager {
 
     private suspend fun refreshWithMutex() {
         refreshMutex.withLock {
+            EventBus.getDefault().post(RefreshVersionsEvent(START))
+
             try {
                 versions.clear()
 
@@ -87,7 +93,7 @@ object VersionsManager {
                                 if (oldConfigFile.exists()) {
                                     runCatching {
                                         Tools.GLOBAL_GSON.fromJson(Tools.read(oldConfigFile), VersionConfig::class.java).apply {
-                                            setIsolation(true)
+                                            setIsolationType(VersionConfig.IsolationType.ENABLE)
                                             setVersionPath(versionFile)
                                             save()
                                         }
@@ -98,7 +104,18 @@ object VersionsManager {
                                     }
                                 }
                                 //读取此文件的内容，并解析为VersionConfig
-                                val config = Tools.GLOBAL_GSON.fromJson(Tools.read(configFile), VersionConfig::class.java)
+                                val configString = Tools.read(configFile)
+                                val config = Tools.GLOBAL_GSON.fromJson(configString, VersionConfig::class.java)
+                                runCatching {
+                                    JsonParser.parseString(configString).asJsonObject.apply {
+                                        if (has("isolation")) {
+                                            config.setIsolationType(
+                                                if (get("isolation").asBoolean) VersionConfig.IsolationType.ENABLE
+                                                else VersionConfig.IsolationType.DISABLE
+                                            )
+                                        }
+                                    }
+                                }.getOrElse { Logging.e("Refresh Versions", "Failed to parse the version isolation field of the old version.", it) }
                                 config.setVersionPath(versionFile)
                                 config
                             }.getOrElse { e ->
@@ -125,7 +142,7 @@ object VersionsManager {
                 }.execute()
             } finally {
                 //使用事件通知版本已刷新
-                EventBus.getDefault().post(RefreshVersionsEvent())
+                EventBus.getDefault().post(RefreshVersionsEvent(END))
             }
         }
     }
@@ -137,42 +154,46 @@ object VersionsManager {
         if (versions.isEmpty()) return null
 
         getPathConfigFile().apply {
+            fun returnVersionByFirst(): Version? {
+                versions.forEach { version ->
+                    if (version.isValid()) {
+                        //确保版本有效
+                        saveCurrentVersion(version.getVersionName())
+                        return version
+                    }
+                }
+                //如果所有版本都无效，或者没有版本，那么久返回空
+                return null
+            }
+
             return if (exists()) {
                 runCatching {
                     val string = Tools.read(this)
                     getVersion(string) ?: run {
-                        versions.forEach { version ->
-                            if (version.isValid()) {
-                                //确保版本有效
-                                saveCurrentVersion(version.getVersionName())
-                                return version
-                            }
-                        }
-                        //如果所有版本都无效，或者没有版本，那么久返回空
-                        null
+                        return returnVersionByFirst()
                     }
                 }.getOrElse { e ->
                     Logging.e("Get Current Version", Tools.printToString(e))
-                    null
+                    returnVersionByFirst()
                 }
-            } else null
+            } else returnVersionByFirst()
         }
     }
 
     /**
      * @return 获取 Zalith 启动器版本标识文件夹
      */
-    fun getZalithVersionPath(version: Version) = File(version.getVersionPath(), "ZalithLauncher")
+    fun getZalithVersionPath(version: Version) = File(version.getVersionPath(), InfoCenter.LAUNCHER_NAME)
 
     /**
      * @return 通过目录获取 Zalith 启动器版本标识文件夹
      */
-    fun getZalithVersionPath(folder: File) = File(folder, "ZalithLauncher")
+    fun getZalithVersionPath(folder: File) = File(folder, InfoCenter.LAUNCHER_NAME)
 
     /**
      * @return 通过名称获取 Zalith 启动器版本标识文件夹
      */
-    fun getZalithVersionPath(name: String) = File(getVersionPath(name), "ZalithLauncher")
+    fun getZalithVersionPath(name: String) = File(getVersionPath(name), InfoCenter.LAUNCHER_NAME)
 
     /**
      * @return 获取当前版本设置的图标
@@ -213,6 +234,11 @@ object VersionsManager {
             .setConfirmListener { editText, _ ->
                 val string = editText.text.toString()
 
+                if (string.contains("/")) {
+                    editText.error = context.getString(R.string.generic_input_invalid_character, "/")
+                    return@setConfirmListener false
+                }
+
                 //与原始名称一致
                 if (string == version.getVersionName()) return@setConfirmListener true
 
@@ -242,6 +268,10 @@ object VersionsManager {
      * 重命名当前版本，但并不会在这里对即将重命名的名称，进行非法性判断
      */
     private fun renameVersion(version: Version, name: String) {
+        val currentVersionName = getCurrentVersion()?.getVersionName()
+        //如果当前的版本是即将被重命名的版本，那么就把将要重命名的名字设置为当前版本
+        if (version.getVersionName() == currentVersionName) saveCurrentVersion(name)
+
         val versionFolder = version.getVersionPath()
         val renameFolder = File(ProfilePathHome.versionsHome, name)
 
@@ -303,11 +333,11 @@ object VersionsManager {
                     copyVersion(version, string, checked)
                 }.beforeStart(TaskExecutors.getAndroidUI()) {
                     dialog.show()
-                }.ended(TaskExecutors.getAndroidUI()) {
-                    dialog.dismiss()
-                    refresh()
                 }.onThrowable { e ->
                     Tools.showErrorRemote(e)
+                }.finallyTask(TaskExecutors.getAndroidUI()) {
+                    dialog.dismiss()
+                    refresh()
                 }.execute()
                 true
             }.buildDialog()
@@ -352,7 +382,7 @@ object VersionsManager {
         //保存版本配置文件
         version.getVersionConfig().copy().let { config ->
             config.setVersionPath(newVersion)
-            config.setIsolation(true)
+            config.setIsolationType(VersionConfig.IsolationType.ENABLE)
             config.saveWithThrowable()
         }
     }

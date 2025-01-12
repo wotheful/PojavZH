@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Zalith Launcher -->
+    <string name="generic_open">Open</string>
     <string name="generic_close">Close</string>
     <string name="generic_return">Return</string>
     <string name="generic_edit">Edit</string>
@@ -45,6 +46,7 @@
     <string name="generic_input_too_small">The value is too small, it must be at least %s</string>
     <string name="generic_input_too_big">The value is too big, it can be at most %s</string>
     <string name="generic_copied">Copied</string>
+    <string name="generic_saved">Saved</string>
     <string name="generic_release">Release</string>
     <string name="generic_debug">Debug</string>
     <string name="generic_pre_release">Pre-release</string>
@@ -69,7 +71,7 @@
     <string name="option_hotbar_width">Detection Box Width</string>
     <string name="option_hotbar_height">Detection Box Height</string>
     <string name="customctrl_editor_exit_title">Exit?</string>
-    <string name="customctrl_editor_exit_msg">Are you sure you want to exit?</string>
+    <string name="customctrl_editor_exit_msg">The current modifications will not be saved. Are you sure you want to exit directly?</string>
     <string name="customctrl_editor_exit">Exit Editor</string>
     <string name="global_save_and_exit">Save and Exit</string>
     <string name="version_snapshot">Snapshot</string>
@@ -89,7 +91,7 @@
     <string name="microsoft_login_retry_later">Your actions are too frequent, please try again later</string>
     <string name="storage_required">%s requires external storage, please reconnect and restart the software</string>
     <string name="dialog_select_jar">Select Jar File</string>
-    <string name="percent_format">%d%%</string>
+    <string name="percent_format" translatable="false">%d%%</string>
     <string name="version_select_hint">Select Version</string>
     <string name="notif_error_occured">An error occurred</string>
     <string name="notif_error_occured_desc">Click to view details</string>
@@ -109,6 +111,7 @@
     <string name="newdl_starting">Reading game metadata…</string>
     <string name="newdl_downloading_metadata">Downloading game metadata (%s)</string>
     <string name="newdl_downloading_game_files">Downloading game files… (%d/%d, %.2f MB)</string>
+    <string name="newdl_downloading_game_files_size">Downloading game files… (%.2f/%.2f MB, %.2f MB/s)</string>
     <string name="log_view_button_scroll_off">Auto-scroll: Off</string>
     <string name="log_view_button_scroll_on">Auto-scroll: On</string>
     <string name="log_view_button_output_off">Output: Off</string>
@@ -143,7 +146,7 @@
     <string name="customctrl_addbutton_joystick">Add Joystick</string>
     <string name="customctrl_addsubbutton">Add Sub-Button</string>
     <string name="customctrl_selectdefault">Select Default Control Layout</string>
-    <string name="customctrl_export">Export Control Layout</string>
+    <string name="customctrl_export">Save and Share</string>
     <string name="customctrl_passthru">Mouse Passthrough</string>
     <string name="customctrl_swipeable">Swipeable</string>
     <string name="customctrl_forward_lock">Forward Lock</string>
@@ -215,6 +218,7 @@
     <string name="version_install_type_version">Download and install as a version</string>
     <string name="version_install_type_mod">Download and install as a Mod</string>
     <string name="version_install_optifine_and_forge">Some versions of OptiFine may not work on Forge, and if you encounter crashes or compatibility issues, consider removing OptiFine first!</string>
+    <string name="version_install_log_flood_warning">If the logs flood the screen and cause the device to lag during installation, click here to close the logs!</string>
     <string name="version_manager_shortcuts">Shortcuts</string>
     <string name="version_manager_shortcuts_mods">Mod Management</string>
     <string name="version_manager_shortcuts_version_path">Game Path Folder</string>
@@ -234,6 +238,7 @@
     <string name="version_manager_task_in_progress">Task in progress, version management is temporarily unavailable</string>
     <string name="version_manager_invalid">This version is invalid</string>
     <string name="version_manager_no_installed_version">Launcher did not find any installed Minecraft!</string>
+    <string name="version_manager_isolation_type_follow_global">Follow Launcher Settings</string>
     <!-- Profiles Path -->
     <string name="permissions_manage_external_storage">%s requires permission to manage all files on the device to use this feature properly. Please enable the permission!</string>
     <string name="permissions_write_external_storage">%s requires storage management permission. If the permission is not enabled, it may cause issues such as game files failing to save or decompress properly. Please grant the permission to ensure proper functionality.</string>
@@ -248,6 +253,7 @@
     <!-- Profile -->
     <string name="pedit_isolation_enabled">Enable Version Isolation</string>
     <string name="pedit_reset_icon">This will reset the custom icon you set, and the operation is irreversible. Are you sure you want to reset the version icon?</string>
+    <string name="pedit_unsaved_tip">You have made modifications to this version configuration. Returning directly will lose these changes. Are you sure you want to return directly?</string>
     <string name="pedit_control">Control Layout</string>
     <string name="pedit_custom_path">Custom Path</string>
     <string name="pedit_default">(Use global default)</string>
@@ -267,7 +273,7 @@
     <string name="account_microsoft_xerr_unauthorized">Your Microsoft account login information seems to be expired, this often happens after the account password is changed. Please remove the current account and log in again to reset your login information.</string>
     <string name="account_local_account">Offline Account</string>
     <string name="account_local_account_empty">Username cannot be empty!</string>
-    <string name="account_local_account_invalid">Valid usernames only support English letters (both uppercase and lowercase), numbers, and underscores. The length must be between 3 and 16 characters, otherwise the game may not run properly.\nExamples of correct usernames: Name, Name_, Name123\nExamples of incorrect usernames: Name@, N ame, name_name_name_name\nHowever, if you have used relevant mods or plugins to bypass this restriction, you can continue using this name. Otherwise, please rename it!</string>
+    <string name="account_local_account_invalid">A valid username only supports English letters (both uppercase and lowercase), numbers, and underscores. The username length must be between 3 and 16 characters. [RED;BOLD]Otherwise, the game may fail to function properly.[/RED;BOLD]\nExamples of valid usernames: Name, Name_, Name123\nExamples of invalid usernames: Name@, N ame, name_name_name_name\nHowever, if you are using mods or plugins that remove this restriction, you can continue using this name. Otherwise, please rename it!</string>
     <string name="account_login_local_name">Username</string>
     <string name="account_login_start">Start Login!</string>
     <string name="account_login_microsoft_progress">Logging in to Microsoft account: %s</string>
@@ -341,7 +347,6 @@
     <string name="file_delete_dir_message">When deleting a folder, all files inside this folder will be deleted as well. If this folder contains important files, please cancel this operation!</string>
     <string name="file_delete_multiple_items_title">Are you sure you want to delete the selected items?</string>
     <string name="file_delete_multiple_items_message">This operation will permanently delete all selected items, please proceed with caution!</string>
-    <string name="file_rename_empty">File name cannot be empty!</string>
     <string name="file_rename_exitis">File name conflicts with an existing file!</string>
     <string name="file_external_storage">External storage directory</string>
     <string name="file_software_private">Software private directory</string>
@@ -360,9 +365,6 @@
     <string name="main_install_jar_file">Execute .jar file</string>
     <string name="main_share_logs">Share log files</string>
     <string name="main_share_crash_report">Share crash report</string>
-    <string name="main_share_log_title">Please select log file type</string>
-    <string name="main_share_launcher_log">Launcher log file</string>
-    <string name="main_share_game_log">Last game run log</string>
     <string name="main_launch">Launch Game</string>
     <string name="setting_category_control">Control settings</string>
     <string name="setting_category_virtual_mouse">Virtual mouse</string>
@@ -370,27 +372,28 @@
     <string name="setting_category_controller_settings">Controller settings</string>
     <string name="setting_category_java_tweaks">Java tweaks</string>
     <string name="setting_category_video">Video Settings</string>
-    <string name="setting_category_version">Version</string>
+    <string name="setting_category_version">Version Settings</string>
     <string name="setting_category_language">Language</string>
     <string name="setting_category_personalization">Personalization</string>
     <string name="setting_category_download">Downloads</string>
     <string name="setting_category_game">Game Settings</string>
-    <string name="setting_category_launcher">Launcher</string>
+    <string name="setting_category_launcher">Launcher Settings</string>
     <string name="setting_category_game_menu">Game Menu</string>
-    <string name="setting_category_experimental">Experimental</string>
+    <string name="setting_category_experimental">Experimental Settings</string>
     <string name="setting_category_experimental_patches">Experimental Patches</string>
+    <string name="setting_category_support">External Support</string>
     <string name="setting_renderer_title">Renderer</string>
-    <string name="setting_renderer_name_ltw">LTW (Only for 1.17+)</string>
+    <string name="setting_renderer_name_ltw">LTW (1.17+ only)</string>
+    <string name="setting_renderer_name_angle">Angle (1.17+ only)</string>
     <string name="setting_ignore_notch_title">Fullscreen Mode</string>
     <string name="setting_ignore_notch_desc">Ignore the notch and extend screen content to full screen for a more complete immersive experience</string>
     <string name="setting_resolution_scaler_title">Resolution Scaling</string>
     <string name="setting_resolution_scaler_desc">Allows adjusting the game\'s resolution, with native resolution set to 100%</string>
-    <string name="setting_use_surface_view_title">Use Alternate Surface Rendering</string>
+    <string name="setting_use_surface_view_title">Use Alternative Surface Rendering</string>
     <string name="setting_use_surface_view_desc">May help improve performance on devices limited by GPU capabilities</string>
     <string name="setting_sustained_performance_title">Enable Sustained Performance Mode</string>
-    <string name="setting_sustained_performance_desc">Limits peak performance to prevent overheating and throttling</string>
     <string name="setting_force_vsync_title">Force V-Sync</string>
-    <string name="setting_force_vsync_description">Limits peak performance to prevent overheating and throttling</string>
+    <string name="setting_limit_overheating_throttling">Prevent overheating throttling by limiting peak performance</string>
     <string name="setting_vsync_in_zink_title">Allow V-Sync with Zink</string>
     <string name="setting_vsync_in_zink_desc">Allows the launcher to use internal system APIs to enable V-Sync for Zink</string>
     <string name="setting_vulkan_driver_system_title">Use System Vulkan Driver</string>
@@ -430,6 +433,10 @@
     <string name="setting_deadzone_scale_desc">Increase this option if the joystick drifts</string>
     <string name="setting_java_multirt_title">Runtime Environment Manager</string>
     <string name="setting_java_multirt_desc">Manage installed Java Runtime Environments</string>
+    <string name="setting_java_select_runtime_title">Select Runtime Before Execution</string>
+    <string name="setting_java_select_runtime_desc">The Java runtime environment to be used before entering the execution environment</string>
+    <string name="setting_java_select_runtime_ask_me">Let me choose temporarily</string>
+    <string name="setting_java_select_runtime_default">Current default runtime environment</string>
     <string name="setting_java_args_title">JVM Startup Arguments</string>
     <string name="setting_java_args_desc">Additional JVM arguments added when launching Minecraft. It is not recommended to modify this without confidence, as it may cause the game to crash</string>
     <string name="setting_java_memory_title">Memory Allocation</string>
@@ -444,16 +451,24 @@
     <string name="setting_shader_dump_desc">Logs converted shaders to a log file</string>
     <string name="setting_force_big_core_title">Force Renderer to Run on Big Core</string>
     <string name="setting_force_big_core_desc">Forces the Minecraft rendering thread to run on the highest frequency core</string>
+    <string name="setting_use_controller_proxy_title">Enable Control Proxy</string>
+    <string name="setting_use_controller_proxy_desc">Enable the local controller proxy client when launching the game to communicate with the TouchController mod, ensuring the proper functioning of the touchscreen controls.</string>
+    <string name="setting_touch_controller_vibrate_duration_title">TouchController Mod Vibration Duration</string>
+    <string name="setting_touch_controller_vibrate_duration_desc">Set the vibration duration for this mod to suit different usage needs.</string>
     <string name="setting_verify_manifest_title">Game Version List Check</string>
     <string name="setting_verify_manifest_desc">When enabled, the launcher will check the game version list and libraries</string>
     <string name="setting_resource_image_cache_title">Cache resource images</string>
     <string name="setting_resource_image_cache_desc">When enabled, the launcher will cache the cover images and screenshots of resources for faster loading next time</string>
+    <string name="setting_resource_full_name_title">Resource Full Name Prefix</string>
+    <string name="setting_resource_full_name_desc">When downloading resource files, whether to add the full name of the resource as a prefix to the custom file name</string>
     <string name="setting_download_source_title">Game Download Source</string>
     <string name="setting_download_source_desc">Choose a mirror download source instead of using the official download source</string>
     <string name="setting_max_download_threads_title">Max Download Threads</string>
     <string name="setting_max_download_threads_desc">Maximum number of concurrent downloads when downloading multiple files simultaneously, but too many threads will cause launcher lag. 64 threads are sufficient!</string>
-    <string name="setting_version_isolation_title">Default Version Isolation</string>
-    <string name="setting_version_isolation_desc">When installing a new version, should version isolation be selected by default?</string>
+    <string name="setting_version_isolation_title">Version Isolation</string>
+    <string name="setting_version_isolation_desc">Enable version isolation for the game version\nWhen disabled, the game path will be .minecraft/\nWhen enabled, the game path will change to .minecraft/versions/&lt;version name&gt;/</string>
+    <string name="setting_version_custom_info_title">Custom Info</string>
+    <string name="setting_version_custom_info_desc">Custom info will be displayed in the lower-left corner of the game’s main menu and the upper-left corner of the F3 debug screen. After adding the [zl_version] field, the launcher will replace it with the launcher version number.</string>
     <string name="setting_set_game_language_title">Auto Set Game Language</string>
     <string name="setting_set_game_language_desc">Automatically set the game language to the selected language when the game starts</string>
     <string name="setting_set_game_language_list">Set Game Language</string>
@@ -539,6 +554,7 @@
     <string name="download_install_dependencies_tool">Tool</string>
     <string name="download_install_dependencies_include">Includes</string>
     <string name="download_install">Download %s</string>
+    <string name="download_install_is_adapt">Current version %s is available</string>
     <string name="download_install_unpack_world_error">Unable to recognize file structure, automatic unpacking failed, please handle the file manually!</string>
     <!-- ModPack -->
     <string name="select_modpack_local_tip">Please select a modpack file that the launcher supports importing!</string>
@@ -637,6 +653,7 @@
     <string name="newbie_guide_mod_search">Click to summon a search box and use it to quickly find the Mod you\'re looking for.</string>
     <string name="newbie_guide_mod_import">Select a Mod file in the native file manager to import it into the current Mod folder.</string>
     <string name="newbie_guide_mod_download">Click to enter the Mod download page where you can search and download Mods online.</string>
+    <string name="newbie_guide_game_menu">You can drag the game menu floating window to any position on the screen.</string>
     <!-- Sponsorship Related -->
     <string name="request_sponsorship_title">Support My Development</string>
     <string name="request_sponsorship_message">Most of the content in this software is developed and maintained by me alone. If you find this software helpful and are in a position to do so, I hope you will consider sponsoring me to give me more motivation to continue developing and improving it. Thank you for your support!</string>
