@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <dlfcn.h>
 #include "egl_loader.h"
-#include "loader_dlopen.h"
 
 EGLBoolean (*eglMakeCurrent_p) (EGLDisplay dpy, EGLSurface draw, EGLSurface read, EGLContext ctx);
 EGLBoolean (*eglDestroyContext_p) (EGLDisplay dpy, EGLContext ctx);
