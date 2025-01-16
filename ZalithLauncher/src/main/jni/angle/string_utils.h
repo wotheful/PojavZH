@@ -1,5 +1,5 @@
-#ifndef _GL4ES_STRING_UTILS_H_
-#define _GL4ES_STRING_UTILS_H_
+#ifndef __GL4ES_STRING_UTILS_H_
+#define __GL4ES_STRING_UTILS_H_
 
 extern const char* AllSeparators;
 
@@ -28,4 +28,4 @@ int gl4es_countstring_simple(char* pBuffer, const char* S);
 char* gl4es_inplace_replace_simple(char* pBuffer, int* size, const char* S, const char* D);
 
 
-#endif // _GL4ES_STRING_UTILS_H_
+#endif // __GL4ES_STRING_UTILS_H_
