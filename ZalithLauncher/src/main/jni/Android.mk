@@ -23,6 +23,8 @@ LOCAL_SHARED_LIBRARIES := angle_gles2
 LOCAL_SRC_FILES := angle/main.c angle/string_utils.c
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/angle
 LOCAL_CFLAGS += -rdynamic
+LOCAL_CFLAGS += -O3 -fPIC -DPIC -flto=thin -fwhole-program-vtables -mllvm -polly -pthread -Wall -Weverything -std=c2x -fno-emulated-tls -march=armv8-a+simd+crc+crypto+fp16 -mcpu=cortex-a76 -fdata-sections -ffunction-sections -fmerge-all-constants
+LOCAL_LDLAGS += -flto=thin -Wl,-plugin-opt=-emulated-tls=0 -fuse-ld=lld
 include $(BUILD_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
