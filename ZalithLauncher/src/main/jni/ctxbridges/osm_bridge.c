@@ -78,7 +78,7 @@ void osm_release_window(void) {
     osm_swap_surfaces(currentBundle);
 }
 
-void osm_apply_current_ll(void) {
+static void osm_apply_current_ll(void) {
     ANativeWindow_Buffer* buffer = &currentBundle->buffer;
     OSMesaMakeCurrent_p(currentBundle->context, buffer->bits, GL_UNSIGNED_BYTE, buffer->width, buffer->height);
     if(buffer->stride != currentBundle->last_stride)
