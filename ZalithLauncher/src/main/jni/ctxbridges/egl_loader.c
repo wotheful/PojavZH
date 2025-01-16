@@ -32,8 +32,8 @@ __eglMustCastToProperFunctionPointerType (*eglGetProcAddress_p) (const char *pro
 
 void dlsym_EGL(void) {
     void* dl_handle = NULL;
-    if(getenv("POJAVEXEC_EGL")) dl_handle = dlopen(getenv("POJAVEXEC_EGL"), RTLD_LAZY);
-    if(dl_handle == NULL) dl_handle = dlopen("libEGL.so", RTLD_LAZY);
+    if(getenv("POJAVEXEC_EGL")) dl_handle = dlopen(getenv("POJAVEXEC_EGL"), RTLD_LOCAL|RTLD_LAZY);
+    if(dl_handle == NULL) dl_handle = dlopen("libEGL.so", RTLD_LOCAL|RTLD_LAZY);
     if(dl_handle == NULL) abort();
     eglGetProcAddress_p = dlsym(dl_handle, "eglGetProcAddress");
     if(eglGetProcAddress_p == NULL) {
