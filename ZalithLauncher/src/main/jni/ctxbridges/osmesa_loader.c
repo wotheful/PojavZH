@@ -7,7 +7,6 @@
 #include "environ/environ.h"
 #include "osmesa_loader.h"
 #include "renderer_config.h"
-#include "loader_dlopen.h"
 
 GLboolean (*OSMesaMakeCurrent_p) (OSMesaContext ctx, void *buffer, GLenum type,
                                          GLsizei width, GLsizei height);
@@ -22,7 +21,7 @@ void (*glClear_p) (GLbitfield mask);
 void (*glReadPixels_p) (GLint x, GLint y, GLsizei width, GLsizei height, GLenum format, GLenum type, void * data);
 void* (*OSMesaGetProcAddress_p)(const char* funcName);
 
-bool dlsym_OSMesa() {
+bool dlsym_OSMesa(void) {
     char* mesa_library = getenv("MESA_LIBRARY");
     void* dl_handle = dlopen(mesa_library, RTLD_LOCAL | RTLD_LAZY);
     if(dl_handle == NULL) return false;
