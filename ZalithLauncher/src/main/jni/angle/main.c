@@ -1,8 +1,9 @@
 //#import <Foundation/Foundation.h>
 #include <stdio.h>
 #include <dlfcn.h>
+#include <string.h>
+#include <malloc.h>
 
-#include "GL/gl.h"
 #include "GLES3/gl32.h"
 #include "string_utils.h"
 
@@ -15,22 +16,24 @@
 
 int proxy_width, proxy_height, proxy_intformat, maxTextureSize;
 
-void glBindFragDataLocationEXT(GLuint program, GLuint colorNumber, const char * name);
-
 void(*gles_glGetTexLevelParameteriv)(GLenum target, GLint level, GLenum pname, GLint *params);
 void(*gles_glShaderSource)(GLuint shader, GLsizei count, const GLchar * const *string, const GLint *length);
+GLuint (*gles_glCreateShader) (GLenum shaderType);
 void(*gles_glTexImage2D)(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid *data);
-
-void glBindFragDataLocation(GLuint program, GLuint colorNumber, const char * name) {
-    glBindFragDataLocationEXT(program, colorNumber, name);
-}
-
-void glClearDepth(GLdouble depth) {
-    glClearDepthf(depth);
-}
+void(*gles_glDrawElementsBaseVertex)(GLenum mode,
+                                  GLsizei count,
+                                  GLenum type,
+                                  void *indices,
+                                  GLint basevertex);
+void (*gles_glGetBufferParameteriv) (GLenum target, GLenum pname, GLint *params);
+void * (*gles_glMapBufferRange) (GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access);
+const GLubyte * (*gles_glGetString) (GLenum name);
+void (*gles_glTexParameterf) (GLenum target, GLenum pname, GLfloat param);
 
 void *glMapBuffer(GLenum target, GLenum access) {
     // Use: GL_EXT_map_buffer_range
+    LOOKUP_FUNC(glGetBufferParameteriv);
+    LOOKUP_FUNC(glMapBufferRange);
 
     GLenum access_range;
     GLint length;
@@ -68,8 +71,18 @@ void *glMapBuffer(GLenum target, GLenum access) {
             break;
     }
 
-    glGetBufferParameteriv(target, GL_BUFFER_SIZE, &length);
-    return glMapBufferRange(target, 0, length, access_range);
+    gles_glGetBufferParameteriv(target, GL_BUFFER_SIZE, &length);
+    return gles_glMapBufferRange(target, 0, length, access_range);
+}
+
+static GLenum currShaderType = GL_VERTEX_SHADER;
+
+GLuint glCreateShader(GLenum shaderType) {
+    LOOKUP_FUNC(glCreateShader);
+
+    currShaderType = shaderType;
+
+    return gles_glCreateShader(shaderType);
 }
 
 void glShaderSource(GLuint shader, GLsizei count, const GLchar * const *string, const GLint *length) {
@@ -124,24 +137,27 @@ void glShaderSource(GLuint shader, GLsizei count, const GLchar * const *string, 
 
     int convertedLen = strlen(converted);
 
-#ifdef __APPLE__
+//#ifdef __APPLE__
     // patch OptiFine 1.17.x
-    if (FindString(converted, "\nuniform mat4 textureMatrix = mat4(1.0);")) {
-        InplaceReplace(converted, &convertedLen, "\nuniform mat4 textureMatrix = mat4(1.0);", "\n#define textureMatrix mat4(1.0)");
+    if (gl4es_find_string(converted, "\nuniform mat4 textureMatrix = mat4(1.0);")) {
+        gl4es_inplace_replace(converted, &convertedLen, "\nuniform mat4 textureMatrix = mat4(1.0);", "\n#define textureMatrix mat4(1.0)");
     }
-#endif
+//#endif
 
     // some needed exts
     const char* extensions =
         "#extension GL_EXT_blend_func_extended : enable\n"
         // For OptiFine (see patch above)
         "#extension GL_EXT_shader_non_constant_global_initializers : enable\n";
-    converted = InplaceInsert(GetLine(converted, 1), extensions, converted, &convertedLen);
+    converted = gl4es_inplace_insert(gl4es_getline(converted, 1), extensions, converted, &convertedLen);
 
     gles_glShaderSource(shader, 1, (const GLchar * const*)((converted)?(&converted):(&source)), NULL);
 
     free(source);
     free(converted);
+
+    converted = replace_word(converted, "#version 300 es", "#version 320 es");
+    // printf("Output GLSL ES:\n%s", converted);
 }
 
 int isProxyTexture(GLenum target) {
@@ -171,7 +187,7 @@ void glGetTexLevelParameteriv(GLenum target, GLint level, GLenum pname, GLint *p
             case GL_TEXTURE_WIDTH:
                 (*params) = nlevel(proxy_width,level);
                 break;
-            case GL_TEXTURE_HEIGHT: 
+            case GL_TEXTURE_HEIGHT:
                 (*params) = nlevel(proxy_height,level);
                 break;
             case GL_TEXTURE_INTERNAL_FORMAT:
@@ -183,8 +199,52 @@ void glGetTexLevelParameteriv(GLenum target, GLint level, GLenum pname, GLint *p
     }
 }
 
+void glTexParameterf(GLenum target, GLenum pname, GLfloat param) {
+    LOOKUP_FUNC(glTexParameterf);
+
+    // Not supported, crashes some mods that check
+    // for OpenGL errors
+    if(pname == GL_TEXTURE_LOD_BIAS_EXT) {
+        return;
+    }
+
+    gles_glTexParameterf(target, pname, param);
+}
+
 void glTexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid *data) {
     LOOKUP_FUNC(glTexImage2D)
+
+    // Regal doesn't handle depth formats well
+    // Convert it to sized GLES formats instead
+    if(internalformat == GL_DEPTH_COMPONENT) {
+        switch (type) {
+            case GL_UNSIGNED_SHORT:
+                internalformat = GL_DEPTH_COMPONENT16;
+                break;
+            case GL_UNSIGNED_INT:
+                internalformat = GL_DEPTH_COMPONENT24;
+                break;
+            case GL_FLOAT:
+                internalformat = GL_DEPTH_COMPONENT32F;
+                break;
+            default:
+                printf("Depth texture type %d failed for depth component!\n", type);
+                break;
+        }
+    } else if(internalformat == GL_DEPTH_STENCIL) {
+        switch (type) {
+            case GL_UNSIGNED_INT:
+                internalformat = GL_DEPTH24_STENCIL8;
+                break;
+            case GL_FLOAT:
+                internalformat = GL_DEPTH32F_STENCIL8;
+                break;
+            default:
+                printf("Depth texture type %d failed for depth stencil!\n", type);
+                break;
+        }
+    }
+
     if (isProxyTexture(target)) {
         if (!maxTextureSize) {
             glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
@@ -197,5 +257,36 @@ void glTexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei widt
         // swizzle_internalformat((GLenum *) &internalformat, format, type);
     } else {
         gles_glTexImage2D(target, level, internalformat, width, height, border, format, type, data);
+    }
+}
+
+// Sodium
+const void *const glMultiDrawElementsBaseVertex(	GLenum mode,
+                                       const GLsizei *count,
+                                       GLenum type,
+                                       const void * const *indices,
+                                       GLsizei drawcount,
+                                       const GLint *basevertex) {
+    LOOKUP_FUNC(glDrawElementsBaseVertex);
+    for (int i = 0; i < drawcount; i++) {
+        if (count[i] > 0)
+            gles_glDrawElementsBaseVertex(mode,
+                                     count[i],
+                                     type,
+                                     indices[i],
+                                     basevertex[i]);
+    }
+}
+
+const GLubyte * glGetString(GLenum name) {
+    LOOKUP_FUNC(glGetString);
+
+    switch (name) {
+        case GL_VERSION:
+            return (const GLubyte *)"4.6";
+        case GL_SHADING_LANGUAGE_VERSION:
+            return (const GLubyte *)"4.5";
+        default:
+            return gles_glGetString(name);
     }
 }
