@@ -4,8 +4,8 @@
 #include <string.h>
 #include <malloc.h>
 
-#include "GL/gl.h"
 #include "GL/glcorearb.h"
+#include <GLES3/gl32.h>
 #include "string_utils.h"
 
 #define LOOKUP_FUNC(func) \
@@ -14,10 +14,6 @@
     } if (!gles_##func) { \
         gles_##func = dlsym(RTLD_DEFAULT, #func); \
     }
-
-#define GL_PROXY_TEXTURE_RECTANGLE_ARB 0x84F7
-#define GL_TEXTURE_LOD_BIAS_EXT 0x8501
-GLAPI void GLAPIENTRY glGetIntegerv( GLenum pname, GLint *params ); 
 
 int proxy_width, proxy_height, proxy_intformat, maxTextureSize;
 
