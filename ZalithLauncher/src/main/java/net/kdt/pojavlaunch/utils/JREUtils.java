@@ -239,12 +239,14 @@ public class JREUtils {
     private static void setRendererEnv() throws Throwable {
         Map<String, String> envMap = new ArrayMap<>();
 
-        if (LOCAL_RENDERER.startsWith("opengles2")) {
-            envMap.put("LIBGL_ES", "2");
+        if (LOCAL_RENDERER.startsWith("opengles3")) {
+            envMap.put("LIBGL_ES", "3");
             envMap.put("LIBGL_MIPMAP", "3");
             envMap.put("LIBGL_NOERROR", "1");
             envMap.put("LIBGL_NOINTOVLHACK", "1");
             envMap.put("LIBGL_NORMALIZE", "1");
+            envMap.put("LIBGL_GLES", "libGLESv3.so");
+            envMap.put("LIBGL_FB", "3");
         }
 
         String eglName = null;
@@ -361,20 +363,6 @@ public class JREUtils {
         if (LOCAL_RENDERER != null) setRendererEnv();
 
         List<String> userArgs = getJavaArgs(runtimeHome, userArgsString);
-        //Remove arguments that can interfere with the good working of the launcher
-        purgeArg(userArgs,"-Xms");
-        purgeArg(userArgs,"-Xmx");
-        purgeArg(userArgs,"-d32");
-        purgeArg(userArgs,"-d64");
-        purgeArg(userArgs, "-Xint");
-        purgeArg(userArgs, "-XX:+UseTransparentHugePages");
-        purgeArg(userArgs, "-XX:+UseLargePagesInMetaspace");
-        purgeArg(userArgs, "-XX:+UseLargePages");
-        purgeArg(userArgs, "-Dorg.lwjgl.opengl.libname");
-        // Don't let the user specify a custom Freetype library (as the user is unlikely to specify a version compiled for Android)
-        purgeArg(userArgs, "-Dorg.lwjgl.freetype.libname");
-        // Overridden by us to specify the exact number of cores that the android system has
-        purgeArg(userArgs, "-XX:ActiveProcessorCount");
 
         //禁用flite缺失、lwjgl兼容性警告的日志输出
         userArgs.add("-javaagent:" + LibPath.MIO_LIB_FIXER.getAbsolutePath());
@@ -407,7 +395,7 @@ public class JREUtils {
         chdir(gameDirectory == null ? ProfilePathHome.getGameHome() : gameDirectory.getAbsolutePath());
         userArgs.add(0,"java"); //argv[0] is the program name according to C standard.
 
-        final int exitCode = VMLauncher.launchJVM(userArgs.toArray(new String[0]));
+        int exitCode = VMLauncher.launchJVM(userArgs.toArray(new String[0]));
         Logger.appendToLog("Java Exit code: " + exitCode);
         if (exitCode != 0) {
             ErrorActivity.showExitMessage(activity, exitCode, false);
@@ -439,9 +427,9 @@ public class JREUtils {
 
                 "-Dorg.lwjgl.vulkan.libname=libvulkan.so",
                 //LWJGL 3 DEBUG FLAGS
-                //"-Dorg.lwjgl.util.Debug=true",
-                //"-Dorg.lwjgl.util.DebugFunctions=true",
-                //"-Dorg.lwjgl.util.DebugLoader=true",
+                "-Dorg.lwjgl.util.Debug=true",
+                "-Dorg.lwjgl.util.DebugFunctions=true",
+                "-Dorg.lwjgl.util.DebugLoader=true",
                 // GLFW Stub width height
                 "-Dglfwstub.windowWidth=" + Tools.getDisplayFriendlyRes(currentDisplayMetrics.widthPixels, AllSettings.getResolutionRatio().getValue() / 100F),
                 "-Dglfwstub.windowHeight=" + Tools.getDisplayFriendlyRes(currentDisplayMetrics.heightPixels, AllSettings.getResolutionRatio().getValue() / 100F),
@@ -553,7 +541,7 @@ public class JREUtils {
             });
         } else {
             switch (LOCAL_RENDERER){
-                case "opengles2":
+                case "opengles3":
                     renderLibrary = "libgl4es_114.so";
                     break;
                 case "vulkan_zink":
@@ -577,10 +565,7 @@ public class JREUtils {
         }
 
         if (!dlopen(renderLibrary) && !dlopen(findInLdLibPath(renderLibrary))) {
-            Logging.e("RENDER_LIBRARY","Failed to load renderer " + renderLibrary + ". Falling back to GL4ES 1.1.4");
-            LOCAL_RENDERER = "opengles2";
-            renderLibrary = "libgl4es_114.so";
-            dlopen(DIR_NATIVE_LIB + "/libgl4es_114.so");
+            Logging.e("RENDER_LIBRARY","Failed to load renderer " + renderLibrary);
         }
         return renderLibrary;
     }

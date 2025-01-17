@@ -19,8 +19,8 @@ static const char* g_LogTag = "GLBridge";
 static __thread gl_render_window_t* currentBundle;
 static EGLDisplay g_EglDisplay;
 
-bool gl_init() {
-    dlsym_EGL();
+bool gl_init(void) {
+    if(!dlsym_EGL()) return false;
     g_EglDisplay = eglGetDisplay_p(EGL_DEFAULT_DISPLAY);
 
     if (g_EglDisplay == EGL_NO_DISPLAY)
@@ -38,7 +38,7 @@ bool gl_init() {
     return true;
 }
 
-gl_render_window_t* gl_get_current() {
+gl_render_window_t* gl_get_current(void) {
     return currentBundle;
 }
 
@@ -58,17 +58,7 @@ static void gl4esi_get_display_dimensions(int* width, int* height) {
 gl_render_window_t* gl_init_context(gl_render_window_t *share) {
     gl_render_window_t* bundle = malloc(sizeof(gl_render_window_t));
     memset(bundle, 0, sizeof(gl_render_window_t));
-    EGLint egl_attributes[] = { EGL_BLUE_SIZE, 8,
-                    EGL_GREEN_SIZE, 8,
-                    EGL_RED_SIZE, 8,
-                    EGL_ALPHA_SIZE, 8,
-                    EGL_DEPTH_SIZE, 24,
-                    EGL_SURFACE_TYPE,
-                    EGL_WINDOW_BIT|EGL_PBUFFER_BIT,
-                    EGL_RENDERABLE_TYPE,
-                    EGL_OPENGL_ES2_BIT,
-                    EGL_NONE
-                    };
+    EGLint egl_attributes[] = { EGL_BLUE_SIZE, 8, EGL_GREEN_SIZE, 8, EGL_RED_SIZE, 8, EGL_ALPHA_SIZE, 8, EGL_DEPTH_SIZE, 24, EGL_ALPHA_MASK_SIZE, 8, EGL_SURFACE_TYPE, EGL_WINDOW_BIT|EGL_PBUFFER_BIT, EGL_CONFORMANT, EGL_OPENGL_ES3_BIT, EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT, EGL_NONE };
     EGLint num_configs = 0;
 
     if (eglChooseConfig_p(g_EglDisplay, egl_attributes, NULL, 0, &num_configs) != EGL_TRUE)
@@ -102,12 +92,12 @@ gl_render_window_t* gl_init_context(gl_render_window_t *share) {
             printf("EGLBridge: Binding to OpenGL ES\n");
             bindResult = eglBindAPI_p(EGL_OPENGL_ES_API);
         }
-        if (!bindResult) printf("EGLBridge: bind failed: %p\n", eglGetError_p());
+        if (!bindResult) printf("EGLBridge: bind failed: %d\n", eglGetError_p());
     }
 
     int libgl_es = strtol(getenv("LIBGL_ES"), NULL, 0);
     if (libgl_es < 0 || libgl_es > INT16_MAX) libgl_es = 2;
-    const EGLint egl_context_attributes[] = { EGL_CONTEXT_CLIENT_VERSION, libgl_es, EGL_NONE };
+    const EGLint egl_context_attributes[] = { EGL_CONTEXT_CLIENT_VERSION, 3, EGL_NONE };
     bundle->context = eglCreateContext_p(g_EglDisplay, bundle->config, share == NULL ? EGL_NO_CONTEXT : share->context, egl_context_attributes);
 
     if (bundle->context == EGL_NO_CONTEXT)
@@ -120,27 +110,25 @@ gl_render_window_t* gl_init_context(gl_render_window_t *share) {
     return bundle;
 }
 
-void gl_swap_surface(gl_render_window_t* bundle) {
-    if (bundle->nativeSurface != NULL)
+static void gl_swap_surface(gl_render_window_t* bundle) {
+    if(bundle->nativeSurface != NULL) {
         ANativeWindow_release(bundle->nativeSurface);
-
-    if (bundle->surface != NULL)
-        eglDestroySurface_p(g_EglDisplay, bundle->surface);
-
-    if (bundle->newNativeSurface != NULL)
-    {
+    }
+    if(bundle->surface != NULL) eglDestroySurface_p(g_EglDisplay, bundle->surface);
+    if(bundle->newNativeSurface != NULL) {
         __android_log_print(ANDROID_LOG_ERROR, g_LogTag, "Switching to new native surface");
         bundle->nativeSurface = bundle->newNativeSurface;
         bundle->newNativeSurface = NULL;
         ANativeWindow_acquire(bundle->nativeSurface);
         ANativeWindow_setBuffersGeometry(bundle->nativeSurface, 0, 0, bundle->format);
         bundle->surface = eglCreateWindowSurface_p(g_EglDisplay, bundle->config, bundle->nativeSurface, NULL);
-    } else {
+    }else{
         __android_log_print(ANDROID_LOG_ERROR, g_LogTag, "No new native surface, switching to 1x1 pbuffer");
         bundle->nativeSurface = NULL;
         const EGLint pbuffer_attrs[] = {EGL_WIDTH, 1 , EGL_HEIGHT, 1, EGL_NONE};
         bundle->surface = eglCreatePbufferSurface_p(g_EglDisplay, bundle->config, pbuffer_attrs);
     }
+    //eglMakeCurrent_p(g_EglDisplay, bundle->surface, bundle->surface, bundle->context);
 }
 
 void gl_make_current(gl_render_window_t* bundle) {
@@ -163,8 +151,9 @@ void gl_make_current(gl_render_window_t* bundle) {
         hasSetMainWindow = true;
     }
 
-    if (bundle->surface == NULL)
+    if(bundle->surface == NULL) { //it likely will be on the first run
         gl_swap_surface(bundle);
+    }
 
     if (eglMakeCurrent_p(g_EglDisplay, bundle->surface, bundle->surface, bundle->context))
     {
@@ -181,28 +170,25 @@ void gl_make_current(gl_render_window_t* bundle) {
 
 }
 
-void gl_swap_buffers() {
-    if (currentBundle->state == STATE_RENDERER_NEW_WINDOW)
-    {
-        eglMakeCurrent_p(g_EglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+void gl_swap_buffers(void) {
+    if(currentBundle->state == STATE_RENDERER_NEW_WINDOW) {
+        eglMakeCurrent_p(g_EglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT); //detach everything to destroy the old EGLSurface
         gl_swap_surface(currentBundle);
         eglMakeCurrent_p(g_EglDisplay, currentBundle->surface, currentBundle->surface, currentBundle->context);
         currentBundle->state = STATE_RENDERER_ALIVE;
     }
-
-    if (currentBundle->surface != NULL)
-        if (!eglSwapBuffers_p(g_EglDisplay, currentBundle->surface) && eglGetError_p() == EGL_BAD_SURFACE)
-        {
+    if(currentBundle->surface != NULL)
+        if(!eglSwapBuffers_p(g_EglDisplay, currentBundle->surface) && eglGetError_p() == EGL_BAD_SURFACE) {
             eglMakeCurrent_p(g_EglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
             currentBundle->newNativeSurface = NULL;
             gl_swap_surface(currentBundle);
             eglMakeCurrent_p(g_EglDisplay, currentBundle->surface, currentBundle->surface, currentBundle->context);
             __android_log_print(ANDROID_LOG_INFO, g_LogTag, "The window has died, awaiting window change");
-        }
+    }
 
 }
 
-void gl_setup_window() {
+void gl_setup_window(void) {
     if (pojav_environ->mainWindowBundle != NULL)
     {
         __android_log_print(ANDROID_LOG_INFO, g_LogTag, "Main window bundle is not NULL, changing state");

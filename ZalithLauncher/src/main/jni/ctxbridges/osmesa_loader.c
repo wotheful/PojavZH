@@ -22,7 +22,7 @@ void (*glClear_p) (GLbitfield mask);
 void (*glReadPixels_p) (GLint x, GLint y, GLsizei width, GLsizei height, GLenum format, GLenum type, void* data);
 void (*glReadBuffer_p) (GLenum mode);
 
-bool is_renderer_vulkan() {
+bool is_renderer_vulkan(void) {
     return (pojav_environ->config_renderer == RENDERER_VK_ZINK
          || pojav_environ->config_renderer == RENDERER_VIRGL);
 }
@@ -49,7 +49,7 @@ void* load_symbol(void* handle, const char* symbol_name) {
     return symbol;
 }
 
-void dlsym_OSMesa() {
+void dlsym_OSMesa(void) {
     if (!is_renderer_vulkan()) return;
 
     char* mesa_library = getenv("MESA_LIBRARY");
