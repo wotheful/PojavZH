@@ -125,7 +125,7 @@ bool checkAdrenoGraphics() {
 }
 void* load_turnip_vulkan() {
     if(!checkAdrenoGraphics()) return NULL;
-    const char* native_dir = getenv("POJAV_NATIVEDIR");
+    const char* native_dir = getenv("DRIVER_PATH");
     const char* cache_dir = getenv("TMPDIR");
     if(!linker_ns_load(native_dir)) return NULL;
     void* linkerhook = linker_ns_dlopen("liblinkerhook.so", RTLD_LOCAL | RTLD_NOW);
@@ -288,14 +288,17 @@ EXTERNAL_API void* pojavCreateContext(void* contextSrc) {
     return br_init_context((basic_render_window_t*)contextSrc);
 }
 
-EXTERNAL_API JNIEXPORT jlong JNICALL
-Java_org_lwjgl_vulkan_VK_getVulkanDriverHandle(ABI_COMPAT JNIEnv *env, ABI_COMPAT jclass thiz) {
-    printf("EGLBridge: LWJGL-side Vulkan loader requested the Vulkan handle\n");
-    // The code below still uses the env var because
+void* maybe_load_vulkan() {
+    // We use the env var because
     // 1. it's easier to do that
     // 2. it won't break if something will try to load vulkan and osmesa simultaneously
     if(getenv("VULKAN_PTR") == NULL) load_vulkan();
-    return strtoul(getenv("VULKAN_PTR"), NULL, 0x10);
+    return (void*) strtoul(getenv("VULKAN_PTR"), NULL, 0x10);
+}
+EXTERNAL_API JNIEXPORT jlong JNICALL
+Java_org_lwjgl_vulkan_VK_getVulkanDriverHandle(ABI_COMPAT JNIEnv *env, ABI_COMPAT jclass thiz) {
+    printf("EGLBridge: LWJGL-side Vulkan loader requested the Vulkan handle\n");
+    return (jlong) maybe_load_vulkan();
 }
 
 EXTERNAL_API void pojavSwapInterval(int interval) {

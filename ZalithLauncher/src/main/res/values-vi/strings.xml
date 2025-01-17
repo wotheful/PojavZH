@@ -180,6 +180,7 @@
     <string name="controls_info_default_desc">Đây là tệp bố cục điều khiển mặc định, nhấn để thao tác bố cục điều khiển này.</string>
     <string name="controls_set_default_message">Bạn có chắc chắn muốn đặt bố cục điều khiển này làm bố cục điều khiển mặc định không?</string>
     <string name="controls_nothing">Không có bố cục điều khiển nào ở đây, khởi động lại ứng dụng sẽ tạo một bố cục điều khiển mặc định mới</string>
+    <string name="controls_tip_set_default">Nhấn giữ bố cục điều khiển để đặt nó làm bố cục điều khiển mặc định!</string>
     <string name="replacement_customcontrol">Thay thế bố cục điều khiển</string>
     <string name="custom_control_title">Quản lý bố cục điều khiển</string>
     <string name="controller_button_start">Bắt đầu</string>
@@ -215,12 +216,13 @@
     <string name="version_install_log_flood_warning">Nếu nhật ký tràn màn hình và khiến thiết bị bị lag trong quá trình cài đặt, nhấp vào đây để đóng nhật ký!</string>
     <string name="version_manager_shortcuts">Phím tắt</string>
     <string name="version_manager_shortcuts_mods">Quản lý Mod</string>
-    <string name="version_manager_shortcuts_version_path">Thư mục đường dẫn trò chơi</string>
+    <string name="version_manager_shortcuts_version_path">Thư mục đường dẫn game</string>
     <string name="version_manager_shortcuts_resource_path">Thư mục gói tài nguyên</string>
-    <string name="version_manager_shortcuts_world_path">Thư mục lưu trữ thế giới</string>
+    <string name="version_manager_shortcuts_world_path">Thư mục lưu game</string>
     <string name="version_manager_shortcuts_shader_path">Thư mục gói shader</string>
+    <string name="version_manager_shortcuts_screenshot_path">Thư mục ảnh chụp màn hình</string>
     <string name="version_manager_shortcuts_logs_path">Thư mục nhật ký</string>
-    <string name="version_manager_shortcuts_crash_report_path">Thư mục báo cáo lỗi</string>
+    <string name="version_manager_shortcuts_crash_report_path">Thư mục báo cáo sự cố</string>
     <string name="version_manager_edit">Chỉnh sửa phiên bản</string>
     <string name="version_manager_rename">Đổi tên phiên bản</string>
     <string name="version_manager_copy">Sao chép phiên bản</string>
@@ -233,6 +235,12 @@
     <string name="version_manager_invalid">Phiên bản này không hợp lệ</string>
     <string name="version_manager_no_installed_version">Khởi động không tìm thấy bất kỳ phiên bản Minecraft nào đã được cài đặt!</string>
     <string name="version_manager_isolation_type_follow_global">Theo cài đặt của Trình khởi chạy</string>
+    <string name="version_manager_favorites_add_category">Thêm vào yêu thích</string>
+    <string name="version_manager_favorites_remove_folder_title">Xóa yêu thích</string>
+    <string name="version_manager_favorites_remove_folder_message">Bạn có chắc chắn muốn xóa yêu thích này không? Sau khi xóa, thông tin trong yêu thích hiện tại sẽ bị xóa và thao tác này không thể hoàn tác!</string>
+    <string name="version_manager_favorites_write_folder_name">Đặt tên cho yêu thích mới</string>
+    <string name="version_manager_favorites_dialog_title">Thêm vào yêu thích</string>
+    <string name="version_manager_favorites_dialog_no_folders">Chưa có yêu thích nào, vui lòng thêm yêu thích trước!</string>
     <!-- Profiles Path -->
     <string name="permissions_manage_external_storage">%s cần quyền quản lý tất cả các tệp trên thiết bị để sử dụng tính năng này bình thường, vui lòng bật quyền!</string>
     <string name="permissions_write_external_storage">%s yêu cầu quyền quản lý bộ nhớ. Nếu quyền này không được bật, có thể gây ra các vấn đề như tệp trò chơi không thể lưu hoặc giải nén đúng cách. Vui lòng cấp quyền để đảm bảo các chức năng hoạt động đúng.</string>
@@ -263,6 +271,8 @@
     <string name="account_add">Thêm tài khoản</string>
     <string name="account_no_saved_accounts">Không có tài khoản đã lưu</string>
     <string name="account_remove">Tài khoản này sẽ bị xóa khỏi trình khởi động, bạn có chắc chắn muốn làm điều này không?</string>
+    <string name="account_remove_login_type_title">Xóa phương thức đăng nhập: %s</string>
+    <string name="account_remove_login_type_message">Phương thức đăng nhập này sẽ được xóa khỏi trình khởi động, nhưng không xóa tài khoản hiện tại của bạn. Bạn có chắc chắn muốn làm như vậy không?</string>
     <string name="account_microsoft_account">Tài khoản Microsoft</string>
     <string name="account_microsoft_xerr_unauthorized">Thông tin đăng nhập tài khoản Microsoft của bạn có vẻ đã hết hạn, tình huống này thường xảy ra khi mật khẩu tài khoản bị thay đổi. Vui lòng xóa tài khoản hiện tại và đăng nhập lại để đặt lại thông tin đăng nhập của bạn.</string>
     <string name="account_local_account">Tài khoản ngoại tuyến</string>
@@ -358,7 +368,6 @@
     <string name="main_open_main_dir">Mở thư mục chính</string>
     <string name="main_install_jar_file">Thực thi tệp .jar</string>
     <string name="main_share_logs">Chia sẻ tệp nhật ký</string>
-    <string name="main_share_crash_report">Chia sẻ báo cáo sự cố</string>
     <string name="main_launch">Bắt đầu trò chơi</string>
     <string name="setting_category_control">Cài đặt điều khiển</string>
     <string name="setting_category_virtual_mouse">Chuột ảo</string>
@@ -377,8 +386,9 @@
     <string name="setting_category_experimental_patches">Bản vá thử nghiệm</string>
     <string name="setting_category_support">Hỗ trợ bên ngoài</string>
     <string name="setting_renderer_title">Bộ kết xuất</string>
-    <string name="setting_renderer_name_ltw">LTW (chỉ dành cho 1.17+)</string>
     <string name="setting_renderer_name_angle">Angle (chỉ dành cho 1.17+)</string>
+    <string name="setting_renderer_from_plugins">Từ plugin %s</string>
+    <string name="setting_driver_title">Trình điều khiển Vulkan</string>
     <string name="setting_ignore_notch_title">Chế độ toàn màn hình</string>
     <string name="setting_ignore_notch_desc">Bỏ qua màn hình tai thỏ và mở rộng nội dung màn hình đến toàn màn hình\nCung cấp cho bạn trải nghiệm chìm đắm đầy đủ hơn</string>
     <string name="setting_resolution_scaler_title">Điều chỉnh độ phân giải</string>

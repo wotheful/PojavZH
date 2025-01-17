@@ -180,6 +180,7 @@
     <string name="controls_info_default_desc">Dies ist die Standard-Steuerungsdatei. Tippen Sie darauf, um dieses Steuerungsraster zu bearbeiten.</string>
     <string name="controls_set_default_message">Möchten Sie dieses Steuerungsraster wirklich als Standard festlegen?</string>
     <string name="controls_nothing">Hier gibt es keine Steuerungsraster. Beim Neustart der Anwendung wird ein neues Standard-Steuerungsraster generiert.</string>
+    <string name="controls_tip_set_default">Drücken Sie lange auf das Steuerungslayout, um es als Standardsteuerungslayout festzulegen!</string>
     <string name="replacement_customcontrol">Steuerungsraster ersetzen</string>
     <string name="custom_control_title">Steuerungsraster verwalten</string>
     <string name="controller_button_start">Start</string>
@@ -219,6 +220,7 @@
     <string name="version_manager_shortcuts_resource_path">Ressourcenpaket-Ordner</string>
     <string name="version_manager_shortcuts_world_path">Welten-Speicherordner</string>
     <string name="version_manager_shortcuts_shader_path">Shader-Paket-Ordner</string>
+    <string name="version_manager_shortcuts_screenshot_path">Screenshot-Ordner</string>
     <string name="version_manager_shortcuts_logs_path">Protokolldatei-Ordner</string>
     <string name="version_manager_shortcuts_crash_report_path">Absturzbericht-Ordner</string>
     <string name="version_manager_edit">Version bearbeiten</string>
@@ -233,6 +235,12 @@
     <string name="version_manager_invalid">Diese Version ist ungültig</string>
     <string name="version_manager_no_installed_version">Der Launcher keine installierte Minecraft-Version gefunden!</string>
     <string name="version_manager_isolation_type_follow_global">Einstellungen des Launchers übernehmen</string>
+    <string name="version_manager_favorites_add_category">Favorit hinzufügen</string>
+    <string name="version_manager_favorites_remove_folder_title">Favorit entfernen</string>
+    <string name="version_manager_favorites_remove_folder_message">Sind Sie sicher, dass Sie diesen Favoriten entfernen möchten? Nach dem Entfernen werden die Informationen im aktuellen Favoriten gelöscht, und dieser Vorgang ist nicht rückgängig zu machen!</string>
+    <string name="version_manager_favorites_write_folder_name">Neuen Favoriten benennen</string>
+    <string name="version_manager_favorites_dialog_title">Zu Favoriten hinzufügen</string>
+    <string name="version_manager_favorites_dialog_no_folders">Noch keine Favoriten vorhanden, bitte zuerst einen Favoriten hinzufügen!</string>
     <!-- Profiles Path -->
     <string name="permissions_manage_external_storage">%s benötigt die Berechtigung, um alle Dateien auf dem Gerät zu verwalten, damit diese Funktion ordnungsgemäß funktioniert. Bitte erteilen Sie die Berechtigung!</string>
     <string name="permissions_write_external_storage">%s benötigt die Speicherverwaltungsberechtigung. Wenn die Berechtigung nicht aktiviert ist, können Probleme auftreten, wie z. B. das fehlerhafte Speichern oder Entpacken von Spieldateien. Bitte erteilen Sie die Berechtigung, um die ordnungsgemäße Funktion sicherzustellen.</string>
@@ -263,6 +271,8 @@
     <string name="account_add">Konto hinzufügen</string>
     <string name="account_no_saved_accounts">Keine gespeicherten Konten</string>
     <string name="account_remove">Dieses Konto wird aus dem Launcher entfernt. Bist du sicher, dass du das tun möchtest?</string>
+    <string name="account_remove_login_type_title">Anmeldemethode entfernen: %s</string>
+    <string name="account_remove_login_type_message">Diese Anmeldemethode wird aus dem Starter entfernt, aber Ihr bestehendes Konto nicht. Sind Sie sicher, dass Sie dies tun möchten?</string>
     <string name="account_microsoft_account">Microsoft-Konto</string>
     <string name="account_microsoft_xerr_unauthorized">Deine Microsoft-Konto-Anmeldeinformationen scheinen abgelaufen zu sein. Dies passiert oft, nachdem das Kontopasswort geändert wurde. Bitte entferne das aktuelle Konto und melde dich erneut an, um deine Anmeldeinformationen zurückzusetzen.</string>
     <string name="account_local_account">Offline-Konto</string>
@@ -358,7 +368,6 @@
     <string name="main_open_main_dir">Hauptverzeichnis öffnen</string>
     <string name="main_install_jar_file">.jar-Datei ausführen</string>
     <string name="main_share_logs">Logdateien teilen</string>
-    <string name="main_share_crash_report">Absturzbericht teilen</string>
     <string name="main_launch">Spiel starten</string>
     <string name="setting_category_control">Steuerungseinstellungen</string>
     <string name="setting_category_virtual_mouse">Virtueller Mauszeiger</string>
@@ -377,8 +386,9 @@
     <string name="setting_category_experimental_patches">Experimentelle Patches</string>
     <string name="setting_category_support">Externer Support</string>
     <string name="setting_renderer_title">Renderer</string>
-    <string name="setting_renderer_name_ltw">LTW (nur für 1.17+)</string>
     <string name="setting_renderer_name_angle">Angle (nur für 1.17+)</string>
+    <string name="setting_renderer_from_plugins">Von %s-Plugin</string>
+    <string name="setting_driver_title">Vulkan-Treiber</string>
     <string name="setting_ignore_notch_title">Vollbildmodus</string>
     <string name="setting_ignore_notch_desc">Den Notch ignorieren und den Bildschirminhalt auf Vollbild erweitern für ein vollständigeres Eintauchen</string>
     <string name="setting_resolution_scaler_title">Auflösung anpassen</string>

@@ -1,7 +1,6 @@
 package com.movtery.zalithlauncher.feature.version
 
 import android.content.Context
-import com.google.gson.JsonParser
 import com.movtery.zalithlauncher.InfoCenter
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.event.single.RefreshVersionsEvent
@@ -10,6 +9,9 @@ import com.movtery.zalithlauncher.event.single.RefreshVersionsEvent.MODE.START
 import com.movtery.zalithlauncher.event.sticky.InstallingVersionEvent
 import com.movtery.zalithlauncher.feature.customprofilepath.ProfilePathHome
 import com.movtery.zalithlauncher.feature.log.Logging
+import com.movtery.zalithlauncher.feature.version.favorites.FavoritesVersionUtils
+import com.movtery.zalithlauncher.feature.version.install.GameInstaller
+import com.movtery.zalithlauncher.feature.version.utils.VersionInfoUtils
 import com.movtery.zalithlauncher.task.Task
 import com.movtery.zalithlauncher.task.TaskExecutors
 import com.movtery.zalithlauncher.ui.dialog.EditTextDialog
@@ -24,7 +26,6 @@ import net.kdt.pojavlaunch.Tools
 import org.apache.commons.io.FileUtils
 import org.greenrobot.eventbus.EventBus
 import java.io.File
-import java.io.FileWriter
 
 /**
  * 所有版本管理者
@@ -44,7 +45,7 @@ object VersionsManager {
      * 检查版本是否已经存在
      */
     fun isVersionExists(versionName: String, checkJson: Boolean = false): Boolean {
-        val folder = File(ProfilePathHome.versionsHome, versionName)
+        val folder = File(ProfilePathHome.getVersionsHome(), versionName)
         //保证版本文件夹存在的同时，也应保证其版本json文件存在
         return if (checkJson) File(folder, "${folder.name}.json").exists()
         else folder.exists()
@@ -70,7 +71,7 @@ object VersionsManager {
             try {
                 versions.clear()
 
-                val versionsHome = ProfilePathHome.versionsHome
+                val versionsHome = ProfilePathHome.getVersionsHome()
                 File(versionsHome).listFiles()?.forEach { versionFile ->
                     runCatching {
                         if (versionFile.exists() && versionFile.isDirectory) {
@@ -85,45 +86,7 @@ object VersionsManager {
                                 }
                             }
 
-                            //兼容旧版本的版本隔离文件（识别并保存为新版本后，旧的版本隔离文件将被删除）
-                            val oldConfigFile = File(getZalithVersionPath(versionFile), "ZalithVersion.cfg")
-                            val configFile = File(getZalithVersionPath(versionFile), "VersionConfig.json")
-
-                            val versionConfig = runCatching getConfig@{
-                                if (oldConfigFile.exists()) {
-                                    runCatching {
-                                        Tools.GLOBAL_GSON.fromJson(Tools.read(oldConfigFile), VersionConfig::class.java).apply {
-                                            setIsolationType(VersionConfig.IsolationType.ENABLE)
-                                            setVersionPath(versionFile)
-                                            save()
-                                        }
-                                    }.getOrNull().let { config ->
-                                        //移除旧的配置文件
-                                        oldConfigFile.delete()
-                                        config?.let { return@getConfig it }
-                                    }
-                                }
-                                //读取此文件的内容，并解析为VersionConfig
-                                val configString = Tools.read(configFile)
-                                val config = Tools.GLOBAL_GSON.fromJson(configString, VersionConfig::class.java)
-                                runCatching {
-                                    JsonParser.parseString(configString).asJsonObject.apply {
-                                        if (has("isolation")) {
-                                            config.setIsolationType(
-                                                if (get("isolation").asBoolean) VersionConfig.IsolationType.ENABLE
-                                                else VersionConfig.IsolationType.DISABLE
-                                            )
-                                        }
-                                    }
-                                }.getOrElse { Logging.e("Refresh Versions", "Failed to parse the version isolation field of the old version.", it) }
-                                config.setVersionPath(versionFile)
-                                config
-                            }.getOrElse { e ->
-                                Logging.e("Refresh Versions", Tools.printToString(e))
-                                val config = VersionConfig(versionFile)
-                                config.save()
-                                config
-                            }
+                            val versionConfig = VersionConfig.parseConfig(versionFile)
 
                             versions.add(
                                 Version(
@@ -136,6 +99,7 @@ object VersionsManager {
                         }
                     }
                 }
+                CurrentGameInfo.refreshCurrentInfo()
 
                 Task.runTask {
                     GameInstaller.moveVersionFiles()
@@ -153,32 +117,33 @@ object VersionsManager {
     fun getCurrentVersion(): Version? {
         if (versions.isEmpty()) return null
 
-        getPathConfigFile().apply {
-            fun returnVersionByFirst(): Version? {
-                versions.forEach { version ->
-                    if (version.isValid()) {
-                        //确保版本有效
-                        saveCurrentVersion(version.getVersionName())
-                        return version
-                    }
+        fun returnVersionByFirst(): Version? {
+            versions.forEach { version ->
+                if (version.isValid()) {
+                    //确保版本有效
+                    saveCurrentVersion(version.getVersionName())
+                    return version
                 }
-                //如果所有版本都无效，或者没有版本，那么久返回空
-                return null
             }
+            //如果所有版本都无效，或者没有版本，那么久返回空
+            return null
+        }
 
-            return if (exists()) {
-                runCatching {
-                    val string = Tools.read(this)
-                    getVersion(string) ?: run {
-                        return returnVersionByFirst()
-                    }
-                }.getOrElse { e ->
-                    Logging.e("Get Current Version", Tools.printToString(e))
-                    returnVersionByFirst()
-                }
-            } else returnVersionByFirst()
+        return runCatching {
+            val versionString = CurrentGameInfo.getCurrentInfo().version
+            getVersion(versionString) ?: run {
+                return returnVersionByFirst()
+            }
+        }.getOrElse { e ->
+            Logging.e("Get Current Version", Tools.printToString(e))
+            returnVersionByFirst()
         }
     }
+
+    /**
+     * @return 通过版本名，判断其版本是否存在
+     */
+    fun checkVersionExistsByName(versionName: String?): Boolean = getVersion(versionName)?.let { true } ?: false
 
     /**
      * @return 获取 Zalith 启动器版本标识文件夹
@@ -208,18 +173,18 @@ object VersionsManager {
     /**
      * @return 通过名称获取版本的文件夹路径
      */
-    fun getVersionPath(name: String) = File(ProfilePathHome.versionsHome, name)
+    fun getVersionPath(name: String) = File(ProfilePathHome.getVersionsHome(), name)
 
     /**
      * 保存当前选择的版本
      */
     fun saveCurrentVersion(versionName: String) {
-        getPathConfigFile().apply {
-            runCatching {
-                if (!exists()) createNewFile()
-                FileWriter(this).use { it.write(versionName) }
-            }.getOrElse { e -> Logging.e("Save Current Version", Tools.printToString(e)) }
-        }
+        runCatching {
+            CurrentGameInfo.getCurrentInfo().apply {
+                version = versionName
+                saveCurrentInfo()
+            }
+        }.getOrElse { e -> Logging.e("Save Current Version", Tools.printToString(e)) }
     }
 
     /**
@@ -261,7 +226,7 @@ object VersionsManager {
                 renameVersion(version, string)
 
                 true
-            }.buildDialog()
+            }.showDialog()
     }
 
     /**
@@ -272,8 +237,11 @@ object VersionsManager {
         //如果当前的版本是即将被重命名的版本，那么就把将要重命名的名字设置为当前版本
         if (version.getVersionName() == currentVersionName) saveCurrentVersion(name)
 
+        //尝试刷新收藏夹内的版本名称
+        FavoritesVersionUtils.renameVersion(version.getVersionName(), name)
+
         val versionFolder = version.getVersionPath()
-        val renameFolder = File(ProfilePathHome.versionsHome, name)
+        val renameFolder = File(ProfilePathHome.getVersionsHome(), name)
 
         //不管重命名之后的文件夹是什么，只要这个文件夹存在，那么就必须删除
         //否则将出现问题
@@ -340,7 +308,7 @@ object VersionsManager {
                     refresh()
                 }.execute()
                 true
-            }.buildDialog()
+            }.showDialog()
     }
 
     /**
@@ -386,11 +354,6 @@ object VersionsManager {
             config.saveWithThrowable()
         }
     }
-
-    /**
-     * @return 获取当前路径的版本配置文件
-     */
-    private fun getPathConfigFile() = File(ProfilePathHome.gameHome, "CurrentVersion.cfg")
 
     private fun getVersion(name: String?): Version? {
         name?.let { versionName ->

@@ -180,6 +180,7 @@
     <string name="controls_info_default_desc">Este é o arquivo de layout de controle padrão, clique para manipular este layout de controle.</string>
     <string name="controls_set_default_message">Tem certeza de que deseja definir este layout de controle como o padrão?</string>
     <string name="controls_nothing">Não há nenhum layout de controle aqui, reiniciar o aplicativo gerará um novo layout de controle padrão</string>
+    <string name="controls_tip_set_default">Pressione e segure o layout de controle para defini-lo como o layout de controle padrão!</string>
     <string name="replacement_customcontrol">Substituir Layout de Controle</string>
     <string name="custom_control_title">Gerenciar Layouts de Controle</string>
     <string name="controller_button_start">Iniciar</string>
@@ -217,10 +218,11 @@
     <string name="version_manager_shortcuts_mods">Gerenciamento de Mods</string>
     <string name="version_manager_shortcuts_version_path">Pasta do caminho do jogo</string>
     <string name="version_manager_shortcuts_resource_path">Pasta do pacote de recursos</string>
-    <string name="version_manager_shortcuts_world_path">Pasta de salvamento de mundos</string>
-    <string name="version_manager_shortcuts_shader_path">Pasta do pacote de shaders</string>
+    <string name="version_manager_shortcuts_world_path">Pasta de salvamento do jogo</string>
+    <string name="version_manager_shortcuts_shader_path">Pasta do pacote de sombreadores</string>
+    <string name="version_manager_shortcuts_screenshot_path">Pasta de capturas de tela</string>
     <string name="version_manager_shortcuts_logs_path">Pasta de logs</string>
-    <string name="version_manager_shortcuts_crash_report_path">Pasta de relatórios de falha</string>
+    <string name="version_manager_shortcuts_crash_report_path">Pasta de relatórios de falhas</string>
     <string name="version_manager_edit">Editar versão</string>
     <string name="version_manager_rename">Renomear versão</string>
     <string name="version_manager_copy">Copiar versão</string>
@@ -233,6 +235,12 @@
     <string name="version_manager_invalid">Esta versão é inválida</string>
     <string name="version_manager_no_installed_version">O lançador não encontrou nenhum Minecraft instalado!</string>
     <string name="version_manager_isolation_type_follow_global">Seguir as Configurações do Launcher</string>
+    <string name="version_manager_favorites_add_category">Adicionar aos favoritos</string>
+    <string name="version_manager_favorites_remove_folder_title">Remover os favoritos</string>
+    <string name="version_manager_favorites_remove_folder_message">Você tem certeza que quer remover este favorito? Após a remoção, as informações do favorito atual serão apagadas e esta operação não poderá ser desfeita!</string>
+    <string name="version_manager_favorites_write_folder_name">Nomear o novo favorito</string>
+    <string name="version_manager_favorites_dialog_title">Adicionar aos favoritos</string>
+    <string name="version_manager_favorites_dialog_no_folders">Ainda não há favoritos, por favor adicione um primeiro!</string>
     <!-- Profiles Path -->
     <string name="permissions_manage_external_storage">%s precisa da permissão para gerenciar todos os arquivos do dispositivo para usar esta funcionalidade corretamente, por favor, habilite a permissão!</string>
     <string name="permissions_write_external_storage">O %s requer permissão de gerenciamento de armazenamento. Se a permissão não estiver ativada, podem ocorrer problemas como falha ao salvar ou descompactar os arquivos do jogo. Conceda a permissão para garantir o funcionamento correto.</string>
@@ -263,6 +271,8 @@
     <string name="account_add">Adicionar conta</string>
     <string name="account_no_saved_accounts">Nenhuma conta salva</string>
     <string name="account_remove">Esta conta será removida do lançador. Você tem certeza de que deseja fazer isso?</string>
+    <string name="account_remove_login_type_title">Remover tipo de login: %s</string>
+    <string name="account_remove_login_type_message">Este tipo de login será removido do iniciador, mas não removerá sua conta existente. Você tem certeza que quer fazer isso?</string>
     <string name="account_microsoft_account">Conta Microsoft</string>
     <string name="account_microsoft_xerr_unauthorized">As informações de login da sua conta Microsoft parecem estar expiradas. Isso geralmente acontece quando a senha da conta foi alterada. Por favor, remova a conta atual e faça login novamente para redefinir suas informações de login.</string>
     <string name="account_local_account">Conta offline</string>
@@ -358,7 +368,6 @@
     <string name="main_open_main_dir">Abrir diretório principal</string>
     <string name="main_install_jar_file">Executar arquivo .jar</string>
     <string name="main_share_logs">Compartilhar arquivos de log</string>
-    <string name="main_share_crash_report">Compartilhar relatório de falha</string>
     <string name="main_launch">Iniciar Jogo</string>
     <string name="setting_category_control">Configurações de controle</string>
     <string name="setting_category_virtual_mouse">Mouse virtual</string>
@@ -377,8 +386,9 @@
     <string name="setting_category_experimental_patches">Patches experimentais</string>
     <string name="setting_category_support">Suporte Externo</string>
     <string name="setting_renderer_title">Renderizador</string>
-    <string name="setting_renderer_name_ltw">LTW (apenas para 1.17+)</string>
     <string name="setting_renderer_name_angle">Angle (apenas para 1.17+)</string>
+    <string name="setting_renderer_from_plugins">Do plugin %s</string>
+    <string name="setting_driver_title">Driver Vulkan</string>
     <string name="setting_ignore_notch_title">Modo Tela Cheia</string>
     <string name="setting_ignore_notch_desc">Ignorar o entalhe e expandir o conteúdo da tela para tela cheia, proporcionando uma experiência mais imersiva</string>
     <string name="setting_resolution_scaler_title">Ajuste de Resolução</string>

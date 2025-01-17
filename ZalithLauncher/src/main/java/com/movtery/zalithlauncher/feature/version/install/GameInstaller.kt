@@ -1,4 +1,4 @@
-package com.movtery.zalithlauncher.feature.version
+package com.movtery.zalithlauncher.feature.version.install
 
 import android.app.Activity
 import com.kdt.mcgui.ProgressLayout
@@ -7,6 +7,10 @@ import com.movtery.zalithlauncher.event.sticky.InstallingVersionEvent
 import com.movtery.zalithlauncher.event.value.InstallGameEvent
 import com.movtery.zalithlauncher.feature.customprofilepath.ProfilePathHome
 import com.movtery.zalithlauncher.feature.log.Logging
+import com.movtery.zalithlauncher.feature.version.utils.VersionFolderChecker
+import com.movtery.zalithlauncher.feature.version.VersionInfo
+import com.movtery.zalithlauncher.feature.version.utils.VersionInfoUtils
+import com.movtery.zalithlauncher.feature.version.VersionsManager
 import com.movtery.zalithlauncher.task.Task
 import net.kdt.pojavlaunch.Tools
 import net.kdt.pojavlaunch.progresskeeper.ProgressKeeper
@@ -120,7 +124,7 @@ class GameInstaller(
         @JvmStatic
         fun moveVersionFiles() {
             val foldersPair = VersionFolderChecker.checkVersionsFolder() ?: return //缓存文件不存在，不检查
-            val versionFolder = File(ProfilePathHome.versionsHome, foldersPair.second.customVersion)
+            val versionFolder = File(ProfilePathHome.getVersionsHome(), foldersPair.second.customVersion)
 
             val loaderInfo = foldersPair.second
             if (!loaderInfo.name.equals("OptiFine", true)) return //仅用于OptiFine

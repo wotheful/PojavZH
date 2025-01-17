@@ -35,6 +35,7 @@ import com.movtery.zalithlauncher.event.single.PageOpacityChangeEvent;
 import com.movtery.zalithlauncher.event.single.SwapToLoginEvent;
 import com.movtery.zalithlauncher.event.sticky.InstallingVersionEvent;
 import com.movtery.zalithlauncher.event.sticky.MinecraftVersionValueEvent;
+import com.movtery.zalithlauncher.event.value.AddFragmentEvent;
 import com.movtery.zalithlauncher.event.value.DownloadProgressKeyEvent;
 import com.movtery.zalithlauncher.event.value.InDownloadFragmentEvent;
 import com.movtery.zalithlauncher.event.value.InstallGameEvent;
@@ -55,8 +56,8 @@ import com.movtery.zalithlauncher.feature.mod.modpack.install.ModPackUtils;
 import com.movtery.zalithlauncher.feature.notice.CheckNewNotice;
 import com.movtery.zalithlauncher.feature.notice.NoticeInfo;
 import com.movtery.zalithlauncher.feature.update.UpdateUtils;
-import com.movtery.zalithlauncher.feature.version.GameInstaller;
-import com.movtery.zalithlauncher.feature.version.InstallTask;
+import com.movtery.zalithlauncher.feature.version.install.GameInstaller;
+import com.movtery.zalithlauncher.feature.version.install.InstallTask;
 import com.movtery.zalithlauncher.feature.version.Version;
 import com.movtery.zalithlauncher.feature.version.VersionsManager;
 import com.movtery.zalithlauncher.setting.AllSettings;
@@ -139,7 +140,7 @@ public class LauncherActivity extends BaseActivity {
 
     @Subscribe()
     public void event(PageOpacityChangeEvent event) {
-        setPageOpacity();
+        setPageOpacity(event.getProgress());
     }
 
     @Subscribe()
@@ -255,6 +256,7 @@ public class LauncherActivity extends BaseActivity {
         new EditTextDialog.Builder(this)
                 .setTitle(R.string.version_install_new)
                 .setEditText(dirGameModpackFile.getName())
+                .setAsRequired()
                 .setConfirmListener((editText, checked) -> {
                     String customName = editText.getText().toString();
 
@@ -299,7 +301,7 @@ public class LauncherActivity extends BaseActivity {
                     }).execute();
 
                     return true;
-                }).buildDialog();
+                }).showDialog();
     }
 
     @Subscribe()
@@ -313,6 +315,27 @@ public class LauncherActivity extends BaseActivity {
             binding.progressLayout.observe(event.getProgressKey());
         } else {
             binding.progressLayout.unObserve(event.getProgressKey());
+        }
+    }
+
+    @Subscribe()
+    public synchronized void event(AddFragmentEvent event) {
+        Fragment currentFragment = getCurrentFragment();
+        if (currentFragment != null) {
+            try {
+                AddFragmentEvent.FragmentActivityCallBack activityCallBack = event.getFragmentActivityCallback();
+                if (activityCallBack != null) {
+                    activityCallBack.callBack(currentFragment.requireActivity());
+                }
+                ZHTools.addFragment(
+                        currentFragment,
+                        event.getFragmentClass(),
+                        event.getFragmentTag(),
+                        event.getBundle()
+                );
+            } catch (Exception e) {
+                Logging.e("LauncherActivity", "Failed attempt to jump to a new Fragment!", e);
+            }
         }
     }
 
@@ -387,8 +410,8 @@ public class LauncherActivity extends BaseActivity {
     }
 
     private void processViews() {
-        setPageOpacity();
         refreshBackground();
+        setPageOpacity(AllSettings.getPageOpacity().getValue());
         mSettingsButtonWrapper = new SettingsButtonWrapper(binding.settingButton);
         mSettingsButtonWrapper.setOnTypeChangeListener(type -> ViewAnimUtils.setViewAnim(binding.settingButton, Animations.Pulse));
         binding.downloadButton.setOnClickListener(v -> {
@@ -453,7 +476,7 @@ public class LauncherActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        setPageOpacity();
+        setPageOpacity(AllSettings.getPageOpacity().getValue());
         //避免切换回来的时候，找不到账号，应该在这里刷新账户
         accountsManager.reload();
     }
@@ -580,7 +603,7 @@ public class LauncherActivity extends BaseActivity {
                 .setMessage(getString(R.string.notification_permission_dialog_text, InfoCenter.APP_NAME, InfoCenter.APP_NAME))
                 .setConfirmClickListener(checked -> askForNotificationPermission(null))
                 .setCancelClickListener(this::handleNoNotificationPermission)
-                .buildDialog();
+                .showDialog();
     }
 
     private void handleNoNotificationPermission() {
@@ -596,8 +619,8 @@ public class LauncherActivity extends BaseActivity {
         mRequestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
     }
 
-    private void setPageOpacity() {
-        float v = (float) AllSettings.getPageOpacity().getValue() / 100;
+    private void setPageOpacity(int pageOpacity) {
+        float v = (float) pageOpacity / 100;
         if (binding.containerFragment.getAlpha() != v) binding.containerFragment.setAlpha(v);
     }
 }

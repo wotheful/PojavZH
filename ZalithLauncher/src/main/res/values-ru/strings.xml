@@ -180,6 +180,7 @@
     <string name="controls_info_default_desc">Это файл раскладки управления по умолчанию, нажмите, чтобы управлять этой раскладкой.</string>
     <string name="controls_set_default_message">Вы уверены, что хотите установить эту раскладку управления как раскладку по умолчанию?</string>
     <string name="controls_nothing">Здесь нет раскладки управления, перезапуск приложения сгенерирует новую раскладку управления по умолчанию</string>
+    <string name="controls_tip_set_default">Нажмите и удерживайте макет управления, чтобы установить его в качестве макета управления по умолчанию!</string>
     <string name="replacement_customcontrol">Заменить раскладку управления</string>
     <string name="custom_control_title">Управление раскладками управления</string>
     <string name="controller_button_start">Старт</string>
@@ -215,12 +216,13 @@
     <string name="version_install_log_flood_warning">Если логи перегружают экран и вызывают зависание устройства во время установки, нажмите здесь, чтобы закрыть логи!</string>
     <string name="version_manager_shortcuts">Ярлыки</string>
     <string name="version_manager_shortcuts_mods">Управление модами</string>
-    <string name="version_manager_shortcuts_version_path">Папка пути игры</string>
-    <string name="version_manager_shortcuts_resource_path">Папка пакета ресурсов</string>
-    <string name="version_manager_shortcuts_world_path">Папка сохранений мира</string>
-    <string name="version_manager_shortcuts_shader_path">Папка пакета шейдеров</string>
-    <string name="version_manager_shortcuts_logs_path">Папка логов</string>
-    <string name="version_manager_shortcuts_crash_report_path">Папка отчетов об ошибках</string>
+    <string name="version_manager_shortcuts_version_path">Папка игрового пути</string>
+    <string name="version_manager_shortcuts_resource_path">Папка с ресурсным пакетом</string>
+    <string name="version_manager_shortcuts_world_path">Папка сохранений игры</string>
+    <string name="version_manager_shortcuts_shader_path">Папка с пакетом шейдеров</string>
+    <string name="version_manager_shortcuts_screenshot_path">Папка скриншотов</string>
+    <string name="version_manager_shortcuts_logs_path">Папка с журналами</string>
+    <string name="version_manager_shortcuts_crash_report_path">Папка с отчетами об ошибках</string>
     <string name="version_manager_edit">Редактировать версию</string>
     <string name="version_manager_rename">Переименовать версию</string>
     <string name="version_manager_copy">Копировать версию</string>
@@ -233,6 +235,12 @@
     <string name="version_manager_invalid">Эта версия недействительна</string>
     <string name="version_manager_no_installed_version">Запускатель не нашёл установленную версию Minecraft!</string>
     <string name="version_manager_isolation_type_follow_global">Следовать настройкам лаунчера</string>
+    <string name="version_manager_favorites_add_category">Добавить в избранное</string>
+    <string name="version_manager_favorites_remove_folder_title">Удалить избранное</string>
+    <string name="version_manager_favorites_remove_folder_message">Вы уверены, что хотите удалить это избранное? После удаления информация в текущем избранном будет очищена, и эта операция не может быть отменена!</string>
+    <string name="version_manager_favorites_write_folder_name">Назвать новый фаворит</string>
+    <string name="version_manager_favorites_dialog_title">Добавить в избранное</string>
+    <string name="version_manager_favorites_dialog_no_folders">Еще нет избранного, пожалуйста, добавьте избранное сначала!</string>
     <!-- Profiles Path -->
     <string name="permissions_manage_external_storage">%s требует разрешения на управление всеми файлами устройства для правильной работы этой функции, пожалуйста, включите разрешение!</string>
     <string name="permissions_write_external_storage">Для работы %s требуется разрешение на управление хранилищем. Если разрешение не предоставлено, могут возникнуть проблемы, такие как невозможность сохранения или распаковки игровых файлов. Пожалуйста, предоставьте разрешение для обеспечения корректной работы.</string>
@@ -263,6 +271,8 @@
     <string name="account_add">Добавить аккаунт</string>
     <string name="account_no_saved_accounts">Нет сохранённых аккаунтов</string>
     <string name="account_remove">Этот аккаунт будет удалён из лаунчера, вы уверены, что хотите это сделать?</string>
+    <string name="account_remove_login_type_title">Удалить способ входа: %s</string>
+    <string name="account_remove_login_type_message">Этот способ входа будет удален из запускателя, но не удален существующий аккаунт. Вы уверены, что хотите это сделать?</string>
     <string name="account_microsoft_account">Аккаунт Microsoft</string>
     <string name="account_microsoft_xerr_unauthorized">Ваша информация для входа в аккаунт Microsoft, похоже, устарела. Это часто происходит, когда пароль аккаунта был изменён. Пожалуйста, удалите текущий аккаунт и войдите в свой аккаунт снова, чтобы сбросить вашу информацию для входа.</string>
     <string name="account_local_account">Локальный аккаунт</string>
@@ -358,7 +368,6 @@
     <string name="main_open_main_dir">Открыть главную папку</string>
     <string name="main_install_jar_file">Запустить .jar файл</string>
     <string name="main_share_logs">Поделиться файлами логов</string>
-    <string name="main_share_crash_report">Поделиться отчетом о сбое</string>
     <string name="main_launch">Запустить игру</string>
     <string name="setting_category_control">Настройки управления</string>
     <string name="setting_category_virtual_mouse">Виртуальная мышь</string>
@@ -377,8 +386,9 @@
     <string name="setting_category_experimental_patches">Экспериментальные патчи</string>
     <string name="setting_category_support">Внешняя поддержка</string>
     <string name="setting_renderer_title">Рендерер</string>
-    <string name="setting_renderer_name_ltw">LTW (только для 1.17+)</string>
     <string name="setting_renderer_name_angle">Angle (только для 1.17+)</string>
+    <string name="setting_renderer_from_plugins">Из плагина %s</string>
+    <string name="setting_driver_title">Драйвер Vulkan</string>
     <string name="setting_ignore_notch_title">Полноэкранный режим</string>
     <string name="setting_ignore_notch_desc">Игнорировать вырез и расширить контент на весь экран для более полного погружения</string>
     <string name="setting_resolution_scaler_title">Масштабирование разрешения</string>

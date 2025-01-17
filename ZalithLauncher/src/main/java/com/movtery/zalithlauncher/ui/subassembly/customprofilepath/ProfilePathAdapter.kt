@@ -19,6 +19,7 @@ import com.movtery.zalithlauncher.ui.dialog.EditTextDialog
 import com.movtery.zalithlauncher.ui.dialog.TipDialog
 import com.movtery.zalithlauncher.ui.fragment.FilesFragment
 import com.movtery.zalithlauncher.ui.fragment.FragmentWithAnim
+import com.movtery.zalithlauncher.ui.fragment.VersionsListFragment
 import com.movtery.zalithlauncher.utils.StoragePermissionsUtils
 import com.movtery.zalithlauncher.utils.ZHTools
 
@@ -28,7 +29,7 @@ class ProfilePathAdapter(
 ) :
     RecyclerView.Adapter<ProfilePathAdapter.ViewHolder>() {
     private val mData: MutableList<ProfileItem> = ArrayList()
-    private val radioButtonMap: MutableMap<String, RadioButton> = HashMap()
+    private val radioButtonList: MutableList<RadioButton> = mutableListOf()
     //如果没有存储权限，那么旧设置为默认路径
     private var currentId: String? = if (StoragePermissionsUtils.checkPermissions()) launcherProfile.getValue() else "default"
     private val managerPopupWindow: PopupWindow = PopupWindow().apply {
@@ -50,13 +51,18 @@ class ProfilePathAdapter(
         holder.setView(mData[position], position)
     }
 
+    override fun onViewRecycled(holder: ViewHolder) {
+        super.onViewRecycled(holder)
+        radioButtonList.remove(holder.binding.radioButton)
+    }
+
     override fun getItemCount(): Int = mData.size
 
     fun updateData(data: MutableList<ProfileItem>) {
         this.mData.clear()
         this.mData.addAll(data)
-        radioButtonMap.apply {
-            forEach { (_, radioButton) -> radioButton.isChecked = false }
+        radioButtonList.apply {
+            forEach { radioButton -> radioButton.isChecked = false }
             clear()
         }
         refresh()
@@ -77,27 +83,26 @@ class ProfilePathAdapter(
     private fun setPathId(id: String) {
         currentId = id
         setCurrentPathId(id)
-        updateRadioButtonState(id)
+        radioButtonList.forEach { radioButton -> radioButton.isChecked = radioButton.tag.toString() == id }
     }
 
-    private fun updateRadioButtonState(id: String) {
-        //遍历全部RadioButton，取消除去此id的全部RadioButton
-        for ((key, value) in radioButtonMap) {
-            value.isChecked = id == key
-        }
-    }
-
-    inner class ViewHolder(private val binding: ItemProfilePathBinding) :
+    inner class ViewHolder(val binding: ItemProfilePathBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun setView(profileItem: ProfileItem, position: Int) {
             binding.apply {
-                radioButtonMap[profileItem.id] = radioButton
+                radioButtonList.add(
+                    radioButton.apply {
+                        tag = profileItem.id
+                        isChecked = currentId == profileItem.id
+                    }
+                )
                 title.text = profileItem.title
                 path.text = profileItem.path
                 path.isSelected = true
 
                 val onClickListener = View.OnClickListener {
+                    if (VersionsListFragment.checkLastRefreshTime()) return@OnClickListener
                     if (currentId != profileItem.id) {
                         StoragePermissionsUtils.checkPermissions(fragment.requireActivity(), R.string.profiles_path_title) {
                             setPathId(profileItem.id)
@@ -109,10 +114,6 @@ class ProfilePathAdapter(
 
                 operate.setOnClickListener {
                     showPopupWindow(root, profileItem.id == "default", profileItem, position)
-                }
-
-                if (currentId == profileItem.id) {
-                    updateRadioButtonState(profileItem.id)
                 }
             }
         }
@@ -148,7 +149,7 @@ class ProfilePathAdapter(
                                     mData[itemIndex].title = string
                                     refresh()
                                     true
-                                }.buildDialog()
+                                }.showDialog()
                         }
                         delete -> {
                             TipDialog.Builder(context)
@@ -162,7 +163,7 @@ class ProfilePathAdapter(
                                     }
                                     mData.removeAt(itemIndex)
                                     refresh()
-                                }.buildDialog()
+                                }.showDialog()
                         }
                         else -> {}
                     }

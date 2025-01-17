@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.movtery.zalithlauncher.InfoCenter
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.databinding.ActivitySplashBinding
-import com.movtery.zalithlauncher.feature.customprofilepath.ProfilePathHome
 import com.movtery.zalithlauncher.feature.unpack.Components
 import com.movtery.zalithlauncher.feature.unpack.Jre
 import com.movtery.zalithlauncher.feature.unpack.UnpackComponentsTask
@@ -66,11 +65,12 @@ class SplashActivity : BaseActivity() {
         //但是并不强制要求用户必须授予权限，如果用户拒绝，那么之后产生的问题将由用户承担
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P && !StoragePermissionsUtils.hasStoragePermissions(this)) {
             TipDialog.Builder(this)
+                .setTitle(R.string.generic_warning)
                 .setMessage(InfoCenter.replaceName(this, R.string.permissions_write_external_storage))
                 .setWarning()
                 .setConfirmClickListener { requestStoragePermissions() }
                 .setCancelClickListener { checkEnd() } //用户取消，那就跟随用户的意愿
-                .buildDialog()
+                .showDialog()
         } else {
             checkEnd()
         }
@@ -133,9 +133,6 @@ class SplashActivity : BaseActivity() {
         Task.runTask {
             UnpackSingleFilesTask(this).run()
         }.execute()
-
-        //检查 launcher_profiles.json 文件是否存在，不存在将会导致 Forge、NeoForge 等无法正常安装
-        ProfilePathHome.checkForLauncherProfiles(this)
 
         binding.startButton.isClickable = true
     }

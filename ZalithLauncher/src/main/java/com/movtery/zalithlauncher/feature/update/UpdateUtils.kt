@@ -134,8 +134,7 @@ class UpdateUtils {
         }
 
         @JvmStatic
-        fun getArchModel(): String? {
-            val arch = Tools.DEVICE_ARCHITECTURE
+        fun getArchModel(arch: Int = Tools.DEVICE_ARCHITECTURE): String? {
             if (arch == Architecture.ARCH_ARM64) return "arm64-v8a"
             if (arch == Architecture.ARCH_ARM) return "armeabi-v7a"
             if (arch == Architecture.ARCH_X86_64) return "x86_64"
@@ -172,6 +171,7 @@ class UpdateUtils {
         fun installApk(context: Context, outputFile: File) {
             runInUIThread {
                 TipDialog.Builder(context)
+                    .setTitle(R.string.update)
                     .setMessage(StringUtils.insertNewline(context.getString(R.string.update_success), outputFile.absolutePath))
                     .setCenterMessage(false)
                     .setCancelable(false)
@@ -183,7 +183,7 @@ class UpdateUtils {
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                         context.startActivity(intent)
-                    }.buildDialog()
+                    }.showDialog()
             }
         }
     }

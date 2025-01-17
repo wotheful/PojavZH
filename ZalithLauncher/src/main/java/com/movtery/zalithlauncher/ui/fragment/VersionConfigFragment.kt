@@ -14,16 +14,17 @@ import com.movtery.anim.animations.Animations
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.databinding.FragmentVersionConfigBinding
 import com.movtery.zalithlauncher.event.sticky.FileSelectorEvent
-import com.movtery.zalithlauncher.feature.customprofilepath.ProfilePathManager.Companion.currentPath
+import com.movtery.zalithlauncher.feature.customprofilepath.ProfilePathManager.Companion.getCurrentPath
 import com.movtery.zalithlauncher.feature.version.NoVersionException
 import com.movtery.zalithlauncher.feature.version.Version
 import com.movtery.zalithlauncher.feature.version.VersionConfig
 import com.movtery.zalithlauncher.feature.version.VersionConfig.CREATOR.getIsolationString
 import com.movtery.zalithlauncher.feature.version.VersionConfig.IsolationType
-import com.movtery.zalithlauncher.feature.version.VersionIconUtils
+import com.movtery.zalithlauncher.feature.version.utils.VersionIconUtils
 import com.movtery.zalithlauncher.feature.version.VersionsManager.getCurrentVersion
 import com.movtery.zalithlauncher.feature.version.VersionsManager.refresh
 import com.movtery.zalithlauncher.listener.SimpleTextWatcher
+import com.movtery.zalithlauncher.plugins.driver.DriverPluginManager
 import com.movtery.zalithlauncher.setting.AllSettings.Companion.versionIsolation
 import com.movtery.zalithlauncher.task.Task
 import com.movtery.zalithlauncher.task.TaskExecutors.Companion.getAndroidUI
@@ -168,7 +169,7 @@ class VersionConfigFragment : FragmentWithAnim(R.layout.fragment_version_config)
                             putBoolean(FilesFragment.BUNDLE_SHOW_FILE, false)
                             putBoolean(FilesFragment.BUNDLE_REMOVE_LOCK_PATH, false)
                             putBoolean(FilesFragment.BUNDLE_QUICK_ACCESS_PATHS, false)
-                            putString(FilesFragment.BUNDLE_LOCK_PATH, currentPath)
+                            putString(FilesFragment.BUNDLE_LOCK_PATH, getCurrentPath())
                             putString(FilesFragment.BUNDLE_LIST_PATH, currentVersion.getVersionsFolder())
                         }
                     )
@@ -197,7 +198,7 @@ class VersionConfigFragment : FragmentWithAnim(R.layout.fragment_version_config)
                 .setMessage(R.string.pedit_unsaved_tip)
                 .setWarning()
                 .setConfirmClickListener { forceBack() }
-                .buildDialog()
+                .showDialog()
             return false
         }
         return true
@@ -229,12 +230,13 @@ class VersionConfigFragment : FragmentWithAnim(R.layout.fragment_version_config)
 
     private fun resetIcon() {
         TipDialog.Builder(requireActivity())
+            .setTitle(R.string.generic_warning)
             .setMessage(R.string.pedit_reset_icon)
             .setWarning()
             .setConfirmClickListener {
                 mVersionIconUtils.resetIcon()
                 refreshIcon(false)
-            }.buildDialog()
+            }.showDialog()
     }
 
     private fun loadValues(context: Context) {
@@ -263,12 +265,11 @@ class VersionConfigFragment : FragmentWithAnim(R.layout.fragment_version_config)
                 //控制布局
                 controlName.text = config.getControl()
                 //自定义路径
-                customPath.text = config.getCustomPath().replaceFirst(currentPath.toRegex(), ".")
+                customPath.text = config.getCustomPath().replaceFirst(getCurrentPath().toRegex(), ".")
 
                 //渲染器
                 val renderersList = Tools.getCompatibleRenderers(context)
-                val rendererNames: MutableList<String> = ArrayList()
-                rendererNames.addAll(renderersList.rendererIds)
+                val rendererNames: MutableList<String> = ArrayList(renderersList.rendererIds)
                 val renderList: MutableList<String> = ArrayList(renderersList.rendererDisplayNames.size + 1)
                 renderList.addAll(renderersList.rendererDisplayNames)
                 renderList.add(context.getString(R.string.generic_default))
@@ -285,6 +286,25 @@ class VersionConfigFragment : FragmentWithAnim(R.layout.fragment_version_config)
                     OnSpinnerItemSelectedListener { _: Int, _: String?, i1: Int, _: String? ->
                         if (i1 == renderList.size - 1) config.setRenderer("")
                         else config.setRenderer(rendererNames[i1])
+                    })
+
+                //驱动器
+                val driverNames = DriverPluginManager.getDriverNameList()
+                val driverList = ArrayList(driverNames)
+                driverList.add(context.getString(R.string.generic_default))
+                var driverIndex = driverList.size - 1
+                if (config.getDriver().isNotEmpty()) {
+                    val index = driverNames.indexOf(config.getDriver())
+                    if (index != -1) driverIndex = index
+                }
+                val driverAdapter = DefaultSpinnerAdapter(driverSpinner)
+                driverAdapter.setItems(driverList)
+                driverSpinner.setSpinnerAdapter(driverAdapter)
+                driverSpinner.selectItemByIndex(driverIndex)
+                driverSpinner.setOnSpinnerItemSelectedListener(
+                    OnSpinnerItemSelectedListener { _: Int, _: String?, i1: Int, _: String? ->
+                        if (i1 == driverList.size - 1) config.setDriver("")
+                        else config.setDriver(driverNames[i1])
                     })
 
                 //自定义信息

@@ -187,6 +187,7 @@
     <string name="controls_info_default_desc">这是默认的控制布局文件，点击可操作此控制布局。</string>
     <string name="controls_set_default_message">你确定要将此控制布局设置为默认控制布局吗？</string>
     <string name="controls_nothing">这里没有任何控制布局，重启应用将生成一份新的默认控制布局</string>
+    <string name="controls_tip_set_default">长按控制布局，可以将其设置为默认的控制布局哦！</string>
     <string name="replacement_customcontrol">更换控制布局</string>
     <string name="custom_control_title">管理控制布局</string>
 
@@ -228,6 +229,7 @@
     <string name="version_manager_shortcuts_resource_path">资源包文件夹</string>
     <string name="version_manager_shortcuts_world_path">游戏存档文件夹</string>
     <string name="version_manager_shortcuts_shader_path">光影包文件夹</string>
+    <string name="version_manager_shortcuts_screenshot_path">屏幕截图文件夹</string>
     <string name="version_manager_shortcuts_logs_path">日志文件夹</string>
     <string name="version_manager_shortcuts_crash_report_path">崩溃报告文件夹</string>
     <string name="version_manager_edit">编辑版本</string>
@@ -242,6 +244,12 @@
     <string name="version_manager_invalid">该版本无效</string>
     <string name="version_manager_no_installed_version">启动器没有找到已安装的 Minecraft！</string>
     <string name="version_manager_isolation_type_follow_global">跟随启动器设置</string>
+    <string name="version_manager_favorites_add_category">添加收藏夹</string>
+    <string name="version_manager_favorites_remove_folder_title">移除收藏夹</string>
+    <string name="version_manager_favorites_remove_folder_message">你确定要移除这个收藏夹吗？移除后，当前收藏夹内的信息将被清除，且此操作不可撤销！</string>
+    <string name="version_manager_favorites_write_folder_name">为新的收藏夹命名</string>
+    <string name="version_manager_favorites_dialog_title">添加到收藏夹</string>
+    <string name="version_manager_favorites_dialog_no_folders">还没有收藏夹，请先添加收藏夹！</string>
 
     <!-- Profiles Path -->
     <string name="permissions_manage_external_storage">%s 需要管理设备所有文件的权限，以便正常使用这个功能，请开启权限！</string>
@@ -276,6 +284,8 @@
     <string name="account_add">添加账户</string>
     <string name="account_no_saved_accounts">没有已保存的账户</string>
     <string name="account_remove">此账号将从启动器内移除，你确定要这么做吗？</string>
+    <string name="account_remove_login_type_title">移除登陆方式：%s</string>
+    <string name="account_remove_login_type_message">这个登陆方式将从启动器内移除，但并不会移除已有的账号，你确定要这么做吗？</string>
     <string name="account_microsoft_account">微软账号</string>
     <string name="account_microsoft_xerr_unauthorized">你的微软账号登录信息貌似已经过期，这种情况常出现在账户密码被修改之后，请移除当前帐号并重新登录你的账号，以重置的你的登录信息。</string>
     <string name="account_local_account">离线账号</string>
@@ -378,7 +388,6 @@
     <string name="main_open_main_dir">打开主目录</string>
     <string name="main_install_jar_file">执行 .jar 文件</string>
     <string name="main_share_logs">分享日志文件</string>
-    <string name="main_share_crash_report">分享崩溃报告</string>
     <string name="main_launch">启动游戏</string>
 
     <string name="setting_category_control">控制设置</string>
@@ -399,8 +408,9 @@
     <string name="setting_category_support">外部支持</string>
 
     <string name="setting_renderer_title">渲染器</string>
-    <string name="setting_renderer_name_ltw">LTW (仅限 1.17+)</string>
     <string name="setting_renderer_name_angle">Angle (仅限 1.17+)</string>
+    <string name="setting_renderer_from_plugins">来自 %s 插件</string>
+    <string name="setting_driver_title">Vulkan 驱动器</string>
     <string name="setting_ignore_notch_title">全屏模式</string>
     <string name="setting_ignore_notch_desc">忽略刘海屏并将屏幕内容扩展至全屏，给你以更完整的沉浸感</string>
     <string name="setting_resolution_scaler_title">分辨率调整</string>

@@ -181,6 +181,7 @@
     <string name="controls_info_default_desc">This is the default control layout file. Click to manipulate this layout.</string>
     <string name="controls_set_default_message">Are you sure you want to set this control layout as the default?</string>
     <string name="controls_nothing">There are no control layouts here. Restarting the app will generate a new default layout.</string>
+    <string name="controls_tip_set_default">Long press the control layout to set it as the default control layout!</string>
     <string name="replacement_customcontrol">Replace Control Layout</string>
     <string name="custom_control_title">Manage Control Layouts</string>
     <string name="controller_button_a" translatable="false">A</string>
@@ -225,6 +226,7 @@
     <string name="version_manager_shortcuts_resource_path">Resource Pack Folder</string>
     <string name="version_manager_shortcuts_world_path">World Save Folder</string>
     <string name="version_manager_shortcuts_shader_path">Shader Pack Folder</string>
+    <string name="version_manager_shortcuts_screenshot_path">Screenshot Folder</string>
     <string name="version_manager_shortcuts_logs_path">Log Folder</string>
     <string name="version_manager_shortcuts_crash_report_path">Crash Report Folder</string>
     <string name="version_manager_edit">Edit Version</string>
@@ -239,6 +241,12 @@
     <string name="version_manager_invalid">This version is invalid</string>
     <string name="version_manager_no_installed_version">Launcher did not find any installed Minecraft!</string>
     <string name="version_manager_isolation_type_follow_global">Follow Launcher Settings</string>
+    <string name="version_manager_favorites_add_category">Add Favorite</string>
+    <string name="version_manager_favorites_remove_folder_title">Remove Favorite</string>
+    <string name="version_manager_favorites_remove_folder_message">Are you sure you want to remove this favorite? After removal, the information in the current favorite will be cleared, and this operation cannot be undone!</string>
+    <string name="version_manager_favorites_write_folder_name">Name New Favorite</string>
+    <string name="version_manager_favorites_dialog_title">Add to Favorite</string>
+    <string name="version_manager_favorites_dialog_no_folders">No favorites yet, please add a favorite first!</string>
     <!-- Profiles Path -->
     <string name="permissions_manage_external_storage">%s requires permission to manage all files on the device to use this feature properly. Please enable the permission!</string>
     <string name="permissions_write_external_storage">%s requires storage management permission. If the permission is not enabled, it may cause issues such as game files failing to save or decompress properly. Please grant the permission to ensure proper functionality.</string>
@@ -269,6 +277,8 @@
     <string name="account_add">Add Account</string>
     <string name="account_no_saved_accounts">No Saved Accounts</string>
     <string name="account_remove">This account will be removed from the launcher, are you sure you want to do this?</string>
+    <string name="account_remove_login_type_title">Remove Login Method: %s</string>
+    <string name="account_remove_login_type_message">This login method will be removed from the launcher, but it will not remove your existing account. Are you sure you want to do this?</string>
     <string name="account_microsoft_account">Microsoft Account</string>
     <string name="account_microsoft_xerr_unauthorized">Your Microsoft account login information seems to be expired, this often happens after the account password is changed. Please remove the current account and log in again to reset your login information.</string>
     <string name="account_local_account">Offline Account</string>
@@ -364,7 +374,6 @@
     <string name="main_open_main_dir">Open main directory</string>
     <string name="main_install_jar_file">Execute .jar file</string>
     <string name="main_share_logs">Share log files</string>
-    <string name="main_share_crash_report">Share crash report</string>
     <string name="main_launch">Launch Game</string>
     <string name="setting_category_control">Control settings</string>
     <string name="setting_category_virtual_mouse">Virtual mouse</string>
@@ -383,8 +392,9 @@
     <string name="setting_category_experimental_patches">Experimental Patches</string>
     <string name="setting_category_support">External Support</string>
     <string name="setting_renderer_title">Renderer</string>
-    <string name="setting_renderer_name_ltw">LTW (1.17+ only)</string>
     <string name="setting_renderer_name_angle">Angle (1.17+ only)</string>
+    <string name="setting_renderer_from_plugins">From %s Plugin</string>
+    <string name="setting_driver_title">Vulkan Driver</string>
     <string name="setting_ignore_notch_title">Fullscreen Mode</string>
     <string name="setting_ignore_notch_desc">Ignore the notch and extend screen content to full screen for a more complete immersive experience</string>
     <string name="setting_resolution_scaler_title">Resolution Scaling</string>

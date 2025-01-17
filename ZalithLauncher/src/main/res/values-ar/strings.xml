@@ -180,6 +180,7 @@
     <string name="controls_info_default_desc">هذا هو ملف تخطيط التحكم الافتراضي، اضغط للتعامل مع تخطيط التحكم هذا.</string>
     <string name="controls_set_default_message">هل أنت متأكد أنك تريد تعيين تخطيط التحكم هذا كتخطيط التحكم الافتراضي؟</string>
     <string name="controls_nothing">لا يوجد هنا أي تخطيطات تحكم، سيتم إنشاء تخطيط تحكم افتراضي جديد عند إعادة تشغيل التطبيق</string>
+    <string name="controls_tip_set_default">اضغط مطولاً على تخطيط التحكم لتعيينه كتخطيط التحكم الافتراضي!</string>
     <string name="replacement_customcontrol">استبدال تخطيط التحكم</string>
     <string name="custom_control_title">إدارة تخطيطات التحكم</string>
     <string name="controller_button_start">بدء</string>
@@ -219,6 +220,7 @@
     <string name="version_manager_shortcuts_resource_path">مجلد حزمة الموارد</string>
     <string name="version_manager_shortcuts_world_path">مجلد حفظ اللعبة</string>
     <string name="version_manager_shortcuts_shader_path">مجلد حزمة الظلال</string>
+    <string name="version_manager_shortcuts_screenshot_path">مجلد لقطات الشاشة</string>
     <string name="version_manager_shortcuts_logs_path">مجلد السجلات</string>
     <string name="version_manager_shortcuts_crash_report_path">مجلد تقارير الأعطال</string>
     <string name="version_manager_edit">تحرير الإصدار</string>
@@ -233,6 +235,12 @@
     <string name="version_manager_invalid">هذه النسخة غير صالحة</string>
     <string name="version_manager_no_installed_version">المُحَرّك لم يجد أي Minecraft مُثبّت!</string>
     <string name="version_manager_isolation_type_follow_global">اتبع إعدادات المشغل</string>
+    <string name="version_manager_favorites_add_category">إضافة المفضل</string>
+    <string name="version_manager_favorites_remove_folder_title">إزالة المفضل</string>
+    <string name="version_manager_favorites_remove_folder_message">هل أنت متأكد من أنك تريد إزالة هذا المفضل؟ بعد الإزالة سيتم مسح المعلومات في المفضل الحالي ولا يمكن إعادة هذه العملية!</string>
+    <string name="version_manager_favorites_write_folder_name">تسمية المفضل الجديد</string>
+    <string name="version_manager_favorites_dialog_title">إضافة إلى المفضل</string>
+    <string name="version_manager_favorites_dialog_no_folders">لا يوجد مفضلات حتى الآن، يرجى إضافة مفضل أولاً!</string>
     <!-- Profiles Path -->
     <string name="permissions_manage_external_storage">%s يحتاج إلى إمكانية التحكم في جميع ملفات الجهاز لاستخدام هذه الميزة بشكل صحيح، يرجى تمكين الإذن!</string>
     <string name="permissions_write_external_storage">يتطلب %s إذن إدارة التخزين. إذا لم يتم تمكين الإذن، فقد يؤدي ذلك إلى مشاكل مثل فشل حفظ ملفات اللعبة أو فك ضغطها بشكل صحيح. يرجى منح الإذن لضمان عمل الوظائف بشكل صحيح.</string>
@@ -263,6 +271,8 @@
     <string name="account_add">إضافة حساب</string>
     <string name="account_no_saved_accounts">لا توجد حسابات محفوظة</string>
     <string name="account_remove">سيتم إزالة هذا الحساب من المشغل، هل أنت متأكد من القيام بذلك؟</string>
+    <string name="account_remove_login_type_title">إزالة طريقة الدخول: %s</string>
+    <string name="account_remove_login_type_message">سيتم إزالة طريقة الدخول هذه من البدء، ولكنها لن تزيل حسابك الحالي. هل أنت متأكد من أنك تريد القيام بذلك؟</string>
     <string name="account_microsoft_account">حساب مايكروسوفت</string>
     <string name="account_microsoft_xerr_unauthorized">يبدو أن معلومات تسجيل الدخول إلى حساب مايكروسوفت الخاص بك قد انتهت، هذا الأمر شائع عند تغيير كلمة مرور الحساب، يرجى إزالة الحساب الحالي وإعادة تسجيل الدخول لإعادة تعيين معلومات تسجيل الدخول الخاصة بك.</string>
     <string name="account_local_account">حساب في وضع عدم الاتصال</string>
@@ -358,7 +368,6 @@
     <string name="main_open_main_dir">فتح الدليل الرئيسي</string>
     <string name="main_install_jar_file">تنفيذ ملف .jar</string>
     <string name="main_share_logs">مشاركة ملفات السجل</string>
-    <string name="main_share_crash_report">مشاركة تقرير الانهيار</string>
     <string name="main_launch">إطلاق اللعبة</string>
     <string name="setting_category_control">إعدادات التحكم</string>
     <string name="setting_category_virtual_mouse">الماوس الافتراضي</string>
@@ -377,8 +386,9 @@
     <string name="setting_category_experimental_patches">تصحيحات تجريبية</string>
     <string name="setting_category_support">الدعم الخارجي</string>
     <string name="setting_renderer_title">العارض</string>
-    <string name="setting_renderer_name_ltw">LTW (للإصدارات 1.17+ فقط)</string>
     <string name="setting_renderer_name_angle">Angle (للإصدارات 1.17+ فقط)</string>
+    <string name="setting_renderer_from_plugins">من ملحق %s</string>
+    <string name="setting_driver_title">برنامج تشغيل Vulkan</string>
     <string name="setting_ignore_notch_title">وضع ملء الشاشة</string>
     <string name="setting_ignore_notch_desc">تجاهل الشق وتمد المحتوى إلى كامل الشاشة لتجربة غامرة أكثر تكاملاً</string>
     <string name="setting_resolution_scaler_title">ضبط الدقة</string>

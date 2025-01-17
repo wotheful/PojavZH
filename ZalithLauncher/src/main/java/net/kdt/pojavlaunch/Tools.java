@@ -34,6 +34,8 @@ import com.google.gson.GsonBuilder;
 import com.movtery.zalithlauncher.InfoCenter;
 import com.movtery.zalithlauncher.R;
 import com.movtery.zalithlauncher.context.ContextExecutor;
+import com.movtery.zalithlauncher.plugins.renderer.RendererPluginManager;
+import com.movtery.zalithlauncher.utils.LauncherProfiles;
 import com.movtery.zalithlauncher.feature.customprofilepath.ProfilePathHome;
 import com.movtery.zalithlauncher.feature.log.Logging;
 import com.movtery.zalithlauncher.feature.version.Version;
@@ -682,7 +684,7 @@ public final class Tools {
                     });
 
                     return true;
-                }).buildDialog();
+                }).showDialog();
     }
 
     /** Launch the mod installer activity. The Uri must be from our own content provider or
@@ -692,6 +694,7 @@ public final class Tools {
         Intent intent = new Intent(activity, JavaGUILauncherActivity.class);
         intent.putExtra("modUri", uri);
         SelectRuntimeUtils.selectRuntime(activity, null, jreName -> {
+            LauncherProfiles.generateLauncherProfiles();
             intent.putExtra(JavaGUILauncherActivity.EXTRAS_JRE_NAME, jreName);
             activity.startActivity(intent);
         });
@@ -777,6 +780,21 @@ public final class Tools {
             if(rendererId.contains("zink") && !deviceHasZinkBinary) continue;
             rendererIds.add(rendererId);
             rendererNames.add(defaultRendererNames[i]);
+        }
+        // 渲染器插件
+        if (RendererPluginManager.isAvailable()) {
+            RendererPluginManager.getRendererList().forEach(renderer -> {
+                if (rendererIds.contains(renderer.getId())) {
+                    //尝试进行覆盖
+                    int rendererIndex = rendererIds.indexOf(renderer.getId());
+                    if (rendererIndex != -1) {
+                        rendererIds.remove(renderer.getId());
+                        rendererNames.remove(rendererIndex);
+                    }
+                }
+                rendererIds.add(renderer.getId());
+                rendererNames.add(renderer.getDes());
+            });
         }
         sCompatibleRenderers = new RenderersList(rendererIds,
                 rendererNames.toArray(new String[0]));

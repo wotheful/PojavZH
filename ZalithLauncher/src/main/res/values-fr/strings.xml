@@ -180,6 +180,7 @@
     <string name="controls_info_default_desc">Ceci est le fichier de disposition de contrôles par défaut, cliquez pour manipuler cette disposition de contrôles.</string>
     <string name="controls_set_default_message">Êtes-vous sûr de vouloir définir cette disposition de contrôles comme disposition par défaut ?</string>
     <string name="controls_nothing">Il n\'y a aucune disposition de contrôles ici, redémarrer l\'application générera une nouvelle disposition de contrôles par défaut</string>
+    <string name="controls_tip_set_default">Appuyez longuement sur la disposition des commandes pour la définir comme disposition de contrôle par défaut !</string>
     <string name="replacement_customcontrol">Changer de disposition de contrôles</string>
     <string name="custom_control_title">Gérer les dispositions de contrôles</string>
     <string name="controller_button_start">Démarrer</string>
@@ -217,10 +218,11 @@
     <string name="version_manager_shortcuts_mods">Gestion des Mods</string>
     <string name="version_manager_shortcuts_version_path">Dossier du chemin du jeu</string>
     <string name="version_manager_shortcuts_resource_path">Dossier du pack de ressources</string>
-    <string name="version_manager_shortcuts_world_path">Dossier des sauvegardes de monde</string>
-    <string name="version_manager_shortcuts_shader_path">Dossier des packs de shaders</string>
+    <string name="version_manager_shortcuts_world_path">Dossier des sauvegardes du jeu</string>
+    <string name="version_manager_shortcuts_shader_path">Dossier du pack de shaders</string>
+    <string name="version_manager_shortcuts_screenshot_path">Dossier des captures d\'écran</string>
     <string name="version_manager_shortcuts_logs_path">Dossier des journaux</string>
-    <string name="version_manager_shortcuts_crash_report_path">Dossier des rapports de plantage</string>
+    <string name="version_manager_shortcuts_crash_report_path">Dossier des rapports de crash</string>
     <string name="version_manager_edit">Éditer la version</string>
     <string name="version_manager_rename">Renommer la version</string>
     <string name="version_manager_copy">Copier la version</string>
@@ -233,6 +235,12 @@
     <string name="version_manager_invalid">Cette version est invalide</string>
     <string name="version_manager_no_installed_version">Le lanceur n\'a trouvé aucune version de Minecraft installée!</string>
     <string name="version_manager_isolation_type_follow_global">Suivre les paramètres du lanceur</string>
+    <string name="version_manager_favorites_add_category">Ajouter aux favoris</string>
+    <string name="version_manager_favorites_remove_folder_title">Supprimer les favoris</string>
+    <string name="version_manager_favorites_remove_folder_message">Êtes-vous sûr de vouloir supprimer ce favori ? Après la suppression, les informations du favori actuel seront effacées et cette opération ne peut pas être annulée !</string>
+    <string name="version_manager_favorites_write_folder_name">Nommer le nouveau favori</string>
+    <string name="version_manager_favorites_dialog_title">Ajouter aux favoris</string>
+    <string name="version_manager_favorites_dialog_no_folders">Pas de favoris pour le moment, veuillez en ajouter un d\'abord !</string>
     <!-- Profiles Path -->
     <string name="permissions_manage_external_storage">%s nécessite l\'autorisation de gérer tous les fichiers de l\'appareil pour fonctionner correctement. Veuillez activer les autorisations !</string>
     <string name="permissions_write_external_storage">%s nécessite l\'autorisation de gestion du stockage. Si l\'autorisation n\'est pas activée, cela peut entraîner des problèmes tels que l\'échec de l\'enregistrement ou de la décompression des fichiers de jeu. Veuillez accorder l\'autorisation pour assurer le bon fonctionnement.</string>
@@ -263,6 +271,8 @@
     <string name="account_add">Ajouter un compte</string>
     <string name="account_no_saved_accounts">Aucun compte enregistré</string>
     <string name="account_remove">Ce compte sera supprimé du lanceur. Êtes-vous sûr de vouloir faire cela ?</string>
+    <string name="account_remove_login_type_title">Supprimer le type de connexion : %s</string>
+    <string name="account_remove_login_type_message">Ce type de connexion sera supprimé du lanceur, mais il ne supprimera pas votre compte existant. Êtes-vous sûr de vouloir faire cela ?</string>
     <string name="account_microsoft_account">Compte Microsoft</string>
     <string name="account_microsoft_xerr_unauthorized">Vos informations de connexion à votre compte Microsoft semblent avoir expiré, ce qui se produit souvent après la modification du mot de passe du compte. Veuillez supprimer le compte actuel et vous reconnecter pour réinitialiser vos informations de connexion.</string>
     <string name="account_local_account">Compte hors ligne</string>
@@ -358,7 +368,6 @@
     <string name="main_open_main_dir">Ouvrir le répertoire principal</string>
     <string name="main_install_jar_file">Exécuter le fichier .jar</string>
     <string name="main_share_logs">Partager les fichiers journaux</string>
-    <string name="main_share_crash_report">Partager le rapport de crash</string>
     <string name="main_launch">Lancer le jeu</string>
     <string name="setting_category_control">Paramètres de contrôle</string>
     <string name="setting_category_virtual_mouse">Souris virtuelle</string>
@@ -377,8 +386,9 @@
     <string name="setting_category_experimental_patches">Patchs expérimentaux</string>
     <string name="setting_category_support">Support externe</string>
     <string name="setting_renderer_title">Moteur de rendu</string>
-    <string name="setting_renderer_name_ltw">LTW (uniquement pour 1.17+)</string>
     <string name="setting_renderer_name_angle">Angle (uniquement pour 1.17+)</string>
+    <string name="setting_renderer_from_plugins">Depuis le plugin %s</string>
+    <string name="setting_driver_title">Pilote Vulkan</string>
     <string name="setting_ignore_notch_title">Mode plein écran</string>
     <string name="setting_ignore_notch_desc">Ignorer l\'encoche et étendre le contenu de l\'écran en plein écran pour une immersion plus complète</string>
     <string name="setting_resolution_scaler_title">Ajustement de la résolution</string>

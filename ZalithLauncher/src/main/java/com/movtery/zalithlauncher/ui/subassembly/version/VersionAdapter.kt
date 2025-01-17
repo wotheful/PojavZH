@@ -19,7 +19,7 @@ import com.movtery.zalithlauncher.databinding.ItemVersionBinding
 import com.movtery.zalithlauncher.databinding.ViewVersionManagerBinding
 import com.movtery.zalithlauncher.feature.customprofilepath.ProfilePathManager
 import com.movtery.zalithlauncher.feature.version.Version
-import com.movtery.zalithlauncher.feature.version.VersionIconUtils
+import com.movtery.zalithlauncher.feature.version.utils.VersionIconUtils
 import com.movtery.zalithlauncher.feature.version.VersionsManager
 import com.movtery.zalithlauncher.task.Task
 import com.movtery.zalithlauncher.ui.dialog.TipDialog
@@ -32,9 +32,9 @@ class VersionAdapter(
     private val parentFragment: Fragment,
     private val listener: OnVersionItemClickListener
 ) : RecyclerView.Adapter<VersionAdapter.ViewHolder>() {
-    private val versions: MutableList<Version?> = ArrayList()
-    //记录版本路径与之对应的RadioButton的Map
-    private val radioButtonMap: MutableMap<String, RadioButton> = HashMap()
+    private val versions: MutableList<Version> = ArrayList()
+    //所有的RadioButton的List，其记录了当前所代表的版本路径
+    private val radioButtonList: MutableList<RadioButton> = mutableListOf()
     private var currentVersion: String? = null
     private var managerPopupWindow: PopupWindow = PopupWindow().apply {
         isFocusable = true
@@ -42,14 +42,14 @@ class VersionAdapter(
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun refreshVersions(versions: List<Version?>) {
+    fun refreshVersions(versions: List<Version>) {
         this.versions.clear()
         this.versions.addAll(versions)
-        this.radioButtonMap.apply {
-            forEach { (_, radioButton) -> radioButton.isChecked = false }
+        this.radioButtonList.apply {
+            forEach { radioButton -> radioButton.isChecked = false }
             clear()
         }
-        refreshCurrentVersion()
+        currentVersion = VersionsManager.getCurrentVersion()?.getVersionPath()?.absolutePath
         notifyDataSetChanged()
     }
 
@@ -57,25 +57,15 @@ class VersionAdapter(
         managerPopupWindow.dismiss()
     }
 
-    private fun refreshCurrentVersion() {
-        currentVersion = VersionsManager.getCurrentVersion()?.getVersionPath()?.absolutePath
-    }
-
     private fun setCurrentVersion(context: Context, version: Version) {
         if (version.isValid()) {
-            listener.onVersionClick(version)
-            refreshCurrentVersion()
+            VersionsManager.saveCurrentVersion(version.getVersionName())
+            currentVersion = version.getVersionPath().absolutePath
         } else {
             //版本无效时，不能设置版本，默认点击就会提示用户删除
             deleteVersion(version, context.getString(R.string.version_manager_delete_tip_invalid))
         }
-        updateRadioButtonState()
-    }
-
-    private fun updateRadioButtonState() {
-        for ((key, value) in radioButtonMap) {
-            value.isChecked = currentVersion == key
-        }
+        radioButtonList.forEach { radioButton -> radioButton.isChecked = radioButton.tag.toString() == currentVersion }
     }
 
     //删除版本前提示用户，如果版本无效，那么默认点击事件就是删除版本
@@ -95,7 +85,7 @@ class VersionAdapter(
                         VersionsManager.refresh()
                     }
                 ).start()
-            }.buildDialog()
+            }.showDialog()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -104,6 +94,11 @@ class VersionAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(versions[position])
+    }
+
+    override fun onViewRecycled(holder: ViewHolder) {
+        super.onViewRecycled(holder)
+        radioButtonList.remove(holder.binding.radioButton)
     }
 
     override fun getItemCount(): Int = versions.size
@@ -117,70 +112,58 @@ class VersionAdapter(
             }
         }
 
-        fun bind(version: Version?) {
+        fun bind(version: Version) {
             binding.apply {
                 versionInfoLayout.removeAllViews()
                 versionName.isSelected = true
 
-                version?.let {
-                    radioButtonMap[it.getVersionPath().absolutePath] = radioButton
-                    versionName.text = it.getVersionName()
-
-                    if (!it.isValid()) {
-                        mContext.getString(R.string.version_manager_invalid).addInfoIfNotBlank(true)
+                val versionPath = version.getVersionPath().absolutePath
+                radioButtonList.add(
+                    radioButton.apply {
+                        tag = versionPath
+                        isChecked = currentVersion == versionPath
                     }
+                )
 
-                    if (it.getVersionConfig().isIsolation()) {
-                        mContext.getString(R.string.pedit_isolation_enabled).addInfoIfNotBlank()
-                    }
+                versionName.text = version.getVersionName()
 
-                    it.getVersionInfo()?.let { versionInfo ->
-                        versionInfoLayout.addView(getInfoTextView(versionInfo.minecraftVersion))
-                        versionInfo.loaderInfo?.forEach { loaderInfo ->
-                            loaderInfo.name.addInfoIfNotBlank()
-                            loaderInfo.version.addInfoIfNotBlank()
-                        }
-                    }
-
-                    operate.setOnClickListener { _ ->
-                        showPopupWindow(operate, it)
-                    }
-
-                    VersionIconUtils(it).start(versionIcon)
-
-                    val onClickListener = View.OnClickListener { _ ->
-                        setCurrentVersion(mContext, it)
-                    }
-                    radioButton.setOnClickListener(onClickListener)
-                    root.setOnClickListener(onClickListener)
-
-                    setViewsVisibility(true)
-                    refreshRadioButtons(it)
-                    return
+                if (!version.isValid()) {
+                    mContext.getString(R.string.version_manager_invalid).addInfoIfNotBlank(true)
                 }
-                versionIcon.setImageDrawable(ContextCompat.getDrawable(root.context, R.drawable.ic_add))
-                versionName.setText(R.string.version_install_new)
-                root.setOnClickListener { listener.onCreateVersion() }
 
-                setViewsVisibility(false)
-                refreshRadioButtons(null)
-            }
-        }
-
-        private fun setViewsVisibility(show: Boolean) {
-            val visible = if (show) View.VISIBLE else View.GONE
-            binding.apply {
-                operate.visibility = visible
-                radioButton.visibility = visible
-                radioButtonSpace.visibility = visible
-            }
-        }
-
-        private fun refreshRadioButtons(version: Version?) {
-            version?.getVersionPath()?.absolutePath.let { versionPath ->
-                if (currentVersion == versionPath) {
-                    updateRadioButtonState()
+                if (version.getVersionConfig().isIsolation()) {
+                    mContext.getString(R.string.pedit_isolation_enabled).addInfoIfNotBlank()
                 }
+
+                version.getVersionInfo()?.let { versionInfo ->
+                    versionInfoLayout.addView(getInfoTextView(versionInfo.minecraftVersion))
+                    versionInfo.loaderInfo?.forEach { loaderInfo ->
+                        loaderInfo.name.addInfoIfNotBlank()
+                        loaderInfo.version.addInfoIfNotBlank()
+                    }
+                }
+
+                favorite.setOnClickListener { _ ->
+                    listener.showFavoritesDialog(version.getVersionName())
+                }
+                favorite.setImageDrawable(
+                    ContextCompat.getDrawable(mContext,
+                        if (listener.isVersionFavorited(version.getVersionName())) R.drawable.ic_favorite
+                        else R.drawable.ic_favorite_border
+                    )
+                )
+
+                operate.setOnClickListener { _ ->
+                    showPopupWindow(operate, version)
+                }
+
+                VersionIconUtils(version).start(versionIcon)
+
+                val onClickListener = View.OnClickListener { _ ->
+                    setCurrentVersion(mContext, version)
+                }
+                radioButton.setOnClickListener(onClickListener)
+                root.setOnClickListener(onClickListener)
             }
         }
 
@@ -232,7 +215,7 @@ class VersionAdapter(
 
         private fun swapPath(path: String) {
             val bundle = Bundle()
-            bundle.putString(FilesFragment.BUNDLE_LOCK_PATH, ProfilePathManager.currentPath)
+            bundle.putString(FilesFragment.BUNDLE_LOCK_PATH, ProfilePathManager.getCurrentPath())
             bundle.putString(FilesFragment.BUNDLE_LIST_PATH, path)
             bundle.putBoolean(FilesFragment.BUNDLE_QUICK_ACCESS_PATHS, false)
             ZHTools.swapFragmentWithAnim(
@@ -243,7 +226,14 @@ class VersionAdapter(
     }
 
     interface OnVersionItemClickListener {
-        fun onVersionClick(version: Version)
-        fun onCreateVersion()
+        /**
+         * 用户点击了“收藏”按钮，检查并展示“收藏”弹窗
+         */
+        fun showFavoritesDialog(versionName: String)
+
+        /**
+         * 检查当前版本是否被收藏了
+         */
+        fun isVersionFavorited(versionName: String): Boolean
     }
 }

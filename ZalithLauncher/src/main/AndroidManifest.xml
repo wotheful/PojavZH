@@ -61,6 +61,7 @@
             android:screenOrientation="sensorLandscape" />
         <activity
             android:name="net.kdt.pojavlaunch.LauncherActivity"
+            android:windowSoftInputMode="adjustResize"
             android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|keyboard|navigation"
             android:screenOrientation="sensorLandscape" />
         <activity
@@ -124,5 +125,8 @@
     </application>
     <queries>
         <package android:name="net.kdt.pojavlaunch.ffmpeg"/>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+        </intent>
     </queries>
 </manifest>
