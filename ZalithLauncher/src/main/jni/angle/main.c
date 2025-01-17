@@ -5,7 +5,6 @@
 #include <malloc.h>
 
 #include "GL/glcorearb.h"
-#include <GLES3/gl32.h>
 #include "string_utils.h"
 
 #define GL_PROXY_TEXTURE_RECTANGLE_ARB 0x84F7
