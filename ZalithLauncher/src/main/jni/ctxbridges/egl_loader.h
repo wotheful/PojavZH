@@ -32,6 +32,6 @@ extern EGLBoolean (*eglQuerySurface_p)( 	EGLDisplay display,
 
 extern __eglMustCastToProperFunctionPointerType (*eglGetProcAddress_p) (const char *procname);
 
-bool dlsym_EGL(void);
+void dlsym_EGL(void);
 
 #endif //__POJAVLAUNCHER_EGL_LOADER_H_
