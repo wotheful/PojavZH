@@ -377,10 +377,6 @@ public class JREUtils {
         userArgs.add("-Xmx" + AllSettings.getRamAllocation().getValue().getValue() + "M");
         if (LOCAL_RENDERER != null) userArgs.add("-Dorg.lwjgl.opengl.libname=" + loadGraphicsLibrary());
 
-        // Force LWJGL to use the Freetype library intended for it, instead of using the one
-        // that we ship with Java (since it may be older than what's needed)
-        userArgs.add("-Dorg.lwjgl.freetype.libname="+ DIR_NATIVE_LIB +"/libfreetype.so");
-
         // Some phones are not using the right number of cores, fix that
         userArgs.add("-XX:ActiveProcessorCount=" + java.lang.Runtime.getRuntime().availableProcessors());
 
@@ -562,8 +558,11 @@ public class JREUtils {
                 case "opengles3_angle":
                     renderLibrary = "libAngle.so";
                     break;
+                case "opengles3_ltw":
+                    renderLibrary = "libltw.so";
+                    break;
                 default:
-                    Logging.w("RENDER_LIBRARY", "No renderer selected, defaulting to opengles2");
+                    Logging.w("RENDER_LIBRARY", "No renderer selected, defaulting to opengles3");
                     renderLibrary = "libgl4es_114.so";
                     break;
             }
