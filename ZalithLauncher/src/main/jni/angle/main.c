@@ -4,6 +4,7 @@
 #include <string.h>
 #include <malloc.h>
 
+#include "GL/gl.h"
 #include "GL/glcorearb.h"
 #include "string_utils.h"
 
