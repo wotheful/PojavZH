@@ -59,6 +59,7 @@ static void gl4esi_get_display_dimensions(int* width, int* height) {
 gl_render_window_t* gl_init_context(gl_render_window_t *share) {
     gl_render_window_t* bundle = malloc(sizeof(gl_render_window_t));
     memset(bundle, 0, sizeof(gl_render_window_t));
+    EGLint egl_attributes[] = { EGL_NONE };
     if (!strcmp(getenv("POJAV_RENDERER"), "opengles3_angle")
      || !strncmp(getenv("POJAV_RENDERER"), "opengles3_desktopgl", 19))
     {
