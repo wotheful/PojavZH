@@ -72,7 +72,7 @@ static jint hooked_ProcessImpl_forkAndExec(JNIEnv *env, jobject process, jint mo
 }
 
 // Hook the forkAndExec method in the Java runtime for custom executable overriding.
-void hookExec() {
+void hookExec(void) {
     jclass cls;
     orig_ProcessImpl_forkAndExec = dlsym(RTLD_DEFAULT, "Java_java_lang_UNIXProcess_forkAndExec");
     if (!orig_ProcessImpl_forkAndExec) {
