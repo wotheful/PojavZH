@@ -4,7 +4,8 @@
 #include <string.h>
 #include <malloc.h>
 
-#include "GLES3/gl32.h"
+#include "GL/glcorearb.h"
+#include <GLES3/gl32.h>
 #include "string_utils.h"
 
 #define LOOKUP_FUNC(func) \
