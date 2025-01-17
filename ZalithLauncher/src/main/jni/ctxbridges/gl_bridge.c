@@ -1,4 +1,5 @@
 #include <EGL/egl.h>
+#include <EGL/eglext.h>
 #include <android/log.h>
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
@@ -14,8 +15,6 @@
 //
 // Created by maks on 17.09.2022.
 //
-
-#define EGL_OPENGL_ES3_BIT_KHR            0x00000040
 
 static const char* g_LogTag = "GLBridge";
 static __thread gl_render_window_t* currentBundle;
