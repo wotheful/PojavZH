@@ -271,11 +271,6 @@ public class JREUtils {
             }
         }
 
-        if (LOCAL_RENDERER.equals("opengles3_angle")) {
-            envMap.put("LIBGL_ES", "3");
-            eglName = "libAngle.so";
-        }
-
         if (LOCAL_RENDERER.equals("opengles3_ltw")) {
             envMap.put("LIBGL_ES", "3");
             eglName = "libltw.so";
