@@ -44,7 +44,7 @@ void *egl_make_current(void *window) {
     }
 }
 
-bool loadSymbolsVirGL() {
+bool loadSymbolsVirGL(void) {
     dlsym_OSMesa();
     dlsym_EGL();
 
@@ -65,7 +65,7 @@ bool loadSymbolsVirGL() {
     return true;
 }
 
-int virglInit() {
+int virglInit(void) {
     if (pojav_environ->config_renderer != RENDERER_VIRGL)
         return 0;
 
@@ -93,7 +93,7 @@ int virglInit() {
             EGL_ALPHA_SIZE, 8,
             // Minecraft required on initial 24
             EGL_DEPTH_SIZE, 24,
-            EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+            EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT,
             EGL_NONE
     };
 
@@ -180,7 +180,7 @@ void *virglCreateContext(void *contextSrc) {
     return context;
 }
 
-void *virglGetCurrentContext() {
+void *virglGetCurrentContext(void) {
     return virgl_context;
 }
 
@@ -208,7 +208,7 @@ void virglMakeCurrent(void *window) {
     }
 }
 
-void virglSwapBuffers() {
+void virglSwapBuffers(void) {
     glFinish_p();
     vtest_swap_buffers_p();
 }
