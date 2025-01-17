@@ -20,7 +20,7 @@ static __thread gl_render_window_t* currentBundle;
 static EGLDisplay g_EglDisplay;
 
 bool gl_init(void) {
-    if(!dlsym_EGL()) return false;
+    dlsym_EGL();
     g_EglDisplay = eglGetDisplay_p(EGL_DEFAULT_DISPLAY);
 
     if (g_EglDisplay == EGL_NO_DISPLAY)
