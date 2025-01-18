@@ -19,7 +19,6 @@ include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := Angle
-LOCAL_SHARED_LIBRARIES := angle_gles2
 LOCAL_SRC_FILES := angle/main.c angle/string_utils.c
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/angle
 LOCAL_CFLAGS += -rdynamic
