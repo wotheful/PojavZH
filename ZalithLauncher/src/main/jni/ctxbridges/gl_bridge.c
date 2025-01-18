@@ -136,7 +136,7 @@ static void gl_swap_surface(gl_render_window_t* bundle) {
         const EGLint pbuffer_attrs[] = {EGL_WIDTH, 2 , EGL_HEIGHT, 2, EGL_NONE};
         bundle->surface = eglCreatePbufferSurface_p(g_EglDisplay, bundle->config, pbuffer_attrs);
     }
-    eglMakeCurrent_p(g_EglDisplay, bundle->surface, bundle->surface, bundle->context);
+    // eglMakeCurrent_p(g_EglDisplay, bundle->surface, bundle->surface, bundle->context);
 }
 
 void gl_make_current(gl_render_window_t* bundle) {
