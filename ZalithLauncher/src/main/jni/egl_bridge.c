@@ -275,27 +275,51 @@ EXTERNAL_API void pojavSetWindowHint(int hint, int value) {
 }
 
 EXTERNAL_API void pojavSwapBuffers() {
-   br_swap_buffers();
+    if (pojav_environ->config_renderer == RENDERER_VK_ZINK
+     || pojav_environ->config_renderer == RENDERER_GL4ES)
+    {
+        br_swap_buffers();
+    }
+
+    if (pojav_environ->config_renderer == RENDERER_VIRGL)
+    {
+        virglSwapBuffers();
+    }
+
 }
 
 EXTERNAL_API void pojavMakeCurrent(void* window) {
-     br_make_current((basic_render_window_t*)window);
+    if (pojav_environ->config_renderer == RENDERER_VK_ZINK
+     || pojav_environ->config_renderer == RENDERER_GL4ES)
+    {
+        br_make_current((basic_render_window_t*)window);
+    }
+
+    if (pojav_environ->config_renderer == RENDERER_VIRGL)
+    {
+        virglMakeCurrent(window);
+    }
+
 }
 
 EXTERNAL_API void* pojavCreateContext(void* contextSrc) {
     if (pojav_environ->config_renderer == RENDERER_VULKAN)
         return (void *) pojav_environ->pojavWindow;
 
+    if (pojav_environ->config_renderer == RENDERER_VIRGL)
+        return virglCreateContext(contextSrc);
+
     return br_init_context((basic_render_window_t*)contextSrc);
 }
 
-void* maybe_load_vulkan() {
+static void* maybe_load_vulkan(void) {
     // We use the env var because
     // 1. it's easier to do that
     // 2. it won't break if something will try to load vulkan and osmesa simultaneously
     if(getenv("VULKAN_PTR") == NULL) load_vulkan();
     return (void*) strtoul(getenv("VULKAN_PTR"), NULL, 0x10);
 }
+
 EXTERNAL_API JNIEXPORT jlong JNICALL
 Java_org_lwjgl_vulkan_VK_getVulkanDriverHandle(ABI_COMPAT JNIEnv *env, ABI_COMPAT jclass thiz) {
     printf("EGLBridge: LWJGL-side Vulkan loader requested the Vulkan handle\n");
@@ -303,7 +327,17 @@ Java_org_lwjgl_vulkan_VK_getVulkanDriverHandle(ABI_COMPAT JNIEnv *env, ABI_COMPA
 }
 
 EXTERNAL_API void pojavSwapInterval(int interval) {
-    br_swap_interval(interval);
+    if (pojav_environ->config_renderer == RENDERER_VK_ZINK
+     || pojav_environ->config_renderer == RENDERER_GL4ES)
+    {
+        br_swap_interval(interval);
+    }
+
+    if (pojav_environ->config_renderer == RENDERER_VIRGL)
+    {
+        virglSwapInterval(interval);
+    }
+
 }
 
 JNIEXPORT JNICALL jlong
