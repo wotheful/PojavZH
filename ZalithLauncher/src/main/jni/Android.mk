@@ -11,6 +11,10 @@ LOCAL_PATH := $(HERE_PATH)
 $(call import-module,prefab/bytehook)
 LOCAL_PATH := $(HERE_PATH)
 
+include $(CLEAR_VARS)
+LOCAL_MODULE := angle_gles2
+LOCAL_SRC_FILES := angle/angle-gles/$(TARGET_ARCH_ABI)/libGLESv2_angle.so
+include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := Angle
