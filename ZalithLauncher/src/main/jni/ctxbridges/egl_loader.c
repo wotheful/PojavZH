@@ -24,21 +24,21 @@ EGLint (*eglGetError_p) (void);
 EGLContext (*eglCreateContext_p) (EGLDisplay dpy, EGLConfig config, EGLContext share_list, const EGLint *attrib_list);
 EGLBoolean (*eglSwapInterval_p) (EGLDisplay dpy, EGLint interval);
 EGLSurface (*eglGetCurrentSurface_p) (EGLint readdraw);
-// EGLBoolean (*eglQuerySurface_p)( 	EGLDisplay display,
-//                                            EGLSurface surface,
-//                                            EGLint attribute,
-//                                            EGLint * value);
-// __eglMustCastToProperFunctionPointerType (*eglGetProcAddress_p) (const char *procname);
+EGLBoolean (*eglQuerySurface_p)( 	EGLDisplay display,
+                                           EGLSurface surface,
+                                           EGLint attribute,
+                                           EGLint * value);
+__eglMustCastToProperFunctionPointerType (*eglGetProcAddress_p) (const char *procname);
 
 void dlsym_EGL(void) {
     void* dl_handle = NULL;
     if(getenv("POJAVEXEC_EGL")) dl_handle = dlopen(getenv("POJAVEXEC_EGL"), RTLD_LOCAL|RTLD_LAZY);
     if(dl_handle == NULL) dl_handle = dlopen("libEGL.so", RTLD_LOCAL|RTLD_LAZY);
     if(dl_handle == NULL) abort();
-//     eglGetProcAddress_p = dlsym(dl_handle, "eglGetProcAddress");
-//     if(eglGetProcAddress_p == NULL) {
-//         printf("%s\n", dlerror());
-//     }
+    eglGetProcAddress_p = dlsym(dl_handle, "eglGetProcAddress");
+    if(eglGetProcAddress_p == NULL) {
+        printf("%s\n", dlerror());
+    }
     eglBindAPI_p = dlsym(dl_handle,"eglBindAPI");
     eglChooseConfig_p = dlsym(dl_handle, "eglChooseConfig");
     eglCreateContext_p = dlsym(dl_handle, "eglCreateContext");
