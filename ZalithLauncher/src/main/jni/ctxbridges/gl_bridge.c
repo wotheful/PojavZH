@@ -43,19 +43,6 @@ gl_render_window_t* gl_get_current(void) {
     return currentBundle;
 }
 
-static void gl4esi_get_display_dimensions(int* width, int* height) {
-    if (currentBundle == NULL) goto zero;
-    EGLSurface surface = currentBundle->surface;
-    EGLBoolean result_width = eglQuerySurface_p(g_EglDisplay, surface, EGL_WIDTH, width);
-    EGLBoolean result_height = eglQuerySurface_p(g_EglDisplay, surface, EGL_HEIGHT, height);
-    if (!result_width || !result_height) goto zero;
-    return;
-
-    zero:
-    *width = 0;
-    *height = 0;
-}
-
 gl_render_window_t* gl_init_context(gl_render_window_t *share) {
     gl_render_window_t* bundle = malloc(sizeof(gl_render_window_t));
     memset(bundle, 0, sizeof(gl_render_window_t));
@@ -209,22 +196,5 @@ void gl_swap_interval(int swapInterval) {
     if (pojav_environ->force_vsync) swapInterval = 1;
 
     eglSwapInterval_p(g_EglDisplay, swapInterval);
-}
-
-JNIEXPORT void JNICALL
-Java_org_lwjgl_opengl_PojavRendererInit_nativeInitGl4esInternals(JNIEnv *env, jclass clazz,
-                                                            jobject function_provider) {
-    __android_log_print(ANDROID_LOG_INFO, g_LogTag, "GL4ES internals initializing...");
-    jclass funcProviderClass = (*env)->GetObjectClass(env, function_provider);
-    jmethodID method_getFunctionAddress = (*env)->GetMethodID(env, funcProviderClass, "getFunctionAddress", "(Ljava/lang/CharSequence;)J");
-#define GETSYM(N) ((*env)->CallLongMethod(env, function_provider, method_getFunctionAddress, (*env)->NewStringUTF(env, N)));
-
-    void (*set_getmainfbsize)(void (*new_getMainFBSize)(int* width, int* height)) = (void*)GETSYM("set_getmainfbsize");
-    if(set_getmainfbsize != NULL) {
-        __android_log_print(ANDROID_LOG_INFO, g_LogTag, "GL4ES internals initialized dimension callback");
-        set_getmainfbsize(gl4esi_get_display_dimensions);
-    }
-
-#undef GETSYM
 }
 
