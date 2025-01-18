@@ -94,8 +94,8 @@ gl_render_window_t* gl_init_context(gl_render_window_t *share) {
         if (!strcmp(getenv("POJAV_RENDERER"), "opengles3_angle")
          || !strncmp(getenv("POJAV_RENDERER"), "opengles3_desktopgl", 19))
         {
-            printf("EGLBridge: Binding to OpenGL ES\n");
-            bindResult = eglBindAPI_p(EGL_OPENGL_ES_API);
+            printf("EGLBridge: Binding to OpenGL\n");
+            bindResult = eglBindAPI_p(EGL_OPENGL_API);
         } else {
             printf("EGLBridge: Binding to OpenGL ES\n");
             bindResult = eglBindAPI_p(EGL_OPENGL_ES_API);
@@ -113,7 +113,7 @@ gl_render_window_t* gl_init_context(gl_render_window_t *share) {
         __android_log_print(ANDROID_LOG_ERROR, g_LogTag, "eglCreateContext_p() finished with error: %04x",
                             eglGetError_p());
         free(bundle);
-        return NULL;
+        return bundle;
     }
     return bundle;
 }
