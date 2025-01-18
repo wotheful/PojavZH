@@ -8,6 +8,9 @@
 #include <GLES3/gl32.h>
 #include "string_utils.h"
 
+GLAPI void APIENTRY glTexImage2D (GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels);
+GLAPI void APIENTRY glGetIntegerv (GLenum pname, GLint *data);
+
 #define LOOKUP_FUNC(func) \
     if (!gles_##func) { \
         gles_##func = dlsym(RTLD_NEXT, #func); \
