@@ -278,14 +278,12 @@ public class JREUtils {
 
         if (LOCAL_RENDERER.equals("opengles3_tinywrapper")) {
             envMap.put("LIBGL_ES", "3");
-            eglName = "libEGL.so";
-            System.loadLibrary("GLESv3");
+            eglName = "libtinywrapper.so";
         }
 
         if (LOCAL_RENDERER.equals("opengles3_desktopgl_angle")) {
             envMap.put("LIBGL_ES", "3");
             eglName = "libEGL_angle.so";
-            System.loadLibrary("GLESv2_angle");
         }
 
         if (eglName != null) envMap.put("POJAVEXEC_EGL", eglName);
@@ -566,7 +564,7 @@ public class JREUtils {
                     renderLibrary = "libAngle.so";
                     break;
                 case "opengles3_tinywrapper":
-                    renderLibrary = "libAngle.so";
+                    renderLibrary = "libtinywrapper.so";
                     break;
                 case "opengles3_ltw":
                     renderLibrary = "libltw.so";
