@@ -4,7 +4,8 @@
 #include <string.h>
 #include <malloc.h>
 
-#include "GL/gl.h"
+#include "GL/glcorearb.h"
+#include <GLES3/gl32.h>
 #include "spirv_cross/include/spirv_cross_c.h"
 #include "shaderc/include/shaderc.h"
 #include "string_utils.h"
@@ -15,6 +16,9 @@
     } if (!gles_##func) { \
         gles_##func = dlsym(RTLD_DEFAULT, #func); \
     }
+
+#define GL_PROXY_TEXTURE_RECTANGLE_ARB 0x84F7
+#define GL_TEXTURE_LOD_BIAS_EXT 0x8501
 
 int proxy_width, proxy_height, proxy_intformat, maxTextureSize;
 
@@ -282,9 +286,9 @@ const GLubyte * glGetString(GLenum name) {
 
     switch (name) {
         case GL_VERSION:
-            return "4.6";
+            return (const GLubyte *)"4.6.114514";
         case GL_SHADING_LANGUAGE_VERSION:
-            return "4.5";
+            return (const GLubyte *)"4.5";
         default:
             return gles_glGetString(name);
     }
