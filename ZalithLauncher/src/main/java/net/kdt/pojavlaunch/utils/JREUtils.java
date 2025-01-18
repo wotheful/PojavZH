@@ -278,7 +278,7 @@ public class JREUtils {
 
         if (LOCAL_RENDERER.equals("opengles3_tinywrapper")) {
             envMap.put("LIBGL_ES", "3");
-            eglName = "libtinywrapper.so";
+            eglName = "libvgpu.so";
         }
 
         if (LOCAL_RENDERER.equals("opengles3_desktopgl_angle")) {
