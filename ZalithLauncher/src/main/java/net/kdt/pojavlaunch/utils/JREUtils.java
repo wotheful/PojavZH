@@ -279,6 +279,7 @@ public class JREUtils {
         if (LOCAL_RENDERER.equals("opengles3_tinywrapper")) {
             envMap.put("LIBGL_ES", "3");
             eglName = "libEGL.so";
+            System.loadLibrary("libGLESv3.so");
         }
 
         if (LOCAL_RENDERER.equals("opengles3_desktopgl_angle")) {
