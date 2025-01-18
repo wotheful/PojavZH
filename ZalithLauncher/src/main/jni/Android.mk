@@ -13,18 +13,14 @@ LOCAL_PATH := $(HERE_PATH)
 
 
 include $(CLEAR_VARS)
-LOCAL_MODULE := shaderc
-LOCAL_SRC_FILES := angle/shaderc/libshaderc.so
+LOCAL_MODULE := angle_gles2
+LOCAL_SRC_FILES := angle/angle-gles/$(TARGET_ARCH_ABI)/libGLESv2_angle.so
 include $(PREBUILT_SHARED_LIBRARY)
 
-include $(CLEAR_VARS)
-LOCAL_MODULE := spirv-cross-c-shared
-LOCAL_SRC_FILES := spirv_cross/libspirv-cross-c-shared.so
-include $(PREBUILT_SHARED_LIBRARY)
-
+include $(BUILD_SHARED_LIBRARY)
 include $(CLEAR_VARS)
 LOCAL_MODULE := Angle
-LOCAL_SHARED_LIBRARIES := spirv-cross-c-shared shaderc
+LOCAL_SHARED_LIBRARIES := angle_gles2
 LOCAL_SRC_FILES := angle/main.c angle/string_utils.c
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/angle
 LOCAL_CFLAGS += -rdynamic
