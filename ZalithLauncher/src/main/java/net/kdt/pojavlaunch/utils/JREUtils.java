@@ -276,6 +276,12 @@ public class JREUtils {
             eglName = "libltw.so";
         }
 
+        
+        if (LOCAL_RENDERER.equals("opengles3_angle")) {
+            envMap.put("LIBGL_ES", "3");
+            eglName = "libEGL_angle.so";
+        }
+
         if (eglName != null) envMap.put("POJAVEXEC_EGL", eglName);
 
         if (LOCAL_RENDERER.equals("gallium_virgl")) {
