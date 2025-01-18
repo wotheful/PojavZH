@@ -17,7 +17,7 @@
         <item>gallium_virgl</item> <!-- virgl renderer with OpenGL ES 3 -->
         <item>gallium_freedreno</item> <!-- freedreno with Adreno GPU -->
         <item>gallium_panfrost</item> <!-- panfrost with Mali GPU -->
-        <item>opengles3_angle</item> <!-- Angle with OpenGL 3 -->
+        <item>opengles3_desktopgl_angle</item> <!-- Angle with OpenGL 3 -->
         <item>opengles3_ltw</item> <!-- LTW with OpenGL 3 -->
         <item>opengles3_tinywrapper</item> <!-- LTW with OpenGL 3 -->
     </string-array>
