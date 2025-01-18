@@ -17,7 +17,6 @@ LOCAL_MODULE := angle_gles2
 LOCAL_SRC_FILES := angle/angle-gles/$(TARGET_ARCH_ABI)/libGLESv2_angle.so
 include $(PREBUILT_SHARED_LIBRARY)
 
-include $(BUILD_SHARED_LIBRARY)
 include $(CLEAR_VARS)
 LOCAL_MODULE := Angle
 LOCAL_SHARED_LIBRARIES := angle_gles2
