@@ -6,8 +6,6 @@
 
 #include "GL/glcorearb.h"
 #include <GLES3/gl32.h>
-#include "spirv_cross/include/spirv_cross_c.h"
-#include "shaderc/include/shaderc.h"
 #include "string_utils.h"
 
 #define LOOKUP_FUNC(func) \
@@ -143,12 +141,12 @@ void glShaderSource(GLuint shader, GLsizei count, const GLchar * const *string, 
 
     int convertedLen = strlen(converted);
 
-#ifdef __APPLE__
+//#ifdef __APPLE__
     // patch OptiFine 1.17.x
     if (gl4es_find_string(converted, "\nuniform mat4 textureMatrix = mat4(1.0);")) {
         gl4es_inplace_replace(converted, &convertedLen, "\nuniform mat4 textureMatrix = mat4(1.0);", "\n#define textureMatrix mat4(1.0)");
     }
-#endif
+//#endif
 
     // some needed exts
     const char* extensions =
@@ -161,6 +159,9 @@ void glShaderSource(GLuint shader, GLsizei count, const GLchar * const *string, 
 
     free(source);
     free(converted);
+
+    converted = replace_word(converted, "#version 300 es", "#version 320 es");
+    // printf("Output GLSL ES:\n%s", converted);
 }
 
 int isProxyTexture(GLenum target) {
@@ -286,7 +287,7 @@ const GLubyte * glGetString(GLenum name) {
 
     switch (name) {
         case GL_VERSION:
-            return (const GLubyte *)"4.6.114514";
+            return (const GLubyte *)"4.6";
         case GL_SHADING_LANGUAGE_VERSION:
             return (const GLubyte *)"4.5";
         default:
