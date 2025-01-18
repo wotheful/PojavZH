@@ -276,8 +276,12 @@ public class JREUtils {
             eglName = "libltw.so";
         }
 
-        
-        if (LOCAL_RENDERER.equals("opengles3_angle")) {
+        if (LOCAL_RENDERER.equals("opengles3_tinywrapper")) {
+            envMap.put("LIBGL_ES", "3");
+            eglName = "libEGL.so";
+        }
+
+        if (LOCAL_RENDERER.equals("opengles3_desktopgl_angle")) {
             envMap.put("LIBGL_ES", "3");
             eglName = "libEGL_angle.so";
         }
@@ -556,7 +560,10 @@ public class JREUtils {
                 case "gallium_panfrost":
                     renderLibrary = "libOSMesa_2300d.so";
                     break;
-                case "opengles3_angle":
+                case "opengles3_desktopgl_angle":
+                    renderLibrary = "libAngle.so";
+                    break;
+                case "opengles3_tinywrapper":
                     renderLibrary = "libAngle.so";
                     break;
                 case "opengles3_ltw":
