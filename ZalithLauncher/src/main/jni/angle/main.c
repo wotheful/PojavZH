@@ -16,7 +16,7 @@
     }
 
 #define GL_PROXY_TEXTURE_RECTANGLE_ARB 0x84F7
-#define GL_TEXTURE_LOD_BIAS_EXT
+#define GL_TEXTURE_LOD_BIAS_EXT 0x8501
 
 int proxy_width, proxy_height, proxy_intformat, maxTextureSize;
 
