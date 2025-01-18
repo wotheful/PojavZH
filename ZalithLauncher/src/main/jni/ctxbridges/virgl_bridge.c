@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include "environ/environ.h"
 #include "virgl_bridge.h"
+#include <EGL/eglext.h>
 #include "egl_loader.h"
 #include "osmesa_loader.h"
 #include "renderer_config.h"
@@ -93,7 +94,7 @@ int virglInit(void) {
             EGL_ALPHA_SIZE, 8,
             // Minecraft required on initial 24
             EGL_DEPTH_SIZE, 24,
-            EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT,
+            EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT_KHR,
             EGL_NONE
     };
 
