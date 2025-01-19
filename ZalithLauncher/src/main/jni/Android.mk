@@ -40,7 +40,7 @@ include $(CLEAR_VARS)
 LOCAL_LDLIBS := -ldl -llog -landroid
 # -lGLESv2
 LOCAL_MODULE := pojavexec
-LOCAL_SHARED_LIBRARIES := bytehook
+LOCAL_SHARED_LIBRARIES := bytehook PojavRendererInit_nativeInitGl4esInternals
 LOCAL_CFLAGS += -rdynamic
 # LOCAL_CFLAGS += -DDEBUG
 # -DGLES_TEST
