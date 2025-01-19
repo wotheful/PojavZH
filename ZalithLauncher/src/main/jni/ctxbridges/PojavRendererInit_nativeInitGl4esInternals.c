@@ -1,3 +1,17 @@
+#include <EGL/egl.h>
+#include <EGL/eglext.h>
+#include <android/log.h>
+#include <android/native_window.h>
+#include <android/native_window_jni.h>
+#include <string.h>
+#include <malloc.h>
+#include <stdlib.h>
+#include <dlfcn.h>
+#include <stdbool.h>
+#include <environ/environ.h>
+#include "gl_bridge.h"
+#include "egl_loader.h"
+
 static const char* g_LogTag = "GLBridge";
 static __thread gl_render_window_t* currentBundle;
 static EGLDisplay g_EglDisplay;
