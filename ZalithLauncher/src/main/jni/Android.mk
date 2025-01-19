@@ -58,16 +58,9 @@ LOCAL_CFLAGS += -O3 -fPIC -DPIC -flto=thin -fwhole-program-vtables -mllvm -polly
 LOCAL_LDLAGS += -flto=thin -Wl,-plugin-opt=-emulated-tls=0 -fuse-ld=lld
 LOCAL_LDLIBS += -lEGL -lGLESv3
 endif
-include $(BUILD_SHARED_LIBRARY)
-
-include $(CLEAR_VARS)
-LOCAL_MODULE := PojavRendererInit_nativeInitGl4esInternals
-LOCAL_SRC_FILES := \
-    ctxbridges/PojavRendererInit_nativeInitGl4esInternals.c
-LOCAL_SHARED_LIBRARIES := pojavexec
-LOCAL_CFLAGS += -fPIC -DPIC -flto=thin -fwhole-program-vtables -mllvm -polly -pthread -Wall -Weverything -pedantic -std=c2x -DLLVM_USE_LINKER=lld -fno-emulated-tls -fdata-sections -ffunction-sections -fmerge-all-constants -march=armv8-a+simd+crc+crypto+fp16 -mcpu=cortex-a76
-LOCAL_LDLAGS += -flto=thin -Wl,-plugin-opt=-emulated-tls=0 -fuse-ld=lld
-LOCAL_CFLAGS += -rdynamic
+ifeq ($(filter PojavRendererInit_nativeInitGl4esInternals.c, $(LOCAL_SRC_FILES)), PojavRendererInit_nativeInitGl4esInternals.c)
+    LOCAL_CFLAGS += -O0 -rdynamic
+endif
 include $(BUILD_SHARED_LIBRARY)
 
 #ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
