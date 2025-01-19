@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include "environ/environ.h"
 #include "virgl_bridge.h"
+#include <EGL/egl.h>
 #include <EGL/eglext.h>
 #include "egl_loader.h"
 #include "osmesa_loader.h"
