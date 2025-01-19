@@ -17,11 +17,6 @@ LOCAL_SRC_FILES := angle/angle-gles/$(TARGET_ARCH_ABI)/libGLESv2_angle.so
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
-LOCAL_MODULE := vgpu
-LOCAL_SRC_FILES := angle/angle-gles/$(TARGET_ARCH_ABI)/libvgpu.so
-include $(PREBUILT_SHARED_LIBRARY)
-
-include $(CLEAR_VARS)
 LOCAL_MODULE := Angle
 LOCAL_SRC_FILES := angle/main.c angle/string_utils.c
 LOCAL_SHARED_LIBRARIES := angle_gles2
@@ -32,13 +27,12 @@ LOCAL_LDLAGS += -flto=thin -Wl,-plugin-opt=-emulated-tls=0 -fuse-ld=lld
 include $(BUILD_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
-LOCAL_MODULE := tinywrapper
-LOCAL_SRC_FILES := angle/main.c angle/string_utils.c
-LOCAL_SHARED_LIBRARIES := vgpu
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/angle
-LOCAL_CFLAGS += -rdynamic
-LOCAL_CFLAGS += -O3 -fPIC -DPIC -flto=thin -fwhole-program-vtables -mllvm -polly -pthread -Wall -Weverything -std=c2x -fno-emulated-tls -march=armv8-a+simd+crc+crypto+fp16 -mcpu=cortex-a76 -fdata-sections -ffunction-sections -fmerge-all-constants
+LOCAL_MODULE := PojavRendererInit_nativeInitGl4esInternals
+LOCAL_SRC_FILES := \
+    ctxbridges/PojavRendererInit_nativeInitGl4esInternals.c
+LOCAL_CFLAGS += -fPIC -DPIC -flto=thin -fwhole-program-vtables -mllvm -polly -pthread -Wall -Weverything -pedantic -std=c2x -DLLVM_USE_LINKER=lld -fno-emulated-tls -fdata-sections -ffunction-sections -fmerge-all-constants -march=armv8-a+simd+crc+crypto+fp16 -mcpu=cortex-a76
 LOCAL_LDLAGS += -flto=thin -Wl,-plugin-opt=-emulated-tls=0 -fuse-ld=lld
+LOCAL_CFLAGS += -rdynamic
 include $(BUILD_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
