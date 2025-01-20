@@ -111,6 +111,7 @@ public class JREUtils {
         dlopen(findInLdLibPath("libawt_headless.so"));
         dlopen(findInLdLibPath("libfreetype.so"));
         dlopen(findInLdLibPath("libfontmanager.so"));
+        dlopen(findInLdLibPath("jspawnhelper"));
         for (File f : locateLibs(new File(jreHome, Tools.DIRNAME_HOME_JRE))) {
             dlopen(f.getAbsolutePath());
         }
