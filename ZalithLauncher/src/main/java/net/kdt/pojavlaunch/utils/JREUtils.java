@@ -278,7 +278,16 @@ public class JREUtils {
 
         if (LOCAL_RENDERER.equals("opengles3_gl4es_plus")) {
             envMap.put("LIBGL_ES", "3");
-            eglName = "libvgpu.so";
+            envMap.put("LIBGL_BACKEND_ANGLE", "1");
+            envMap.put("LIBGL_USEVBO", "1");
+            envMap.put("LIBGL_GL", "32");
+            envMap.put("LIBGL_SHADERCONVERTER", "1");
+            envMap.put("LIBGL_NOINTOVLHACK", "1");
+            envMap.put("LIBGL_NORMALIZE", "1");
+            envMap.put("LIBGL_MIPMAP", "1");
+            envMap.put("LIBGL_GLES", "libGLESv3.so");
+            envMap.put("LIBGL_EGL", "libEGL.so");
+            eglName = "libEGL.so";
         }
 
         if (LOCAL_RENDERER.equals("opengles3_desktopgl_angle")) {
