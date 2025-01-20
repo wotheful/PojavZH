@@ -31,7 +31,7 @@ include $(CLEAR_VARS)
 LOCAL_LDLIBS := -ldl -llog -landroid
 # -lGLESv2
 LOCAL_MODULE := pojavexec
-LOCAL_SHARED_LIBRARIES := bytehook PojavRendererInit_nativeInitGl4esInternals
+LOCAL_SHARED_LIBRARIES := bytehook
 LOCAL_CFLAGS += -rdynamic
 # LOCAL_CFLAGS += -DDEBUG
 # -DGLES_TEST
@@ -55,12 +55,9 @@ LOCAL_SRC_FILES := \
 
 ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
 LOCAL_CFLAGS += -DADRENO_POSSIBLE
-LOCAL_CFLAGS += -O3 -fPIC -DPIC -flto=thin -fwhole-program-vtables -mllvm -polly -pthread -Wall -Weverything -std=c2x -fno-emulated-tls -march=armv8-a+simd+crc+crypto+fp16 -mcpu=cortex-a76 -fdata-sections -ffunction-sections -fmerge-all-constants
+LOCAL_CFLAGS += -fPIC -DPIC -flto=thin -fwhole-program-vtables -mllvm -polly -pthread -Wall -Weverything -std=c2x -fno-emulated-tls -march=armv8-a+simd+crc+crypto+fp16 -mcpu=cortex-a76 -fdata-sections -ffunction-sections -fmerge-all-constants
 LOCAL_LDLAGS += -flto=thin -Wl,-plugin-opt=-emulated-tls=0 -fuse-ld=lld
 LOCAL_LDLIBS += -lEGL -lGLESv3
-endif
-ifeq ($(filter PojavRendererInit_nativeInitGl4esInternals.c, $(LOCAL_SRC_FILES)), PojavRendererInit_nativeInitGl4esInternals.c)
-    LOCAL_CFLAGS += -O0 -rdynamic
 endif
 include $(BUILD_SHARED_LIBRARY)
 
