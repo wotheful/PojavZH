@@ -271,12 +271,12 @@ public class JREUtils {
             }
         }
 
-        if (LOCAL_RENDERER.equals("opengles3_ltw")) {
+        if (LOCAL_RENDERER.equals("opengles3_ltw_in_launcher")) {
             envMap.put("LIBGL_ES", "3");
             eglName = "libltw.so";
         }
 
-        if (LOCAL_RENDERER.equals("opengles3_tinywrapper")) {
+        if (LOCAL_RENDERER.equals("opengles3_gl4es_plus")) {
             envMap.put("LIBGL_ES", "3");
             eglName = "libvgpu.so";
         }
@@ -557,16 +557,13 @@ public class JREUtils {
                 case "gallium_virgl":
                     renderLibrary = "libOSMesa_2121.so";
                     break;
-                case "gallium_panfrost":
-                    renderLibrary = "libOSMesa_2300d.so";
-                    break;
                 case "opengles3_desktopgl_angle":
                     renderLibrary = "libAngle.so";
                     break;
-                case "opengles3_tinywrapper":
+                case "opengles3_gl4es_plus":
                     renderLibrary = "libtinywrapper.so";
                     break;
-                case "opengles3_ltw":
+                case "opengles3_ltw_in_launcher":
                     renderLibrary = "libltw.so";
                     break;
                 default:
