@@ -273,7 +273,7 @@ public class JREUtils {
 
         if (LOCAL_RENDERER.equals("opengles3_ltw_in_launcher")) {
             envMap.put("LIBGL_ES", "3");
-            eglName = "libltw.so";
+            envMap.put("POJAVEXEC_EGL", "libltw_in_launcher.so");
         }
 
         if (LOCAL_RENDERER.equals("opengles3_gl4es_plus")) {
@@ -287,12 +287,12 @@ public class JREUtils {
             envMap.put("LIBGL_MIPMAP", "1");
             envMap.put("LIBGL_GLES", "libGLESv3.so");
             envMap.put("LIBGL_EGL", "libEGL.so");
-            eglName = "libEGL.so";
+            envMap.put("POJAVEXEC_EGL", "libEGL.so");
         }
 
         if (LOCAL_RENDERER.equals("opengles3_desktopgl_angle")) {
             envMap.put("LIBGL_ES", "3");
-            eglName = "libEGL_angle.so";
+            envMap.put("POJAVEXEC_EGL", "libEGL_angle.so");
         }
 
         if (eglName != null) envMap.put("POJAVEXEC_EGL", eglName);
@@ -455,7 +455,6 @@ public class JREUtils {
                 "-Dnet.minecraft.clientmodname=" + InfoCenter.LAUNCHER_NAME,
                 "-Dfml.earlyprogresswindow=false", //Forge 1.14+ workaround
                 "-Dloader.disable_forked_guis=true",
-                "-Djdk.lang.Process.launchMechanism=FORK", // Default is POSIX_SPAWN which requires starting jspawnhelper, which doesn't work on Android
                 "-Dsodium.checks.issue2561=false"
         ));
 
@@ -570,10 +569,10 @@ public class JREUtils {
                     renderLibrary = "libAngle.so";
                     break;
                 case "opengles3_gl4es_plus":
-                    renderLibrary = "libtinywrapper.so";
+                    renderLibrary = "libgl4es_plus.so";
                     break;
                 case "opengles3_ltw_in_launcher":
-                    renderLibrary = "libltw.so";
+                    renderLibrary = "libltw_in_launcher.so";
                     break;
                 default:
                     Logging.w("RENDER_LIBRARY", "No renderer selected, defaulting to opengles3");
