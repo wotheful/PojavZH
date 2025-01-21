@@ -19,8 +19,10 @@ import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.os.Build;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 import com.movtery.zalithlauncher.event.single.RefreshHotbarEvent;
 import com.movtery.zalithlauncher.feature.log.Logging;
@@ -107,7 +109,7 @@ public class MinecraftGLSurface extends View implements GrabListener {
      *                 when the cursor is not grabbed
      */
     public void start(boolean isAlreadyRunning, AbstractTouchpad touchpad){
-        setUpPointerCapture(touchpad);
+        if(MainActivity.isAndroid8OrHigher()) setUpPointerCapture(touchpad);
         mInGUIProcessor.setAbstractTouchpad(touchpad);
         if(AllSettings.getAlternateSurface().getValue()){
             SurfaceView surfaceView = new SurfaceView(getContext());

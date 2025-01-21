@@ -3,6 +3,7 @@ package net.kdt.pojavlaunch;
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.P;
 import static com.movtery.zalithlauncher.setting.AllStaticSettings.notchSize;
+import static android.os.Build.VERSION_CODES.Q;
 
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -100,6 +101,7 @@ public final class Tools {
     }
 
     public static void buildNotificationChannel(Context context) {
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
         NotificationChannel channel = new NotificationChannel(
                 NOTIFICATION_CHANNEL_DEFAULT,
                 context.getString(R.string.notif_channel_name), NotificationManager.IMPORTANCE_DEFAULT);
