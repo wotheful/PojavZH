@@ -1,5 +1,8 @@
 package com.movtery.zalithlauncher.feature.download;
 
+import static com.movtery.zalithlauncher.feature.download.InfoAdapter.createCategoryView;
+import static com.movtery.zalithlauncher.feature.download.InfoAdapter.getTagTextView;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -10,7 +13,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,6 +22,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.flexbox.FlexboxLayout;
 import com.movtery.zalithlauncher.R;
 import com.movtery.zalithlauncher.databinding.ItemModDependenciesBinding;
+import com.movtery.zalithlauncher.event.value.AddFragmentEvent;
 import com.movtery.zalithlauncher.feature.download.enums.Category;
 import com.movtery.zalithlauncher.feature.download.enums.ModLoader;
 import com.movtery.zalithlauncher.feature.download.enums.Platform;
@@ -28,40 +31,36 @@ import com.movtery.zalithlauncher.feature.download.item.InfoItem;
 import com.movtery.zalithlauncher.feature.download.utils.DependencyUtils;
 import com.movtery.zalithlauncher.setting.AllSettings;
 import com.movtery.zalithlauncher.ui.fragment.DownloadModFragment;
-import com.movtery.zalithlauncher.ui.fragment.download.AbstractResourceDownloadFragment;
 import com.movtery.zalithlauncher.utils.NumberWithUnits;
 import com.movtery.zalithlauncher.utils.ZHTools;
-import com.movtery.zalithlauncher.utils.stringutils.StringUtils;
 
 import net.kdt.pojavlaunch.Tools;
 
+import org.greenrobot.eventbus.EventBus;
 import org.jackhuang.hmcl.ui.versions.ModTranslations;
 
-import java.io.File;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.concurrent.Future;
 
 public class ModDependenciesAdapter extends RecyclerView.Adapter<ModDependenciesAdapter.InnerHolder> {
-    private final Fragment mParentFragment;
     private final InfoItem mInfoItem;
     private final List<DependenciesInfoItem> mData;
     private SetOnClickListener onClickListener;
 
-    public ModDependenciesAdapter(Fragment fragment, InfoItem item, List<DependenciesInfoItem> mData) {
-        this.mParentFragment = fragment;
+    public ModDependenciesAdapter(InfoItem item, List<DependenciesInfoItem> mData) {
         this.mInfoItem = item;
         this.mData = mData;
     }
 
     @NonNull
     @Override
-    public ModDependenciesAdapter.InnerHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public InnerHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new InnerHolder(ItemModDependenciesBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ModDependenciesAdapter.InnerHolder holder, int position) {
+    public void onBindViewHolder(@NonNull InnerHolder holder, int position) {
         holder.setData(mData.get(position));
     }
 
@@ -102,6 +101,7 @@ public class ModDependenciesAdapter extends RecyclerView.Adapter<ModDependencies
             binding.getRoot().getBackground().setTint(infoItem.getDependencyType().getColor());
 
             binding.sourceImageview.setImageDrawable(getPlatformIcon(infoItem.getPlatform()));
+            binding.sourceTextview.setText(infoItem.getPlatform().getPName());
 
             String title;
             if (ZHTools.areaChecks("zh")) {
@@ -120,15 +120,23 @@ public class ModDependenciesAdapter extends RecyclerView.Adapter<ModDependencies
 
             binding.tagsLayout.addView(
                     getTagTextView(
+                            context,
                             R.string.download_info_dependencies,
                             DependencyUtils.Companion.getTextFromType(context, infoItem.getDependencyType())
-                    ));
+                    )
+            );
 
             binding.tagsLayout.addView(
-                    getTagTextView(R.string.download_info_downloads, NumberWithUnits.formatNumberWithUnit(
-                            infoItem.getDownloadCount(),
-                            //判断当前系统语言是否为英文
-                            ZHTools.isEnglish(mParentFragment.requireActivity()))));
+                    getTagTextView(
+                            context,
+                            R.string.download_info_downloads,
+                            NumberWithUnits.formatNumberWithUnit(
+                                    infoItem.getDownloadCount(),
+                                    //判断当前系统语言是否为英文
+                                    ZHTools.isEnglish(context)
+                            )
+                    )
+            );
 
             StringJoiner modloaderSJ = new StringJoiner(", ");
             for (ModLoader modloader : infoItem.getModloaders()) {
@@ -138,20 +146,23 @@ public class ModDependenciesAdapter extends RecyclerView.Adapter<ModDependencies
             if (modloaderSJ.length() > 0) modloaderText = modloaderSJ.toString();
             else modloaderText = context.getString(R.string.generic_unknown);
             binding.tagsLayout.addView(
-                    getTagTextView(R.string.download_info_modloader, modloaderText)
+                    getTagTextView(context, R.string.download_info_modloader, modloaderText)
             );
 
             binding.thumbnailImageview.setImageDrawable(null);
             RequestBuilder<Drawable> builder = Glide.with(context).load(infoItem.getIconUrl());
-            if (!AllSettings.getResourceImageCache()) builder.diskCacheStrategy(DiskCacheStrategy.NONE);
+            if (!AllSettings.getResourceImageCache().getValue()) builder.diskCacheStrategy(DiskCacheStrategy.NONE);
             builder.into(binding.thumbnailImageview);
 
             itemView.setOnClickListener(v -> {
-                InfoViewModel viewModel = new ViewModelProvider(mParentFragment.requireActivity()).get(InfoViewModel.class);
-                viewModel.setInfoItem(infoItem);
-                viewModel.setPlatformHelper(mInfoItem.getPlatform().getHelper());
-                viewModel.setTargetPath(new File(AbstractResourceDownloadFragment.sGameDir, "/mods"));
-                ZHTools.addFragment(mParentFragment, DownloadModFragment.class, DownloadModFragment.TAG, null);
+                EventBus.getDefault().post(new AddFragmentEvent(
+                        DownloadModFragment.class, DownloadModFragment.TAG, null,
+                        fragmentActivity -> {
+                            InfoViewModel viewModel = new ViewModelProvider(fragmentActivity).get(InfoViewModel.class);
+                            viewModel.setInfoItem(infoItem);
+                            viewModel.setPlatformHelper(mInfoItem.getPlatform().getHelper());
+                        }
+                ));
 
                 if (onClickListener != null) onClickListener.onItemClick();
             });
@@ -164,24 +175,10 @@ public class ModDependenciesAdapter extends RecyclerView.Adapter<ModDependencies
         }
 
         private void addCategoryView(FlexboxLayout layout, String text) {
-            LayoutInflater inflater = LayoutInflater.from(context);
-            TextView textView = (TextView) inflater.inflate(R.layout.item_mod_category_textview, layout, false);
+            TextView textView = createCategoryView(context);
             textView.setText(text);
             textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, Tools.dpToPx(9F));
             layout.addView(textView);
-        }
-
-        private TextView getTagTextView(int string, String value) {
-            TextView textView = new TextView(context);
-            textView.setText(StringUtils.insertSpace(context.getString(string), value));
-            FlexboxLayout.LayoutParams layoutParams = new FlexboxLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            );
-            layoutParams.setMargins(0, 0, (int) Tools.dpToPx(10f), 0);
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, Tools.dpToPx(9F));
-            textView.setLayoutParams(layoutParams);
-            return textView;
         }
     }
 }

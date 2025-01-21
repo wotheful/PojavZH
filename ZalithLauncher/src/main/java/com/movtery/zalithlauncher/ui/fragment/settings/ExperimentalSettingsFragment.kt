@@ -4,13 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.movtery.anim.AnimPlayer
+import com.movtery.anim.animations.Animations
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.databinding.SettingsFragmentExperimentalBinding
 import com.movtery.zalithlauncher.setting.AllSettings
+import com.movtery.zalithlauncher.ui.fragment.settings.wrapper.SeekBarSettingsWrapper
 import com.movtery.zalithlauncher.ui.fragment.settings.wrapper.SwitchSettingsWrapper
 
 class ExperimentalSettingsFragment :
-    AbstractSettingsFragment(R.layout.settings_fragment_experimental) {
+    AbstractSettingsFragment(R.layout.settings_fragment_experimental, SettingCategory.EXPERIMENTAL) {
     private lateinit var binding: SettingsFragmentExperimentalBinding
 
     override fun onCreateView(
@@ -27,7 +30,6 @@ class ExperimentalSettingsFragment :
 
         SwitchSettingsWrapper(
             context,
-            "dump_shaders",
             AllSettings.dumpShaders,
             binding.dumpShadersLayout,
             binding.dumpShaders
@@ -35,10 +37,42 @@ class ExperimentalSettingsFragment :
 
         SwitchSettingsWrapper(
             context,
-            "bigCoreAffinity",
             AllSettings.bigCoreAffinity,
             binding.bigCoreAffinityLayout,
             binding.bigCoreAffinity
         )
+
+        SwitchSettingsWrapper(
+            context,
+            AllSettings.useControllerProxy,
+            binding.useControllerProxyLayout,
+            binding.useControllerProxy
+        )
+
+        SeekBarSettingsWrapper(
+            context,
+            AllSettings.tcVibrateDuration,
+            binding.tcVibrateDurationLayout,
+            binding.tcVibrateDurationTitle,
+            binding.tcVibrateDurationSummary,
+            binding.tcVibrateDurationValue,
+            binding.tcVibrateDuration,
+            "ms"
+        )
+
+        refreshTouchControllerSettings()
+    }
+
+    private fun refreshTouchControllerSettings() {
+        binding.tcVibrateDurationLayout.visibility = if (AllSettings.useControllerProxy.getValue()) View.VISIBLE else View.GONE
+    }
+
+    override fun onChange() {
+        super.onChange()
+        refreshTouchControllerSettings()
+    }
+
+    override fun slideIn(animPlayer: AnimPlayer) {
+        animPlayer.apply(AnimPlayer.Entry(binding.root, Animations.BounceInDown))
     }
 }

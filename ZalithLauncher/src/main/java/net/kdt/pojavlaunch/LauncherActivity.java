@@ -1,5 +1,6 @@
 package net.kdt.pojavlaunch;
 
+import static com.movtery.zalithlauncher.launch.LaunchGame.preLaunch;
 import static net.kdt.pojavlaunch.Tools.currentDisplayMetrics;
 
 import android.Manifest;
@@ -24,19 +25,25 @@ import androidx.fragment.app.FragmentManager;
 import com.kdt.mcgui.ProgressLayout;
 import com.movtery.anim.AnimPlayer;
 import com.movtery.anim.animations.Animations;
+import com.movtery.zalithlauncher.InfoCenter;
 import com.movtery.zalithlauncher.R;
 import com.movtery.zalithlauncher.context.ContextExecutor;
-import com.movtery.zalithlauncher.databinding.ActivityPojavLauncherBinding;
+import com.movtery.zalithlauncher.databinding.ActivityLauncherBinding;
 import com.movtery.zalithlauncher.event.single.LaunchGameEvent;
 import com.movtery.zalithlauncher.event.single.MainBackgroundChangeEvent;
 import com.movtery.zalithlauncher.event.single.PageOpacityChangeEvent;
 import com.movtery.zalithlauncher.event.single.SwapToLoginEvent;
+import com.movtery.zalithlauncher.event.sticky.InstallingVersionEvent;
 import com.movtery.zalithlauncher.event.sticky.MinecraftVersionValueEvent;
+import com.movtery.zalithlauncher.event.value.AddFragmentEvent;
+import com.movtery.zalithlauncher.event.value.DownloadProgressKeyEvent;
 import com.movtery.zalithlauncher.event.value.InDownloadFragmentEvent;
+import com.movtery.zalithlauncher.event.value.InstallGameEvent;
 import com.movtery.zalithlauncher.event.value.InstallLocalModpackEvent;
 import com.movtery.zalithlauncher.event.value.LocalLoginEvent;
 import com.movtery.zalithlauncher.event.value.MicrosoftLoginEvent;
 import com.movtery.zalithlauncher.event.value.OtherLoginEvent;
+import com.movtery.zalithlauncher.feature.accounts.AccountType;
 import com.movtery.zalithlauncher.feature.accounts.AccountsManager;
 import com.movtery.zalithlauncher.feature.accounts.LocalAccountUtils;
 import com.movtery.zalithlauncher.feature.background.BackgroundManager;
@@ -49,13 +56,18 @@ import com.movtery.zalithlauncher.feature.mod.modpack.install.ModPackUtils;
 import com.movtery.zalithlauncher.feature.notice.CheckNewNotice;
 import com.movtery.zalithlauncher.feature.notice.NoticeInfo;
 import com.movtery.zalithlauncher.feature.update.UpdateUtils;
+import com.movtery.zalithlauncher.feature.version.install.GameInstaller;
+import com.movtery.zalithlauncher.feature.version.install.InstallTask;
+import com.movtery.zalithlauncher.feature.version.Version;
+import com.movtery.zalithlauncher.feature.version.VersionsManager;
 import com.movtery.zalithlauncher.setting.AllSettings;
-import com.movtery.zalithlauncher.setting.Settings;
 import com.movtery.zalithlauncher.task.Task;
 import com.movtery.zalithlauncher.task.TaskExecutors;
 import com.movtery.zalithlauncher.ui.activity.BaseActivity;
+import com.movtery.zalithlauncher.ui.dialog.EditTextDialog;
 import com.movtery.zalithlauncher.ui.dialog.TipDialog;
 import com.movtery.zalithlauncher.ui.fragment.AccountFragment;
+import com.movtery.zalithlauncher.ui.fragment.BaseFragment;
 import com.movtery.zalithlauncher.ui.fragment.DownloadFragment;
 import com.movtery.zalithlauncher.ui.fragment.SettingsFragment;
 import com.movtery.zalithlauncher.ui.subassembly.settingsbutton.ButtonType;
@@ -70,21 +82,13 @@ import com.movtery.zalithlauncher.utils.stringutils.StringUtils;
 import net.kdt.pojavlaunch.authenticator.microsoft.MicrosoftBackgroundLogin;
 import net.kdt.pojavlaunch.contracts.OpenDocumentWithExtension;
 import net.kdt.pojavlaunch.fragments.MainMenuFragment;
-import net.kdt.pojavlaunch.fragments.MicrosoftLoginFragment;
-import net.kdt.pojavlaunch.lifecycle.ContextAwareDoneListener;
-import net.kdt.pojavlaunch.modloaders.modpacks.ModloaderInstallTracker;
-import net.kdt.pojavlaunch.modloaders.modpacks.api.NotificationDownloadListener;
 import net.kdt.pojavlaunch.prefs.LauncherPreferences;
 import net.kdt.pojavlaunch.progresskeeper.ProgressKeeper;
 import net.kdt.pojavlaunch.progresskeeper.TaskCountListener;
 import net.kdt.pojavlaunch.services.ProgressServiceKeeper;
-import net.kdt.pojavlaunch.tasks.AsyncMinecraftDownloader;
 import net.kdt.pojavlaunch.tasks.AsyncVersionList;
-import net.kdt.pojavlaunch.tasks.MinecraftDownloader;
 import net.kdt.pojavlaunch.utils.NotificationUtils;
 import net.kdt.pojavlaunch.value.MinecraftAccount;
-import net.kdt.pojavlaunch.value.launcherprofiles.LauncherProfiles;
-import net.kdt.pojavlaunch.value.launcherprofiles.MinecraftProfile;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -104,10 +108,9 @@ public class LauncherActivity extends BaseActivity {
                 }
             });
 
-    private ActivityPojavLauncherBinding binding;
+    private ActivityLauncherBinding binding;
     private SettingsButtonWrapper mSettingsButtonWrapper;
     private ProgressServiceKeeper mProgressServiceKeeper;
-    private ModloaderInstallTracker mInstallTracker;
     private NotificationManager mNotificationManager;
     private boolean mIsInDownloadFragment = false;
     private Future<?> checkNotice;
@@ -137,7 +140,7 @@ public class LauncherActivity extends BaseActivity {
 
     @Subscribe()
     public void event(PageOpacityChangeEvent event) {
-        setPageOpacity();
+        setPageOpacity(event.getProgress());
     }
 
     @Subscribe()
@@ -153,7 +156,7 @@ public class LauncherActivity extends BaseActivity {
 
     @Subscribe()
     public void event(SwapToLoginEvent event) {
-        Fragment currentFragment = getVisibleFragment(binding.containerFragment.getId());
+        Fragment currentFragment = getCurrentFragment();
         //如果当前可见的Fragment不为空，则判断当前的Fragment是否为AccountFragment，不是就跳转至AccountFragment
         if (currentFragment == null || getVisibleFragment(AccountFragment.TAG) != null) return;
         ZHTools.swapFragmentWithAnim(currentFragment, AccountFragment.class, AccountFragment.TAG, null);
@@ -166,13 +169,8 @@ public class LauncherActivity extends BaseActivity {
             return;
         }
 
-        String selectedProfile = AllSettings.getCurrentProfile();
-        if (LauncherProfiles.mainProfileJson == null || !LauncherProfiles.mainProfileJson.profiles.containsKey(selectedProfile)) {
-            Toast.makeText(this, R.string.error_no_version, Toast.LENGTH_LONG).show();
-            return;
-        }
-        MinecraftProfile prof = LauncherProfiles.mainProfileJson.profiles.get(selectedProfile);
-        if (prof == null || prof.lastVersionId == null || "Unknown".equals(prof.lastVersionId)) {
+        Version version = VersionsManager.INSTANCE.getCurrentVersion();
+        if (version == null) {
             Toast.makeText(this, R.string.error_no_version, Toast.LENGTH_LONG).show();
             return;
         }
@@ -186,15 +184,18 @@ public class LauncherActivity extends BaseActivity {
         LocalAccountUtils.checkUsageAllowed(new LocalAccountUtils.CheckResultListener() {
             @Override
             public void onUsageAllowed() {
-                launchGame(prof);
+                preLaunch(LauncherActivity.this, version);
             }
 
             @Override
             public void onUsageDenied() {
-                if (!AllSettings.getLocalAccountReminders()) {
-                    launchGame(prof);
+                if (!AllSettings.getLocalAccountReminders().getValue()) {
+                    preLaunch(LauncherActivity.this, version);
                 } else {
-                    LocalAccountUtils.openDialog(LauncherActivity.this, () -> launchGame(prof),
+                    LocalAccountUtils.openDialog(LauncherActivity.this, checked -> {
+                                LocalAccountUtils.saveReminders(checked);
+                                preLaunch(LauncherActivity.this, version);
+                            },
                             getString(R.string.account_no_microsoft_account) + getString(R.string.account_purchase_minecraft_account_tip),
                             R.string.account_continue_to_launch_the_game);
                 }
@@ -205,8 +206,7 @@ public class LauncherActivity extends BaseActivity {
     @Subscribe()
     public void event(MicrosoftLoginEvent event) {
         new MicrosoftBackgroundLogin(false, event.getUri().getQueryParameter("code")).performLogin(
-                null,
-                accountsManager.getProgressListener(),
+                this, null,
                 accountsManager.getDoneListener(),
                 accountsManager.getErrorListener()
         );
@@ -214,13 +214,13 @@ public class LauncherActivity extends BaseActivity {
 
     @Subscribe()
     public void event(OtherLoginEvent event) {
-        try {
-            event.getAccount().save();
-            Logging.i("Account", "Saved the account : " + event.getAccount().username);
-        } catch (IOException e) {
-            Logging.e("Account", "Failed to save the account : " + e);
-        }
-        accountsManager.getDoneListener().onLoginDone(event.getAccount());
+        Task.runTask(() -> {
+                    event.getAccount().save();
+                    Logging.i("Account", "Saved the account : " + event.getAccount().username);
+                    return null;
+                }).onThrowable(e -> Logging.e("Account", "Failed to save the account : " + e))
+                .finallyTask(() -> accountsManager.getDoneListener().onLoginDone(event.getAccount()))
+                .execute();
     }
 
     @Subscribe()
@@ -228,7 +228,7 @@ public class LauncherActivity extends BaseActivity {
         String userName = event.getUserName();
         MinecraftAccount localAccount = new MinecraftAccount();
         localAccount.username = userName;
-        localAccount.accountType = "Local";
+        localAccount.accountType = AccountType.LOCAL.getType();
         try {
             localAccount.save();
             Logging.i("Account", "Saved the account : " + localAccount.username);
@@ -253,29 +253,96 @@ public class LauncherActivity extends BaseActivity {
         ModPackUtils.ModPackEnum type;
         type = ModPackUtils.determineModpack(dirGameModpackFile);
 
-        Task.runTask(() -> {
-                    ModLoaderWrapper loaderInfo = InstallLocalModPack.installModPack(this, type, dirGameModpackFile,
-                            () -> runOnUiThread(installExtra.dialog::dismiss));
-                    if (loaderInfo == null) return null;
-                    return loaderInfo.getDownloadTask(new NotificationDownloadListener(this, loaderInfo));
-                }).beforeStart(TaskExecutors.getAndroidUI(),
-                        () -> ProgressLayout.setProgress(ProgressLayout.INSTALL_RESOURCE, 0, R.string.generic_waiting))
-                .ended(task -> {
-                    if (task != null) {
-                        task.run();
+        new EditTextDialog.Builder(this)
+                .setTitle(R.string.version_install_new)
+                .setEditText(dirGameModpackFile.getName())
+                .setAsRequired()
+                .setConfirmListener((editText, checked) -> {
+                    String customName = editText.getText().toString();
+
+                    if (customName.contains("/")) {
+                        editText.setError(getString(R.string.generic_input_invalid_character, "/"));
+                        return false;
                     }
-                }).onThrowable(TaskExecutors.getAndroidUI(), e -> Tools.showErrorRemote(this, R.string.modpack_install_download_failed, e))
-                .finallyTask(TaskExecutors.getAndroidUI(), () -> {
-                    ProgressLayout.clearProgress(ProgressLayout.INSTALL_RESOURCE);
-                    installExtra.dialog.dismiss();
-                })
-                .execute();
+
+                    if (VersionsManager.INSTANCE.isVersionExists(customName, true)) {
+                        editText.setError(getString(R.string.version_install_exists));
+                        return false;
+                    }
+
+                    InstallingVersionEvent installingVersionEvent = new InstallingVersionEvent();
+                    Task.runTask(() -> {
+                        EventBus.getDefault().postSticky(installingVersionEvent);
+                        ModLoaderWrapper modLoaderWrapper = InstallLocalModPack.installModPack(this, type, dirGameModpackFile, customName);
+                        if (modLoaderWrapper != null) {
+                            InstallTask downloadTask = modLoaderWrapper.getDownloadTask();
+
+                            if (downloadTask != null) {
+                                Logging.i("Install Version", "Installing ModLoader: " + modLoaderWrapper.getModLoaderVersion());
+                                File file = downloadTask.run(customName);
+                                if (file != null) {
+                                    return new kotlin.Pair<>(modLoaderWrapper, file);
+                                }
+                            }
+                        }
+                        return null;
+                    }).beforeStart(TaskExecutors.getAndroidUI(), () -> ProgressLayout.setProgress(ProgressLayout.INSTALL_RESOURCE, 0, R.string.generic_waiting)).ended(filePair -> {
+                        if (filePair != null) {
+                            try {
+                                ModPackUtils.startModLoaderInstall(filePair.getFirst(), LauncherActivity.this, filePair.getSecond(), customName);
+                            } catch (Throwable e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    }).onThrowable(TaskExecutors.getAndroidUI(), e -> Tools.showErrorRemote(this, R.string.modpack_install_download_failed, e))
+                    .finallyTask(TaskExecutors.getAndroidUI(), () -> {
+                        ProgressLayout.clearProgress(ProgressLayout.INSTALL_RESOURCE);
+                        EventBus.getDefault().removeStickyEvent(installingVersionEvent);
+                    }).execute();
+
+                    return true;
+                }).showDialog();
+    }
+
+    @Subscribe()
+    public void event(InstallGameEvent event) {
+        new GameInstaller(this, event).installGame();
+    }
+
+    @Subscribe()
+    public void event(DownloadProgressKeyEvent event) {
+        if (event.getObserve()) {
+            binding.progressLayout.observe(event.getProgressKey());
+        } else {
+            binding.progressLayout.unObserve(event.getProgressKey());
+        }
+    }
+
+    @Subscribe()
+    public synchronized void event(AddFragmentEvent event) {
+        Fragment currentFragment = getCurrentFragment();
+        if (currentFragment != null) {
+            try {
+                AddFragmentEvent.FragmentActivityCallBack activityCallBack = event.getFragmentActivityCallback();
+                if (activityCallBack != null) {
+                    activityCallBack.callBack(currentFragment.requireActivity());
+                }
+                ZHTools.addFragment(
+                        currentFragment,
+                        event.getFragmentClass(),
+                        event.getFragmentTag(),
+                        event.getBundle()
+                );
+            } catch (Exception e) {
+                Logging.e("LauncherActivity", "Failed attempt to jump to a new Fragment!", e);
+            }
+        }
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityPojavLauncherBinding.inflate(getLayoutInflater());
+        binding = ActivityLauncherBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         processFragment();
@@ -304,13 +371,11 @@ public class LauncherActivity extends BaseActivity {
                 false
         );
 
-        mInstallTracker = new ModloaderInstallTracker(this);
-
         checkNotice();
 
         //检查已经下载后的包，或者检查更新
         Task.runTask(() -> {
-            UpdateUtils.checkDownloadedPackage(this, true);
+            UpdateUtils.checkDownloadedPackage(this, false, true);
             return null;
         }).execute();
     }
@@ -319,13 +384,12 @@ public class LauncherActivity extends BaseActivity {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                MicrosoftLoginFragment fragment = (MicrosoftLoginFragment) getVisibleFragment(MicrosoftLoginFragment.TAG);
-                if (fragment != null) {
-                    if (fragment.canGoBack()) {
-                        fragment.goBack();
-                        return;
-                    }
+                Fragment currentFragment = getCurrentFragment();
+                if (currentFragment instanceof BaseFragment && !((BaseFragment) currentFragment).onBackPressed()) {
+                    //Fragment那边拒绝了返回事件
+                    return;
                 }
+
                 //如果栈中只剩下1个或没有Fragment，则直接退出启动器
                 if (getSupportFragmentManager().getBackStackEntryCount() <= 1) {
                     finish();
@@ -346,8 +410,8 @@ public class LauncherActivity extends BaseActivity {
     }
 
     private void processViews() {
-        setPageOpacity();
         refreshBackground();
+        setPageOpacity(AllSettings.getPageOpacity().getValue());
         mSettingsButtonWrapper = new SettingsButtonWrapper(binding.settingButton);
         mSettingsButtonWrapper.setOnTypeChangeListener(type -> ViewAnimUtils.setViewAnim(binding.settingButton, Animations.Pulse));
         binding.downloadButton.setOnClickListener(v -> {
@@ -367,6 +431,7 @@ public class LauncherActivity extends BaseActivity {
                 Tools.backToMainMenu(this);
             }
         });
+        binding.appTitleText.setText(InfoCenter.APP_NAME);
         binding.appTitleText.setOnClickListener(v ->
                 binding.appTitleText.setText(StringUtils.shiftString(binding.appTitleText.getText().toString(), ShiftDirection.RIGHT, 1))
         );
@@ -374,13 +439,12 @@ public class LauncherActivity extends BaseActivity {
         binding.progressLayout.observe(ProgressLayout.DOWNLOAD_MINECRAFT);
         binding.progressLayout.observe(ProgressLayout.UNPACK_RUNTIME);
         binding.progressLayout.observe(ProgressLayout.INSTALL_RESOURCE);
-        binding.progressLayout.observe(ProgressLayout.AUTHENTICATE_MICROSOFT);
+        binding.progressLayout.observe(ProgressLayout.LOGIN_ACCOUNT);
         binding.progressLayout.observe(ProgressLayout.DOWNLOAD_VERSION_LIST);
 
         binding.noticeLayout.findViewById(R.id.notice_got_button).setOnClickListener(v -> {
             setNotice(false);
-            Settings.Manager.put("noticeDefault", false)
-                    .save();
+            AllSettings.getNoticeDefault().put(false).save();
         });
         new DraggableViewWrapper(binding.noticeLayout, new DraggableViewWrapper.AttributesFetcher() {
             @NonNull
@@ -412,15 +476,9 @@ public class LauncherActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        ContextExecutor.setActivity(this);
-        mInstallTracker.attach();
-        setPageOpacity();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mInstallTracker.detach();
+        setPageOpacity(AllSettings.getPageOpacity().getValue());
+        //避免切换回来的时候，找不到账号，应该在这里刷新账户
+        accountsManager.reload();
     }
 
     @Override
@@ -453,16 +511,16 @@ public class LauncherActivity extends BaseActivity {
     }
 
     private void checkNotice() {
-        checkNotice = TaskExecutors.getDefault().submit(() -> CheckNewNotice.checkNewNotice(this, noticeInfo -> {
+        checkNotice = TaskExecutors.getDefault().submit(() -> CheckNewNotice.checkNewNotice(noticeInfo -> {
             if (checkNotice.isCancelled() || noticeInfo == null) {
                 return;
             }
             //当偏好设置内是开启通知栏 或者 检测到通知编号不为偏好设置里保存的值时，显示通知栏
-            if (AllSettings.getNoticeDefault() ||
-                    (noticeInfo.numbering != AllSettings.getNoticeNumbering())) {
+            if (AllSettings.getNoticeDefault().getValue() ||
+                    (noticeInfo.numbering != AllSettings.getNoticeNumbering().getValue())) {
                 TaskExecutors.runInUIThread(() -> setNotice(true));
-                Settings.Manager.put("noticeDefault", true)
-                        .put("noticeNumbering", noticeInfo.numbering)
+                AllSettings.getNoticeDefault().put(true)
+                        .put(AllSettings.getNoticeNumbering(), noticeInfo.numbering)
                         .save();
             }
         }));
@@ -507,16 +565,6 @@ public class LauncherActivity extends BaseActivity {
         BackgroundManager.setBackgroundImage(this, BackgroundType.MAIN_MENU, findViewById(R.id.background_view));
     }
 
-    private void launchGame(MinecraftProfile prof) {
-        String normalizedVersionId = AsyncMinecraftDownloader.normalizeVersionId(prof.lastVersionId);
-        JMinecraftVersionList.Version mcVersion = AsyncMinecraftDownloader.getListedVersion(normalizedVersionId);
-        new MinecraftDownloader().start(
-                mcVersion,
-                normalizedVersionId,
-                new ContextAwareDoneListener(this, normalizedVersionId)
-        );
-    }
-
     @SuppressWarnings("SameParameterValue")
     private Fragment getVisibleFragment(String tag) {
         return checkFragmentAvailability(getSupportFragmentManager().findFragmentByTag(tag));
@@ -524,6 +572,10 @@ public class LauncherActivity extends BaseActivity {
 
     private Fragment getVisibleFragment(int id) {
         return checkFragmentAvailability(getSupportFragmentManager().findFragmentById(id));
+    }
+
+    private Fragment getCurrentFragment() {
+        return getVisibleFragment(binding.containerFragment.getId());
     }
 
     private Fragment checkFragmentAvailability(Fragment fragment) {
@@ -534,7 +586,7 @@ public class LauncherActivity extends BaseActivity {
     }
 
     private void checkNotificationPermission() {
-        if (AllSettings.getSkipNotificationPermissionCheck() || ZHTools.checkForNotificationPermission()) {
+        if (AllSettings.getSkipNotificationPermissionCheck().getValue() || ZHTools.checkForNotificationPermission()) {
             return;
         }
 
@@ -548,14 +600,14 @@ public class LauncherActivity extends BaseActivity {
     private void showNotificationPermissionReasoning() {
         new TipDialog.Builder(this)
                 .setTitle(R.string.notification_permission_dialog_title)
-                .setMessage(R.string.notification_permission_dialog_text)
-                .setConfirmClickListener(() -> askForNotificationPermission(null))
+                .setMessage(getString(R.string.notification_permission_dialog_text, InfoCenter.APP_NAME, InfoCenter.APP_NAME))
+                .setConfirmClickListener(checked -> askForNotificationPermission(null))
                 .setCancelClickListener(this::handleNoNotificationPermission)
-                .buildDialog();
+                .showDialog();
     }
 
     private void handleNoNotificationPermission() {
-        Settings.Manager.put("skipNotificationPermissionCheck", true).save();
+        AllSettings.getSkipNotificationPermissionCheck().put(true).save();
         Toast.makeText(this, R.string.notification_permission_toast, Toast.LENGTH_LONG).show();
     }
 
@@ -567,8 +619,8 @@ public class LauncherActivity extends BaseActivity {
         mRequestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
     }
 
-    private void setPageOpacity() {
-        float v = (float) AllSettings.getPageOpacity() / 100;
+    private void setPageOpacity(int pageOpacity) {
+        float v = (float) pageOpacity / 100;
         if (binding.containerFragment.getAlpha() != v) binding.containerFragment.setAlpha(v);
     }
 }

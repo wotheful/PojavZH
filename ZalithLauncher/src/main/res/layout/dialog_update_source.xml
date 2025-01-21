@@ -4,7 +4,7 @@
     android:id="@+id/parent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minWidth="@dimen/_450sdp"
+    android:minWidth="@dimen/dialog_min_width"
     android:orientation="vertical"
     android:padding="@dimen/_8sdp">
 
@@ -14,7 +14,7 @@
         android:layout_gravity="center"
         android:singleLine="true"
         android:text="@string/update_update_source"
-        android:textSize="16sp"
+        android:textSize="@dimen/_14ssp"
         android:textStyle="bold" />
 
     <androidx.appcompat.widget.LinearLayoutCompat
@@ -29,6 +29,7 @@
             android:id="@+id/github_release"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/_2sdp"
             android:layout_weight="1"
             android:text="Github Release"
             android:textAllCaps="false"
@@ -38,7 +39,7 @@
             android:id="@+id/ghproxy"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginStart="@dimen/_2sdp"
             android:layout_weight="1"
             android:textAllCaps="false"
             android:text="@string/update_update_source_ghproxy" />

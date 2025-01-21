@@ -3,23 +3,18 @@ package com.movtery.zalithlauncher.feature.customprofilepath
 class ProfilePathHome {
     companion object {
         @JvmStatic
-        val gameHome: String
-            get() = ProfilePathManager.currentPath + "/.minecraft"
+        fun getGameHome(): String = "${ProfilePathManager.getCurrentPath()}/.minecraft"
 
         @JvmStatic
-        val versionsHome: String
-            get() = "$gameHome/versions"
+        fun getVersionsHome(): String = "${getGameHome()}/versions"
 
         @JvmStatic
-        val librariesHome: String
-            get() = "$gameHome/libraries"
+        fun getLibrariesHome(): String = "${getGameHome()}/libraries"
 
         @JvmStatic
-        val assetsHome: String
-            get() = "$gameHome/assets"
+        fun getAssetsHome(): String = "${getGameHome()}/assets"
 
         @JvmStatic
-        val resourcesHome: String
-            get() = "$gameHome/resources"
+        fun getResourcesHome(): String = "${getGameHome()}/resources"
     }
 }

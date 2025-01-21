@@ -1,13 +1,11 @@
 package com.movtery.zalithlauncher.feature
 
-import android.content.Context
-import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.feature.log.Logging
 import com.movtery.zalithlauncher.ui.subassembly.about.SponsorItemBean
 import com.movtery.zalithlauncher.ui.subassembly.about.SponsorMeta
-import com.movtery.zalithlauncher.utils.PathAndUrlManager
 import com.movtery.zalithlauncher.utils.http.CallUtils
 import com.movtery.zalithlauncher.utils.http.CallUtils.CallbackListener
+import com.movtery.zalithlauncher.utils.path.UrlManager
 import com.movtery.zalithlauncher.utils.stringutils.StringUtils
 import net.kdt.pojavlaunch.Tools
 import okhttp3.Call
@@ -27,7 +25,7 @@ class CheckSponsor {
         }
 
         @JvmStatic
-        fun check(context: Context, listener: CheckListener) {
+        fun check(listener: CheckListener) {
             if (isChecking) {
                 listener.onFailure()
                 return
@@ -40,7 +38,6 @@ class CheckSponsor {
                 return
             }
 
-            val token = context.getString(R.string.private_api_token)
             CallUtils(object : CallbackListener {
                 override fun onFailure(call: Call?) {
                     listener.onFailure()
@@ -79,13 +76,13 @@ class CheckSponsor {
                             }
                             listener.onSuccessful(sponsorData)
                         }.getOrElse { e ->
-                            Logging.e("Load Sponsor Data", e.toString())
+                            Logging.e("Load Sponsor Data", "Failed to resolve sponsor list.", e)
                             listener.onFailure()
                         }
                     }
                     isChecking = false
                 }
-            }, PathAndUrlManager.URL_GITHUB_HOME + "sponsor.json", if (token == "DUMMY") null else token).enqueue()
+            }, "${UrlManager.URL_GITHUB_HOME}launcher_sponsor.json", null).enqueue()
         }
     }
 

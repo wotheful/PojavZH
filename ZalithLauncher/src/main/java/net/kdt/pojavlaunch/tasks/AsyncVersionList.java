@@ -9,12 +9,12 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
 import com.movtery.zalithlauncher.feature.log.Logging;
 import com.movtery.zalithlauncher.task.Task;
-import com.movtery.zalithlauncher.utils.PathAndUrlManager;
+import com.movtery.zalithlauncher.utils.path.PathManager;
 import com.movtery.zalithlauncher.utils.ZHTools;
+import com.movtery.zalithlauncher.utils.path.UrlManager;
 
 import net.kdt.pojavlaunch.JMinecraftVersionList;
 import net.kdt.pojavlaunch.Tools;
-import net.kdt.pojavlaunch.prefs.LauncherPreferences;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -27,11 +27,11 @@ public class AsyncVersionList {
 
     public void getVersionList(@Nullable VersionDoneListener listener, boolean secondPass){
         Task.runTask(() -> {
-            File versionFile = new File(PathAndUrlManager.FILE_VERSION_LIST);
+            File versionFile = new File(PathManager.FILE_VERSION_LIST);
             JMinecraftVersionList versionList = null;
             try {
                 if (!versionFile.exists() || (ZHTools.getCurrentTimeMillis() > versionFile.lastModified() + 86400000)) {
-                    versionList = downloadVersionList(LauncherPreferences.PREF_VERSION_REPOS);
+                    versionList = downloadVersionList(UrlManager.URL_MINECRAFT_VERSION_REPOS);
                 }
             } catch (Exception e) {
                 Logging.e("AsyncVersionList", "Refreshing version list failed :" + e);
@@ -58,24 +58,21 @@ public class AsyncVersionList {
 
 
     @SuppressWarnings("SameParameterValue")
-    private JMinecraftVersionList downloadVersionList(String mirror){
+    private JMinecraftVersionList downloadVersionList(String mirror) {
         JMinecraftVersionList list = null;
-        try{
+        try {
             Logging.i("ExtVL", "Syncing to external: " + mirror);
             String jsonString = downloadString(mirror);
             list = Tools.GLOBAL_GSON.fromJson(jsonString, JMinecraftVersionList.class);
-            Logging.i("ExtVL","Downloaded the version list, len=" + list.versions.length);
+            Logging.i("ExtVL", "Downloaded the version list, len=" + list.versions.length);
 
             // Then save the version list
             //TODO make it not save at times ?
-            FileOutputStream fos = new FileOutputStream(PathAndUrlManager.FILE_VERSION_LIST);
+            FileOutputStream fos = new FileOutputStream(PathManager.FILE_VERSION_LIST);
             fos.write(jsonString.getBytes());
             fos.close();
-
-
-
-        }catch (IOException e){
-            Logging.e("AsyncVersionList", e.toString());
+        } catch (IOException e) {
+            Logging.e("AsyncVersionList", Tools.printToString(e));
         }
         return list;
     }

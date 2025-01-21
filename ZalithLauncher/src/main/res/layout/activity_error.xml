@@ -18,9 +18,8 @@
             android:id="@+id/error_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/error_fatal"
             android:textColor="@color/menu_bar_text"
-            android:textSize="16sp"
+            android:textSize="@dimen/_16ssp"
             android:textStyle="bold"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -57,7 +56,7 @@
                 <TextView
                     android:id="@+id/error_text"
                     android:text="Error"
-                    android:textSize="12sp"
+                    android:textSize="@dimen/_12ssp"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textColor="@color/black_or_white"
@@ -69,7 +68,7 @@
                 <TextView
                     android:id="@+id/error_tip"
                     android:text="@string/game_exit_note"
-                    android:textSize="12sp"
+                    android:textSize="@dimen/_12ssp"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_8sdp"
@@ -82,7 +81,7 @@
                 <TextView
                     android:id="@+id/error_no_screenshot"
                     android:text="@string/game_exit_no_screenshot"
-                    android:textSize="12sp"
+                    android:textSize="@dimen/_12ssp"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_8sdp"
@@ -101,9 +100,9 @@
 
     <View
         android:id="@+id/shadowView"
-        android:layout_width="4dp"
+        android:layout_width="@dimen/_4sdp"
         android:layout_height="0dp"
-        android:layout_marginStart="-4dp"
+        android:layout_marginStart="@dimen/_minus4sdp"
         android:background="@drawable/shadow_gradient_right"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/constraintLayout"
@@ -120,55 +119,13 @@
         app:layout_constraintStart_toEndOf="@+id/constraintLayout"
         app:layout_constraintTop_toBottomOf="@+id/top_view">
 
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/crash_buttons"
+        <com.movtery.zalithlauncher.ui.view.AnimButton
+            android:id="@+id/share_log"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toTopOf="@+id/error_restart"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
-
-            <com.movtery.zalithlauncher.ui.view.AnimButton
-                android:id="@+id/crash_share_log"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/_8sdp"
-                android:text="@string/main_share_logs"/>
-
-            <com.movtery.zalithlauncher.ui.view.AnimButton
-                android:id="@+id/crash_share_crash_report"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/_8sdp"
-                android:text="@string/main_share_crash_report"/>
-
-        </androidx.appcompat.widget.LinearLayoutCompat>
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/error_buttons"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toTopOf="@+id/error_restart"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
-
-            <com.movtery.zalithlauncher.ui.view.AnimButton
-                android:id="@+id/error_share"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/_8sdp"
-                android:text="@string/generic_share"/>
-
-            <com.movtery.zalithlauncher.ui.view.AnimButton
-                android:id="@+id/error_copy"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/_8sdp"
-                android:text="@android:string/copy"/>
-
-        </androidx.appcompat.widget.LinearLayoutCompat>
+            android:layout_marginHorizontal="@dimen/_8sdp"
+            android:text="@string/main_share_logs"
+            app:layout_constraintBottom_toTopOf="@id/error_restart"/>
 
         <com.movtery.zalithlauncher.ui.view.AnimButton
             android:id="@+id/error_restart"
@@ -192,7 +149,7 @@
     <View
         android:id="@+id/shadowView2"
         android:layout_width="0dp"
-        android:layout_height="4dp"
+        android:layout_height="@dimen/_4sdp"
         android:background="@drawable/shadow_gradient_down"
         app:layout_constraintEnd_toEndOf="@+id/top_view"
         app:layout_constraintStart_toStartOf="@+id/top_view"

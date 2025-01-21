@@ -1,6 +1,7 @@
 package net.kdt.pojavlaunch.customcontrols.mouse;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.AttributeSet;
@@ -17,9 +18,11 @@ import com.movtery.zalithlauncher.event.single.MCOptionChangeEvent;
 import com.movtery.zalithlauncher.event.single.RefreshHotbarEvent;
 import com.movtery.zalithlauncher.event.value.HotbarChangeEvent;
 import com.movtery.zalithlauncher.setting.AllSettings;
+import com.movtery.zalithlauncher.setting.AllStaticSettings;
 import com.movtery.zalithlauncher.ui.subassembly.hotbar.HotbarType;
 import com.movtery.zalithlauncher.ui.subassembly.hotbar.HotbarUtils;
 
+import net.kdt.pojavlaunch.GrabListener;
 import net.kdt.pojavlaunch.LwjglGlfwKeycode;
 import net.kdt.pojavlaunch.Tools;
 import net.kdt.pojavlaunch.utils.MCOptionUtils;
@@ -37,9 +40,16 @@ public class HotbarView extends View implements View.OnLayoutChangeListener, Run
             LwjglGlfwKeycode.GLFW_KEY_4, LwjglGlfwKeycode.GLFW_KEY_5,   LwjglGlfwKeycode.GLFW_KEY_6,
             LwjglGlfwKeycode.GLFW_KEY_7, LwjglGlfwKeycode.GLFW_KEY_8, LwjglGlfwKeycode.GLFW_KEY_9};
     private final DropGesture mDropGesture = new DropGesture(new Handler(Looper.getMainLooper()));
-    private float mScaleFactor = AllSettings.getResolutionRatio() / 100f;
+    private final GrabListener mGrabListener = new GrabListener() {
+        @Override
+        public void onGrabState(boolean isGrabbing) {
+            mLastIndex = -1;
+            mDropGesture.cancel();
+        }
+    };
+
     private int mWidth;
-    private int mLastIndex;
+    private int mLastIndex = -1;
     private int mGuiScale;
 
     //调整判定框宽高时，用这个动画播放器播放一个淡化动画，来给用户一个当前判定框范围的反馈
@@ -66,11 +76,9 @@ public class HotbarView extends View implements View.OnLayoutChangeListener, Run
         init();
     }
 
-    public void refreshScaleFactor(float scaleFactor) {
-        this.mScaleFactor = scaleFactor;
-    }
-
     private void init() {
+        setAlpha(0);
+        setBackgroundColor(Color.parseColor("#80E64242"));
         adjustAnimPlayer.duration(800);
         adjustAnimPlayer.apply(new AnimPlayer.Entry(this, Animations.FadeOut));
     }
@@ -86,11 +94,13 @@ public class HotbarView extends View implements View.OnLayoutChangeListener, Run
             mParentView.addOnLayoutChangeListener(this);
         }
         adaptiveReset();
+        CallbackBridge.addGrabListener(mGrabListener);
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        CallbackBridge.removeGrabListener(mGrabListener);
         EventBus.getDefault().unregister(this);
     }
 
@@ -171,7 +181,7 @@ public class HotbarView extends View implements View.OnLayoutChangeListener, Run
         // Check if the slot changed and we need to make a key press
         if(hotbarIndex == mLastIndex) {
             // Only check for doubletapping if the slot has not changed
-            if(hasDoubleTapped && !AllSettings.getDisableDoubleTap()) CallbackBridge.sendKeyPress(LwjglGlfwKeycode.GLFW_KEY_F);
+            if (hasDoubleTapped && !AllStaticSettings.disableDoubleTap) CallbackBridge.sendKeyPress(LwjglGlfwKeycode.GLFW_KEY_F);
             return true;
         }
         mLastIndex = hotbarIndex;
@@ -189,7 +199,7 @@ public class HotbarView extends View implements View.OnLayoutChangeListener, Run
     }
 
     private int mcScale(int input) {
-        return (int)((mGuiScale * input)/ mScaleFactor);
+        return (int)((mGuiScale * input)/ AllStaticSettings.scaleFactor);
     }
 
     @Override
@@ -200,7 +210,7 @@ public class HotbarView extends View implements View.OnLayoutChangeListener, Run
         if (hotbarType == HotbarType.AUTO) {
             adaptiveReset();
         } else {
-            manualReset(AllSettings.getHotbarWidth(), AllSettings.getHotbarHeight(), false);
+            manualReset(AllSettings.getHotbarWidth().getValue().getValue(), AllSettings.getHotbarHeight().getValue().getValue(), false);
         }
     }
 

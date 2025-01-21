@@ -4,22 +4,21 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.text.InputType
 import android.view.View
-import android.widget.EditText
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
+import androidx.preference.SeekBarPreference
 import android.widget.TextView
 import android.os.Build
 import androidx.core.content.ContextCompat
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.feature.log.Logging.e
-import com.movtery.zalithlauncher.setting.Settings
+import com.movtery.zalithlauncher.setting.unit.IntSettingUnit
 import com.movtery.zalithlauncher.ui.dialog.EditTextDialog
 
 @SuppressLint("UseSwitchCompatOrMaterialCode", "StringFormatInvalid")
 class SeekBarSettingsWrapper(
     val context: Context,
-    val key: String,
-    val value: Int,
+    val unit: IntSettingUnit,
     val mainView: View,
     val titleView: TextView,
     val summaryView: TextView,
@@ -32,8 +31,7 @@ class SeekBarSettingsWrapper(
 
     constructor(
         context: Context,
-        key: String,
-        value: Int,
+        unit: IntSettingUnit,
         mainView: View,
         titleView: TextView,
         summaryView: TextView,
@@ -42,8 +40,7 @@ class SeekBarSettingsWrapper(
         suffix: String,
     ) : this(
         context,
-        key,
-        value,
+        unit,
         mainView,
         titleView,
         summaryView,
@@ -56,74 +53,67 @@ class SeekBarSettingsWrapper(
     init {
         onStartListener?.onStart(this)
 
-        seekbarView.progress = value
+        seekbarView.progress = unit.getValue()
         valueView.background = ContextCompat.getDrawable(context, R.drawable.background_text)
         setSeekBarValueTextView()
 
         seekbarView.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+            fun updateSeekbarValue(saveValue: Boolean) {
+                val progress = seekbarView.progress
+
                 listener?.onChange(progress)
-                Settings.Manager.put(key, progress).save()
+                if (saveValue) unit.put(progress).save()
                 setSeekBarValueTextView()
                 checkShowRebootDialog(context)
+            }
+
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                updateSeekbarValue(!fromUser)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                setSeekBarValueTextView()
+                updateSeekbarValue(true)
             }
         })
 
         mainView.setOnClickListener {
-            val builder = EditTextDialog.Builder(context)
+            EditTextDialog.Builder(context)
                 .setEditText(seekbarView.progress.toString())
                 .setInputType(InputType.TYPE_CLASS_NUMBER)
                 .setTitle(titleView.text.toString())
                 .setMessage(summaryView.text.toString())
-            builder.setConfirmListener { editBox: EditText ->
-                val string = editBox.text.toString()
+                .setAsRequired()
+                .setConfirmListener { editBox, _ ->
+                    val string = editBox.text.toString()
 
-                if (string.isEmpty()) {
-                    editBox.error = context.getString(R.string.generic_error_field_empty)
-                    return@setConfirmListener false
-                }
+                    val value: Int
+                    try {
+                        value = string.toInt()
+                    } catch (e: NumberFormatException) {
+                        e("SeekBarSettingsWrapper", "The data is illegal", e)
 
-                val value: Int
-                try {
-                    value = string.toInt()
-                } catch (e: NumberFormatException) {
-                    e("Custom Seek Bar", e.toString())
+                        editBox.error = context.getString(R.string.generic_input_invalid)
+                        return@setConfirmListener false
+                    }
 
-                    editBox.error = context.getString(R.string.generic_input_invalid)
-                    return@setConfirmListener false
-                }
+                    if (value > seekbarView.max) {
+                        val maxValue =
+                            String.format("%s %s", seekbarView.max, suffix)
+                        editBox.error = context.getString(R.string.generic_input_too_big, maxValue)
+                        return@setConfirmListener false
+                    }
 
-                if(Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
-                  if (value < seekbarView.min) {
-                    val minValue =
-                        String.format("%s %s", seekbarView.min, suffix)
-                    editBox.error = context.getString(R.string.generic_input_too_small, minValue)
-                    return@setConfirmListener false
-                  }
-                }
-                  
-                if (value > seekbarView.max) {
-                    val maxValue =
-                        String.format("%s %s", seekbarView.max, suffix)
-                    editBox.error = context.getString(R.string.generic_input_too_big, maxValue)
-                    return@setConfirmListener false
-                }
-
-                seekbarView.progress = value
-                true
-            }.buildDialog()
+                    seekbarView.progress = value
+                    true
+                }.showDialog()
         }
     }
 
     fun setSeekBarValueTextView() {
-        val text = "${seekbarView.progress} $suffix"
+        val text = "${seekbarView.progress} $suffix".trim()
         valueView.text = text
     }
 

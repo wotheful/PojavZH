@@ -16,10 +16,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.movtery.zalithlauncher.R;
 import com.movtery.zalithlauncher.setting.AllSettings;
-import com.movtery.zalithlauncher.setting.Settings;
 import com.movtery.zalithlauncher.task.Task;
 import com.movtery.zalithlauncher.ui.dialog.SelectRuntimeDialog;
 import com.movtery.zalithlauncher.ui.dialog.TipDialog;
+import com.movtery.zalithlauncher.utils.runtime.RuntimeSelectedListener;
 
 import net.kdt.pojavlaunch.Architecture;
 import net.kdt.pojavlaunch.Tools;
@@ -29,7 +29,8 @@ import java.util.Objects;
 
 public class RTRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final List<Runtime> mData;
-    private SelectRuntimeDialog.RuntimeSelectedListener mSelectedListener;
+    private RuntimeSelectedListener mSelectedListener;
+    private SelectRuntimeDialog mDialog;
     private final int TYPE_MODE_SELECT = 0;
     private final int TYPE_MODE_EDIT = 1;
     private int mType = TYPE_MODE_EDIT;
@@ -39,10 +40,11 @@ public class RTRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         this.mData = mData;
     }
 
-    public RTRecyclerViewAdapter(List<Runtime> mData, SelectRuntimeDialog.RuntimeSelectedListener listener) {
+    public RTRecyclerViewAdapter(List<Runtime> mData, RuntimeSelectedListener listener, SelectRuntimeDialog dialog) {
         this.mData = mData;
         this.mType = TYPE_MODE_SELECT;
         this.mSelectedListener = listener;
+        this.mDialog = dialog;
     }
 
     @NonNull
@@ -77,7 +79,7 @@ public class RTRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     }
 
     public boolean isDefaultRuntime(Runtime rt) {
-        return Objects.equals(AllSettings.getDefaultRuntime(), rt.name);
+        return Objects.equals(AllSettings.getDefaultRuntime().getValue(), rt.name);
     }
 
     @Override
@@ -86,8 +88,8 @@ public class RTRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     }
 
     @SuppressLint("NotifyDataSetChanged") //not a problem, given the typical size of the list
-    public void setDefault(Runtime rt){
-        Settings.Manager.put("defaultRuntime", rt.name).save();
+    public void setDefault(Runtime rt) {
+        AllSettings.getDefaultRuntime().put(rt.name).save();
         notifyDataSetChanged();
     }
 
@@ -126,7 +128,7 @@ public class RTRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                     mJavaVersionTextView.setText(getJavaVersionName(runtime));
                     mFullJavaVersionTextView.setText(runtime.versionString);
 
-                    mainView.setOnClickListener(v -> mSelectedListener.onSelected(runtime.name));
+                    mainView.setOnClickListener(v -> selectRuntime(runtime.name));
                     return;
                 }
 
@@ -141,8 +143,13 @@ public class RTRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                 //自动选择
                 mJavaVersionTextView.setText(R.string.install_auto_select);
                 mFullJavaVersionTextView.setVisibility(View.GONE);
-                mainView.setOnClickListener(v -> mSelectedListener.onSelected(null));
+                mainView.setOnClickListener(v -> selectRuntime(null));
             }
+        }
+
+        private void selectRuntime(String jreName) {
+            if (mSelectedListener != null) mSelectedListener.onSelected(jreName);
+            if (mDialog != null) mDialog.dismiss();
         }
     }
 
@@ -185,8 +192,9 @@ public class RTRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                     new TipDialog.Builder(mContext)
                             .setTitle(R.string.generic_warning)
                             .setMessage(R.string.multirt_config_removeerror_last)
+                            .setWarning()
                             .setShowCancel(false)
-                            .buildDialog();
+                            .showDialog();
                     return;
                 }
 

@@ -10,18 +10,19 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonParser
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.feature.log.Logging.e
+import com.movtery.zalithlauncher.utils.path.PathManager
 import net.kdt.pojavlaunch.Tools
 import java.io.FileWriter
 
 class NewbieGuideUtils {
     @SuppressLint("NonConstantResourceId")
     companion object {
-        private val TEXT_COLOR = R.color.black_or_white
-        private val TARGET_CIRCLE_COLOR = R.color.background_menu_element
+        private const val TEXT_COLOR = R.color.black_or_white
+        private const val TARGET_CIRCLE_COLOR = R.color.background_menu_element
         private val NEWBIE_TAGS: MutableList<String> = ArrayList()
 
         init {
-            PathAndUrlManager.FILE_NEWBIE_GUIDE.apply {
+            PathManager.FILE_NEWBIE_GUIDE.apply {
                 runCatching {
                     if (!exists()) createNewFile()
 
@@ -38,6 +39,7 @@ class NewbieGuideUtils {
             }
         }
 
+        @JvmStatic
         fun showOnlyOne(tag: String): Boolean {
             println(tag)
             if (!NEWBIE_TAGS.contains(tag)) {
@@ -55,13 +57,14 @@ class NewbieGuideUtils {
                 jsonArray.add(tag)
             }
             runCatching {
-                FileWriter(PathAndUrlManager.FILE_NEWBIE_GUIDE).use { fileWriter ->
+                FileWriter(PathManager.FILE_NEWBIE_GUIDE).use { fileWriter ->
                     println(jsonArray)
                     Gson().toJson(jsonArray, fileWriter)
                 }
             }.getOrElse { e -> e("Write Newbie Guide Tags", Tools.printToString(e)) }
         }
 
+        @JvmStatic
         fun getSimpleTarget(context: Context, view: View?, title: String, desc: String): TapTarget {
             return TapTarget.forView(view, title, desc)
                 .titleTextColor(TEXT_COLOR)
@@ -69,7 +72,7 @@ class NewbieGuideUtils {
                 .targetCircleColorInt(ContextCompat.getColor(context, TARGET_CIRCLE_COLOR))
         }
 
-        @SuppressLint("ResourceType")
+        @JvmStatic
         fun getSimpleTarget(context: Context, view: View?, title: String): TapTarget {
             return TapTarget.forView(view, title)
                 .titleTextColor(TEXT_COLOR)

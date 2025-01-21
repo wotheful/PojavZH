@@ -2,13 +2,11 @@ package com.movtery.zalithlauncher.feature.accounts
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.widget.Button
-import android.widget.CheckBox
 import com.movtery.zalithlauncher.R
-import com.movtery.zalithlauncher.setting.Settings
+import com.movtery.zalithlauncher.setting.AllSettings
 import com.movtery.zalithlauncher.ui.dialog.TipDialog
-import com.movtery.zalithlauncher.utils.PathAndUrlManager
-import net.kdt.pojavlaunch.Tools
+import com.movtery.zalithlauncher.utils.ZHTools
+import com.movtery.zalithlauncher.utils.path.UrlManager
 
 class LocalAccountUtils {
     companion object {
@@ -22,6 +20,11 @@ class LocalAccountUtils {
         }
 
         @JvmStatic
+        fun saveReminders(checked: Boolean) {
+            AllSettings.localAccountReminders.put(!checked).save()
+        }
+
+        @JvmStatic
         @SuppressLint("InflateParams")
         fun openDialog(
             activity: Activity,
@@ -29,22 +32,17 @@ class LocalAccountUtils {
             message: String?,
             confirm: Int
         ) {
-            //不再提醒
-            val checkBox = CheckBox(activity)
-            checkBox.setText(R.string.generic_no_more_reminders)
-            checkBox.setOnCheckedChangeListener { _: Button?, isChecked: Boolean ->
-                Settings.Manager.put("localAccountReminders", !isChecked).save()
-            }
-
             TipDialog.Builder(activity)
                 .setTitle(R.string.generic_warning)
                 .setMessage(message)
-                .addView(checkBox)
+                .setWarning()
+                .setShowCheckBox(true)
+                .setCheckBox(R.string.generic_no_more_reminders)
                 .setConfirmClickListener(confirmClickListener)
                 .setConfirm(confirm)
-                .setCancelClickListener { Tools.openURL(activity, PathAndUrlManager.URL_MINECRAFT) }
+                .setCancelClickListener { ZHTools.openLink(activity, UrlManager.URL_MINECRAFT) }
                 .setCancel(R.string.account_purchase_minecraft_account)
-                .buildDialog()
+                .showDialog()
         }
     }
 

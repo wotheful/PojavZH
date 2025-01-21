@@ -2,24 +2,95 @@ package com.movtery.zalithlauncher.ui.fragment.settings
 
 import android.content.res.Configuration
 import android.content.res.Resources
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
+import com.movtery.anim.AnimPlayer
+import com.movtery.anim.animations.Animations
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.databinding.SettingsFragmentVideoBinding
+import com.movtery.zalithlauncher.feature.log.Logging
+import com.movtery.zalithlauncher.plugins.driver.DriverPluginManager
+import com.movtery.zalithlauncher.plugins.renderer.RendererPluginManager
 import com.movtery.zalithlauncher.setting.AllSettings
+import com.movtery.zalithlauncher.setting.AllStaticSettings
+import com.movtery.zalithlauncher.task.Task
+import com.movtery.zalithlauncher.task.TaskExecutors
+import com.movtery.zalithlauncher.ui.dialog.LocalRendererPluginDialog
 import com.movtery.zalithlauncher.ui.dialog.TipDialog
+import com.movtery.zalithlauncher.ui.fragment.settings.wrapper.BaseSettingsWrapper
 import com.movtery.zalithlauncher.ui.fragment.settings.wrapper.ListSettingsWrapper
 import com.movtery.zalithlauncher.ui.fragment.settings.wrapper.SeekBarSettingsWrapper
 import com.movtery.zalithlauncher.ui.fragment.settings.wrapper.SwitchSettingsWrapper
 import com.movtery.zalithlauncher.utils.ZHTools
+import com.movtery.zalithlauncher.utils.file.FileTools
+import com.movtery.zalithlauncher.utils.path.PathManager
+import com.movtery.zalithlauncher.utils.path.UrlManager
 import net.kdt.pojavlaunch.Tools
-import net.kdt.pojavlaunch.prefs.LauncherPreferences
+import net.kdt.pojavlaunch.contracts.OpenDocumentWithExtension
+import org.apache.commons.io.FileUtils
+import java.io.File
 
-class VideoSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragment_video) {
+class VideoSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragment_video, SettingCategory.VIDEO) {
     private lateinit var binding: SettingsFragmentVideoBinding
+    private lateinit var openDocumentLauncher: ActivityResultLauncher<Any>
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        openDocumentLauncher = registerForActivityResult(OpenDocumentWithExtension("zip", true)) { uris: List<Uri>? ->
+            uris?.let { uriList ->
+                val dialog = ZHTools.showTaskRunningDialog(requireActivity())
+                Task.runTask {
+                    val pluginFiles = mutableListOf<File>()
+                    uriList.forEach { uri ->
+                        val file = FileTools.copyFileInBackground(requireActivity(), uri, PathManager.DIR_CACHE.absolutePath)
+                        println(file.absolutePath)
+                        pluginFiles.add(file)
+                    }
+                    pluginFiles.takeIf { it.isNotEmpty() }
+                }.beforeStart(TaskExecutors.getAndroidUI()) {
+                    dialog.show()
+                }.ended { pluginFiles ->
+                    pluginFiles?.let { files ->
+                        var requiresRestart = false
+                        files.forEach { pluginFile ->
+                            val info = if (RendererPluginManager.importLocalRendererPlugin(pluginFile)) {
+                                requiresRestart = true
+                                "The renderer plugin has been successfully imported!"
+                            } else {
+                                "The renderer plugin import failed!"
+                            }
+                            Logging.i("VideoSettings", info)
+                            FileUtils.deleteQuietly(pluginFile)
+                        }
+                        TaskExecutors.runInUIThread {
+                            if (requiresRestart) {
+                                TipDialog.Builder(requireActivity())
+                                    .setTitle(R.string.generic_warning)
+                                    .setMessage(R.string.setting_renderer_local_import_restart)
+                                    .setConfirmClickListener { ZHTools.killProcess() }
+                                    .showDialog()
+
+                            } else {
+                                TipDialog.Builder(requireActivity())
+                                    .setTitle(R.string.generic_tip)
+                                    .setMessage(R.string.setting_renderer_local_import_failed)
+                                    .showDialog()
+                            }
+                        }
+                    }
+                }.onThrowable { e ->
+                    Tools.showErrorRemote(e)
+                }.finallyTask(TaskExecutors.getAndroidUI()) {
+                    dialog.dismiss()
+                }.execute()
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,13 +102,12 @@ class VideoSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragmen
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val context = requireContext()
+        val context = requireActivity()
 
         val renderers = Tools.getCompatibleRenderers(context)
         ListSettingsWrapper(
             context,
-            "renderer",
-            "opengles2",
+            AllSettings.renderer,
             binding.rendererLayout,
             binding.rendererTitle,
             binding.rendererValue,
@@ -45,19 +115,45 @@ class VideoSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragmen
             renderers.rendererIds.toTypedArray()
         )
 
+        binding.rendererDownload.setOnClickListener { ZHTools.openLink(context, UrlManager.URL_FCL_RENDERER_PLUGIN) }
+
+        BaseSettingsWrapper(
+            context,
+            binding.rendererLocalImportLayout
+        ) {
+            openDocumentLauncher.launch("zip")
+        }
+
+        binding.rendererLocalImportManage.setOnClickListener {
+            if (RendererPluginManager.getAllLocalRendererList().isNotEmpty()) {
+                LocalRendererPluginDialog(requireActivity()).show()
+            }
+        }
+
+        val driverNames = DriverPluginManager.getDriverNameList().toTypedArray()
+        ListSettingsWrapper(
+            context,
+            AllSettings.driver,
+            binding.driverLayout,
+            binding.driverTitle,
+            binding.driverValue,
+            driverNames,
+            driverNames
+        )
+
+        binding.driverDownload.setOnClickListener { ZHTools.openLink(context, UrlManager.URL_FCL_DRIVER_PLUGIN) }
+
         val ignoreNotch = SwitchSettingsWrapper(
             context,
-            "ignoreNotch",
             AllSettings.ignoreNotch,
             binding.ignoreNotchLayout,
             binding.ignoreNotch
         )
-        if (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && LauncherPreferences.PREF_NOTCH_SIZE > 0))
+        if (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && AllStaticSettings.notchSize > 0))
             ignoreNotch.setGone()
 
         SeekBarSettingsWrapper(
             context,
-            "resolutionRatio",
             AllSettings.resolutionRatio,
             binding.resolutionRatioLayout,
             binding.resolutionRatioTitle,
@@ -71,7 +167,6 @@ class VideoSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragmen
 
         SwitchSettingsWrapper(
             context,
-            "sustainedPerformance",
             AllSettings.sustainedPerformance,
             binding.sustainedPerformanceLayout,
             binding.sustainedPerformance
@@ -79,7 +174,6 @@ class VideoSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragmen
 
         SwitchSettingsWrapper(
             context,
-            "alternate_surface",
             AllSettings.alternateSurface,
             binding.alternateSurfaceLayout,
             binding.alternateSurface
@@ -87,7 +181,6 @@ class VideoSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragmen
 
         SwitchSettingsWrapper(
             context,
-            "force_vsync",
             AllSettings.forceVsync,
             binding.forceVsyncLayout,
             binding.forceVsync
@@ -95,7 +188,6 @@ class VideoSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragmen
 
         SwitchSettingsWrapper(
             context,
-            "vsync_in_zink",
             AllSettings.vsyncInZink,
             binding.vsyncInZinkLayout,
             binding.vsyncInZink
@@ -103,7 +195,6 @@ class VideoSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragmen
 
         val zinkPreferSystemDriver = SwitchSettingsWrapper(
             context,
-            "zinkPreferSystemDriver",
             AllSettings.zinkPreferSystemDriver,
             binding.zinkPreferSystemDriverLayout,
             binding.zinkPreferSystemDriver
@@ -116,17 +207,18 @@ class VideoSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragmen
                     TipDialog.Builder(requireActivity())
                         .setTitle(R.string.generic_warning)
                         .setMessage(R.string.setting_zink_driver_adreno)
+                        .setWarning()
                         .setCancelable(false)
                         .setConfirmClickListener { listener.onSave() }
                         .setCancelClickListener { buttonView.isChecked = false }
-                        .buildDialog()
+                        .showDialog()
                 } else {
                     listener.onSave()
                 }
             }
         }
 
-        changeResolutionRatioPreview(AllSettings.resolutionRatio)
+        changeResolutionRatioPreview(AllSettings.resolutionRatio.getValue())
         computeVisibility()
     }
 
@@ -141,8 +233,12 @@ class VideoSettingsFragment : AbstractSettingsFragment(R.layout.settings_fragmen
 
     private fun computeVisibility() {
         binding.apply {
-            binding.forceVsyncLayout.visibility = if (AllSettings.alternateSurface) View.VISIBLE else View.GONE
+            binding.forceVsyncLayout.visibility = if (AllSettings.alternateSurface.getValue()) View.VISIBLE else View.GONE
         }
+    }
+
+    override fun slideIn(animPlayer: AnimPlayer) {
+        animPlayer.apply(AnimPlayer.Entry(binding.root, Animations.BounceInDown))
     }
 
     companion object {

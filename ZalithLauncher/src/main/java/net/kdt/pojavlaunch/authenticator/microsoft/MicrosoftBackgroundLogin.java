@@ -1,5 +1,6 @@
 package net.kdt.pojavlaunch.authenticator.microsoft;
 
+import android.content.Context;
 import android.util.ArrayMap;
 
 import androidx.annotation.NonNull;
@@ -7,16 +8,15 @@ import androidx.annotation.Nullable;
 
 import com.kdt.mcgui.ProgressLayout;
 import com.movtery.zalithlauncher.R;
+import com.movtery.zalithlauncher.feature.accounts.AccountType;
 import com.movtery.zalithlauncher.feature.log.Logging;
 import com.movtery.zalithlauncher.task.Task;
 import com.movtery.zalithlauncher.task.TaskExecutors;
-import com.movtery.zalithlauncher.utils.PathAndUrlManager;
-import com.movtery.zalithlauncher.utils.ZHTools;
+import com.movtery.zalithlauncher.utils.path.UrlManager;
 
 import net.kdt.pojavlaunch.Tools;
 import net.kdt.pojavlaunch.authenticator.listener.DoneListener;
 import net.kdt.pojavlaunch.authenticator.listener.ErrorListener;
-import net.kdt.pojavlaunch.authenticator.listener.ProgressListener;
 import net.kdt.pojavlaunch.value.MinecraftAccount;
 
 import org.json.JSONArray;
@@ -63,7 +63,6 @@ public class MicrosoftBackgroundLogin {
     public String mcToken;
     public String mcUuid;
     public boolean doesOwnGame;
-    public long expiresAt;
 
     public MicrosoftBackgroundLogin(boolean isRefresh, String authCode){
         mIsRefresh = isRefresh;
@@ -72,21 +71,21 @@ public class MicrosoftBackgroundLogin {
 
     /** Performs a full login, calling back listeners appropriately  */
     public void performLogin(
+            final Context context,
             final MinecraftAccount account,
-            @Nullable final ProgressListener progressListener,
             @Nullable final DoneListener doneListener,
             @Nullable final ErrorListener errorListener
     ) {
         Task.runTask(() -> {
-            notifyProgress(progressListener, 1);
+            notifyProgress(1, context.getString(R.string.account_login_progress_access_token));
             String accessToken = acquireAccessToken(mIsRefresh, mAuthCode);
-            notifyProgress(progressListener, 2);
+            notifyProgress(2, context.getString(R.string.account_login_progress_xbl_token));
             String xboxLiveToken = acquireXBLToken(accessToken);
-            notifyProgress(progressListener, 3);
+            notifyProgress(3, context.getString(R.string.account_login_progress_xsts_token));
             String[] xsts = acquireXsts(xboxLiveToken);
-            notifyProgress(progressListener, 4);
+            notifyProgress(4, context.getString(R.string.account_login_progress_minecraft_token));
             String mcToken = acquireMinecraftToken(xsts[0], xsts[1]);
-            notifyProgress(progressListener, 5);
+            notifyProgress(5, context.getString(R.string.account_login_progress_checking));
             fetchOwnedItems(mcToken);
             checkMcProfile(mcToken);
 
@@ -106,9 +105,8 @@ public class MicrosoftBackgroundLogin {
                 acc.username = mcName;
                 acc.profileId = mcUuid;
                 acc.msaRefreshToken = msRefreshToken;
-                acc.expiresAt = expiresAt;
-                acc.accountType = "Microsoft";
-                acc.updateSkin();
+                acc.accountType = AccountType.MICROSOFT.getType();
+                acc.updateMicrosoftSkin();
             }
             acc.save();
             Logging.i("Account", "Saved the account : " + acc.username);
@@ -120,7 +118,7 @@ public class MicrosoftBackgroundLogin {
             Logging.e("MicroAuth", "Exception thrown during authentication", e);
             if(errorListener != null) errorListener.onLoginError(e);
         }).finallyTask(() -> {
-            ProgressLayout.clearProgress(ProgressLayout.AUTHENTICATE_MICROSOFT);
+            ProgressLayout.clearProgress(ProgressLayout.LOGIN_ACCOUNT);
         }).execute();
     }
 
@@ -137,7 +135,7 @@ public class MicrosoftBackgroundLogin {
         );
 
         //да пошла yf[eq1 она ваша джава 11
-        HttpURLConnection conn = PathAndUrlManager.createHttpConnection(url);
+        HttpURLConnection conn = UrlManager.createHttpConnection(url);
         conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
         conn.setRequestProperty("charset", "utf-8");
         conn.setRequestProperty("Content-Length", Integer.toString(formData.getBytes(StandardCharsets.UTF_8).length));
@@ -173,7 +171,7 @@ public class MicrosoftBackgroundLogin {
         data.put("TokenType", "JWT");
 
         String req = data.toString();
-        HttpURLConnection conn = PathAndUrlManager.createHttpConnection(url);
+        HttpURLConnection conn = UrlManager.createHttpConnection(url);
         setCommonProperties(conn, req);
         conn.connect();
 
@@ -203,7 +201,7 @@ public class MicrosoftBackgroundLogin {
         data.put("TokenType", "JWT");
 
         String req = data.toString();
-        HttpURLConnection conn = PathAndUrlManager.createHttpConnection(url);
+        HttpURLConnection conn = UrlManager.createHttpConnection(url);
         setCommonProperties(conn, req);
         conn.connect();
 
@@ -224,9 +222,9 @@ public class MicrosoftBackgroundLogin {
             long xerr = jo.optLong("XErr", -1);
             Integer locale_id = XSTS_ERRORS.get(xerr);
             if(locale_id != null) {
-                throw new PresentedException(new RuntimeException(responseContents), locale_id);
+                throw new PresentedException(new RuntimeException(responseContents), locale_id, false);
             }
-            throw new PresentedException(new RuntimeException(responseContents), R.string.xerr_unknown, xerr);
+            throw new PresentedException(new RuntimeException(responseContents), R.string.xerr_unknown, true, xerr);
         }else{
             throw getResponseThrowable(conn);
         }
@@ -239,7 +237,7 @@ public class MicrosoftBackgroundLogin {
         data.put("identityToken", "XBL3.0 x=" + xblUhs + ";" + xblXsts);
 
         String req = data.toString();
-        HttpURLConnection conn = PathAndUrlManager.createHttpConnection(url);
+        HttpURLConnection conn = UrlManager.createHttpConnection(url);
         setCommonProperties(conn, req);
         conn.connect();
 
@@ -248,7 +246,6 @@ public class MicrosoftBackgroundLogin {
         }
 
         if(conn.getResponseCode() >= 200 && conn.getResponseCode() < 300) {
-            expiresAt = ZHTools.getCurrentTimeMillis() + 86400000;
             JSONObject jo = new JSONObject(Tools.read(conn.getInputStream()));
             conn.disconnect();
             mcToken = jo.getString("access_token");
@@ -262,7 +259,7 @@ public class MicrosoftBackgroundLogin {
     private void fetchOwnedItems(String mcAccessToken) throws IOException {
         URL url = new URL(mcStoreUrl);
 
-        HttpURLConnection conn = PathAndUrlManager.createHttpConnection(url);
+        HttpURLConnection conn = UrlManager.createHttpConnection(url);
         conn.setRequestProperty("Authorization", "Bearer " + mcAccessToken);
         conn.setUseCaches(false);
         conn.connect();
@@ -277,7 +274,7 @@ public class MicrosoftBackgroundLogin {
     private void checkMcProfile(String mcAccessToken) throws IOException, JSONException {
         URL url = new URL(mcProfileUrl);
 
-        HttpURLConnection conn = PathAndUrlManager.createHttpConnection(url);
+        HttpURLConnection conn = UrlManager.createHttpConnection(url);
         conn.setRequestProperty("Authorization", "Bearer " + mcAccessToken);
         conn.setUseCaches(false);
         conn.connect();
@@ -299,17 +296,14 @@ public class MicrosoftBackgroundLogin {
         }else{
             Logging.i("MicrosoftLogin","It seems that this Microsoft Account does not own the game.");
             doesOwnGame = false;
-            throw new PresentedException(new RuntimeException(conn.getResponseMessage()), R.string.minecraft_not_owned);
+            throw new PresentedException(new RuntimeException(conn.getResponseMessage()), R.string.minecraft_not_owned, true);
             //throwResponseError(conn);
         }
     }
 
     /** Wrapper to ease notifying the listener */
-    private void notifyProgress(@Nullable ProgressListener listener, int step){
-        if (listener != null) {
-            TaskExecutors.runInUIThread(() -> listener.onLoginProgress(step));
-        }
-        ProgressLayout.setProgress(ProgressLayout.AUTHENTICATE_MICROSOFT, step * 20);
+    private void notifyProgress(int step, String stepString) {
+        ProgressLayout.setProgress(ProgressLayout.LOGIN_ACCOUNT, step * 20, R.string.account_login_microsoft_progress, stepString);
     }
 
 
@@ -347,7 +341,7 @@ public class MicrosoftBackgroundLogin {
     private RuntimeException getResponseThrowable(HttpURLConnection conn) throws IOException {
         Logging.i("MicrosoftLogin", "Error code: " + conn.getResponseCode() + ": " + conn.getResponseMessage());
         if(conn.getResponseCode() == 429) {
-            return new PresentedException(R.string.microsoft_login_retry_later);
+            return new PresentedException(R.string.microsoft_login_retry_later, false);
         }
         return new RuntimeException(conn.getResponseMessage());
     }

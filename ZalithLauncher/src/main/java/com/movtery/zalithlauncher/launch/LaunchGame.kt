@@ -1,33 +1,122 @@
 package com.movtery.zalithlauncher.launch
 
+import android.app.Activity
+import android.content.Context
 import android.os.Build
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.kdt.mcgui.ProgressLayout
 import com.movtery.zalithlauncher.R
+import com.movtery.zalithlauncher.event.single.AccountUpdateEvent
+import com.movtery.zalithlauncher.feature.accounts.AccountType
+import com.movtery.zalithlauncher.feature.accounts.AccountUtils
 import com.movtery.zalithlauncher.feature.accounts.AccountsManager
 import com.movtery.zalithlauncher.feature.log.Logging
+import com.movtery.zalithlauncher.feature.version.Version
 import com.movtery.zalithlauncher.setting.AllSettings
+import com.movtery.zalithlauncher.support.touch_controller.ControllerProxy
+import com.movtery.zalithlauncher.task.Task
+import com.movtery.zalithlauncher.task.TaskExecutors
 import com.movtery.zalithlauncher.ui.dialog.LifecycleAwareTipDialog
 import com.movtery.zalithlauncher.ui.dialog.TipDialog
 import com.movtery.zalithlauncher.utils.ZHTools
+import com.movtery.zalithlauncher.utils.http.NetworkUtils
 import com.movtery.zalithlauncher.utils.stringutils.StringUtils
 import net.kdt.pojavlaunch.Architecture
 import net.kdt.pojavlaunch.JMinecraftVersionList
 import net.kdt.pojavlaunch.Logger
 import net.kdt.pojavlaunch.Tools
+import net.kdt.pojavlaunch.authenticator.microsoft.PresentedException
+import net.kdt.pojavlaunch.lifecycle.ContextAwareDoneListener
 import net.kdt.pojavlaunch.multirt.MultiRTUtils
 import net.kdt.pojavlaunch.plugins.FFmpegPlugin
-import net.kdt.pojavlaunch.services.GameService.LocalBinder
+import net.kdt.pojavlaunch.progresskeeper.ProgressKeeper
+import net.kdt.pojavlaunch.services.GameService
+import net.kdt.pojavlaunch.tasks.AsyncMinecraftDownloader
+import net.kdt.pojavlaunch.tasks.MinecraftDownloader
 import net.kdt.pojavlaunch.utils.JREUtils
 import net.kdt.pojavlaunch.value.MinecraftAccount
-import net.kdt.pojavlaunch.value.launcherprofiles.LauncherProfiles
-import net.kdt.pojavlaunch.value.launcherprofiles.MinecraftProfile
+import org.greenrobot.eventbus.EventBus
 
 class LaunchGame {
     companion object {
+        /**
+         * 改为启动游戏前进行的操作
+         * - 进行登录，同时也能及时的刷新账号的信息（这明显更合理不是吗，PojavLauncher？）
+         * - 复制 options.txt 文件到游戏目录
+         * @param version 选择的版本
+         */
+        @JvmStatic
+        fun preLaunch(context: Context, version: Version) {
+            fun launch() {
+                //复制一份默认的选项配置文件到游戏目录
+                Task.runTask {
+                    Tools.copyAssetFile(context, "options.txt", version.getGameDir().absolutePath, false)
+                }.onThrowable {
+                    Logging.e("Launch Game", "Failed to copy options.txt files to the game directory!", it)
+                }.execute()
+
+                val versionName = version.getVersionName()
+                val mcVersion = AsyncMinecraftDownloader.getListedVersion(versionName)
+                MinecraftDownloader().start(
+                    mcVersion, versionName, ContextAwareDoneListener(context, version)
+                )
+            }
+
+            fun setGameProgress(pull: Boolean) {
+                if (pull) ProgressKeeper.submitProgress(ProgressLayout.DOWNLOAD_MINECRAFT, 0, R.string.newdl_downloading_game_files, 0, 0, 0)
+                else ProgressLayout.clearProgress(ProgressLayout.DOWNLOAD_MINECRAFT)
+            }
+
+            if (!NetworkUtils.isNetworkAvailable(context)) {
+                // 网络未链接，无法登录，但是依旧允许玩家启动游戏
+                // 在启动时会再检查网络情况，如果仍未连接网络，那么将会临时创建一个同名的离线账号启动游戏
+                Toast.makeText(context, context.getString(R.string.account_login_no_network), Toast.LENGTH_SHORT).show()
+                launch()
+                return
+            }
+
+            val accountsManager = AccountsManager.getInstance()
+
+            if (AccountUtils.isNoLoginRequired(accountsManager.currentAccount)) {
+                launch()
+                return
+            }
+
+            accountsManager.performLogin(
+                context, accountsManager.currentAccount,
+                { _ ->
+                    EventBus.getDefault().post(AccountUpdateEvent())
+                    TaskExecutors.runInUIThread {
+                        Toast.makeText(context, context.getString(R.string.account_login_done), Toast.LENGTH_SHORT).show()
+                    }
+                    //登录完成，正式启动游戏！
+                    launch()
+                },
+                { exception ->
+                    val errorMessage = if (exception is PresentedException) exception.toString(context)
+                    else exception.message
+
+                    TaskExecutors.runInUIThread {
+                        TipDialog.Builder(context)
+                            .setTitle(R.string.generic_error)
+                            .setMessage("${context.getString(R.string.account_login_skip)}\r\n$errorMessage")
+                            .setWarning()
+                            .setConfirmClickListener { launch() }
+                            .setCenterMessage(false)
+                            .showDialog()
+                    }
+
+                    setGameProgress(false)
+                }
+            )
+            setGameProgress(true)
+        }
+
         @Throws(Throwable::class)
         @JvmStatic
-        fun runGame(activity: AppCompatActivity, serverBinder: LocalBinder, minecraftProfile: MinecraftProfile, versionID: String, version: JMinecraftVersionList.Version) {
-            Tools.LOCAL_RENDERER ?: run { Tools.LOCAL_RENDERER = AllSettings.renderer }
+        fun runGame(activity: AppCompatActivity, minecraftVersion: Version, version: JMinecraftVersionList.Version) {
+            Tools.LOCAL_RENDERER ?: run { Tools.LOCAL_RENDERER = AllSettings.renderer.getValue() }
 
             if (!Tools.checkRendererCompatible(activity, Tools.LOCAL_RENDERER)) {
                 val renderersList = Tools.getCompatibleRenderers(activity)
@@ -37,46 +126,85 @@ class LaunchGame {
                 Tools.releaseCache()
             }
 
-            val customArgs = minecraftProfile.javaArgs?.takeIf { it.isNotBlank() }
-                ?: AllSettings.javaArgs?.takeIf { it.isNotBlank() }
-                ?: ""
-            val account = AccountsManager.getInstance().currentAccount
+            var account = AccountsManager.getInstance().currentAccount
+            if (!NetworkUtils.isNetworkAvailable(activity)) {
+                //没有网络时，将账号视为离线账号
+                account = MinecraftAccount().apply {
+                    this.username = account.username
+                    this.accountType = AccountType.LOCAL.type
+                }
+            }
+
+            val customArgs = minecraftVersion.getJavaArgs().takeIf { it.isNotBlank() } ?: ""
+
+            val javaRuntime = getRuntime(activity, minecraftVersion, version.javaVersion?.majorVersion ?: 8)
+
             printLauncherInfo(
-                versionID,
+                activity,
+                minecraftVersion,
                 customArgs.takeIf { it.isNotBlank() } ?: "NONE",
-                minecraftProfile.javaDir ?: AllSettings.defaultRuntime?.takeIf { it.isNotBlank() } ?: "NONE",
+                javaRuntime,
                 account
             )
             JREUtils.redirectAndPrintJRELog()
-            LauncherProfiles.load()
 
-            val requiredJavaVersion = version.javaVersion?.majorVersion ?: 8
-            launch(activity, account, minecraftProfile, versionID, requiredJavaVersion, customArgs)
+            launch(activity, account, minecraftVersion, javaRuntime, customArgs)
             //Note that we actually stall in the above function, even if the game crashes. But let's be safe.
-            activity.runOnUiThread { serverBinder.isActive = false }
+            GameService.setActive(false)
+        }
+
+        private fun getRuntime(activity: Activity, version: Version, targetJavaVersion: Int): String {
+            val versionRuntime = version.getJavaDir()
+                .takeIf { it.isNotEmpty() && it.startsWith(Tools.LAUNCHERPROFILES_RTPREFIX) }
+                ?.removePrefix(Tools.LAUNCHERPROFILES_RTPREFIX)
+                ?: ""
+
+            if (versionRuntime.isNotEmpty()) return versionRuntime
+
+            //如果版本未选择Java环境，则自动选择合适的环境
+            var runtime = AllSettings.defaultRuntime.getValue()
+            val pickedRuntime = MultiRTUtils.read(runtime)
+            if (pickedRuntime.javaVersion == 0 || pickedRuntime.javaVersion < targetJavaVersion) {
+                runtime = MultiRTUtils.getNearestJreName(targetJavaVersion) ?: run {
+                    activity.runOnUiThread {
+                        Toast.makeText(activity, activity.getString(R.string.game_autopick_runtime_failed), Toast.LENGTH_SHORT).show()
+                    }
+                    return runtime
+                }
+            }
+            return runtime
         }
 
         private fun printLauncherInfo(
-            gameVersion: String,
+            context: Context,
+            minecraftVersion: Version,
             javaArguments: String,
             javaRuntime: String,
             account: MinecraftAccount
         ) {
-            fun formatJavaRuntimeString(): String {
-                val prefix = Tools.LAUNCHERPROFILES_RTPREFIX
-                return if (javaRuntime.startsWith(prefix)) javaRuntime.removePrefix(prefix)
-                else javaRuntime
+            var mcInfo = minecraftVersion.getVersionName()
+            minecraftVersion.getVersionInfo()?.let { info ->
+                mcInfo = info.getInfoString()
             }
+
+            val renderers = Tools.getCompatibleRenderers(context).run {
+                rendererDisplayNames.zip(rendererIds)
+            }
+            val rendererName = renderers.find { it.second == Tools.LOCAL_RENDERER }?.first ?: "Parsing failed, original name: ${Tools.LOCAL_RENDERER}"
 
             Logger.appendToLog("--------- Start launching the game")
             Logger.appendToLog("Info: Launcher version: ${ZHTools.getVersionName()} (${ZHTools.getVersionCode()})")
             Logger.appendToLog("Info: Architecture: ${Architecture.archAsString(Tools.DEVICE_ARCHITECTURE)}")
             Logger.appendToLog("Info: Device model: ${StringUtils.insertSpace(Build.MANUFACTURER, Build.MODEL)}")
             Logger.appendToLog("Info: API version: ${Build.VERSION.SDK_INT}")
-            Logger.appendToLog("Info: Selected Minecraft version: $gameVersion")
+            Logger.appendToLog("Info: Renderer: $rendererName")
+            Logger.appendToLog("Info: Selected Minecraft version: ${minecraftVersion.getVersionName()}")
+            Logger.appendToLog("Info: Minecraft Info: $mcInfo")
+            Logger.appendToLog("Info: Game Path: ${minecraftVersion.getGameDir().absolutePath} (Isolation: ${minecraftVersion.isIsolation()})")
             Logger.appendToLog("Info: Custom Java arguments: $javaArguments")
-            Logger.appendToLog("Info: Java Runtime: ${formatJavaRuntimeString()}")
+            Logger.appendToLog("Info: Java Runtime: $javaRuntime")
             Logger.appendToLog("Info: Account: ${account.username} (${account.accountType})")
+            Logger.appendToLog("---------\r\n")
         }
 
         @Throws(Throwable::class)
@@ -84,38 +212,34 @@ class LaunchGame {
         private fun launch(
             activity: AppCompatActivity,
             account: MinecraftAccount,
-            minecraftProfile: MinecraftProfile,
-            versionId: String,
-            versionJavaRequirement: Int,
+            minecraftVersion: Version,
+            javaRuntime: String,
             customArgs: String
         ) {
             checkMemory(activity)
 
-            val runtime = MultiRTUtils.forceReread(
-                Tools.pickRuntime(
-                activity,
-                minecraftProfile,
-                versionJavaRequirement))
+            val runtime = MultiRTUtils.forceReread(javaRuntime)
 
-            val versionInfo = Tools.getVersionInfo(versionId)
-            LauncherProfiles.load()
-            val gameDirPath = Tools.getGameDirPath(minecraftProfile)
+            val versionInfo = Tools.getVersionInfo(minecraftVersion)
+            val gameDirPath = minecraftVersion.getGameDir()
 
             //预处理
             Tools.disableSplash(gameDirPath)
-            val launchClassPath = Tools.generateLaunchClassPath(versionInfo, versionId)
+            val launchClassPath = Tools.generateLaunchClassPath(versionInfo, minecraftVersion)
 
             val launchArgs = LaunchArgs(
-                activity,
                 account,
                 gameDirPath,
-                versionId,
+                minecraftVersion,
                 versionInfo,
+                minecraftVersion.getVersionName(),
                 runtime,
                 launchClassPath
             ).getAllArgs()
 
             FFmpegPlugin.discover(activity)
+            if (AllSettings.useControllerProxy.getValue()) ControllerProxy.startProxy(activity)
+
             JREUtils.launchJavaVM(activity, runtime, gameDirPath, launchArgs, customArgs)
         }
 
@@ -133,10 +257,11 @@ class LaunchGame {
                 R.string.address_memory_warning_msg
             } else R.string.memory_warning_msg
 
-            if (AllSettings.ramAllocation > freeDeviceMemory) {
+            if (AllSettings.ramAllocation.value.getValue() > freeDeviceMemory) {
                 val builder = TipDialog.Builder(activity)
                     .setTitle(R.string.generic_warning)
-                    .setMessage(activity.getString(stringId, freeDeviceMemory, AllSettings.ramAllocation))
+                    .setMessage(activity.getString(stringId, freeDeviceMemory, AllSettings.ramAllocation.value.getValue()))
+                    .setWarning()
                     .setCenterMessage(false)
                     .setShowCancel(false)
                 if (LifecycleAwareTipDialog.haltOnDialog(activity.lifecycle, builder)) return

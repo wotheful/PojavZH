@@ -1,6 +1,6 @@
 package net.kdt.pojavlaunch.utils;
 
-import static com.movtery.zalithlauncher.utils.PathAndUrlManager.DIR_NATIVE_LIB;
+import static com.movtery.zalithlauncher.utils.path.PathManager.DIR_NATIVE_LIB;
 import static net.kdt.pojavlaunch.Architecture.ARCH_X86;
 import static net.kdt.pojavlaunch.Architecture.is64BitsDevice;
 import static net.kdt.pojavlaunch.Tools.LOCAL_RENDERER;
@@ -16,14 +16,19 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.movtery.zalithlauncher.InfoCenter;
 import com.movtery.zalithlauncher.R;
 import com.movtery.zalithlauncher.event.value.JvmExitEvent;
 import com.movtery.zalithlauncher.feature.customprofilepath.ProfilePathHome;
 import com.movtery.zalithlauncher.feature.customprofilepath.ProfilePathManager;
 import com.movtery.zalithlauncher.feature.log.Logging;
+import com.movtery.zalithlauncher.plugins.driver.DriverPluginManager;
+import com.movtery.zalithlauncher.plugins.renderer.RendererPluginManager;
+import com.movtery.zalithlauncher.plugins.renderer.RendererPlugin;
 import com.movtery.zalithlauncher.setting.AllSettings;
 import com.movtery.zalithlauncher.ui.activity.ErrorActivity;
-import com.movtery.zalithlauncher.utils.PathAndUrlManager;
+import com.movtery.zalithlauncher.utils.path.LibPath;
+import com.movtery.zalithlauncher.utils.path.PathManager;
 import com.oracle.dalvik.VMLauncher;
 
 import net.kdt.pojavlaunch.Architecture;
@@ -106,6 +111,7 @@ public class JREUtils {
         dlopen(findInLdLibPath("libawt_headless.so"));
         dlopen(findInLdLibPath("libfreetype.so"));
         dlopen(findInLdLibPath("libfontmanager.so"));
+        dlopen(findInLdLibPath("libjspawnhelper.so"));
         for (File f : locateLibs(new File(jreHome, Tools.DIRNAME_HOME_JRE))) {
             dlopen(f.getAbsolutePath());
         }
@@ -175,6 +181,10 @@ public class JREUtils {
         if (FFmpegPlugin.isAvailable) {
             ldLibraryPath.append(FFmpegPlugin.libraryPath).append(":");
         }
+        RendererPlugin customRenderer = RendererPluginManager.getSelectedRendererPlugin();
+        if (customRenderer != null) {
+            ldLibraryPath.append(customRenderer.getPath()).append(":");
+        }
         ldLibraryPath.append(jreHome)
                 .append("/").append(Tools.DIRNAME_HOME_JRE)
                 .append("/jli:").append(jreHome).append("/").append(Tools.DIRNAME_HOME_JRE)
@@ -190,25 +200,26 @@ public class JREUtils {
         Map<String, String> envMap = new ArrayMap<>();
 
         envMap.put("POJAV_NATIVEDIR", DIR_NATIVE_LIB);
+        envMap.put("DRIVER_PATH", DriverPluginManager.getDriver().getPath());
         envMap.put("JAVA_HOME", jreHome);
-        envMap.put("HOME", PathAndUrlManager.DIR_GAME_HOME);
-        envMap.put("TMPDIR", PathAndUrlManager.DIR_CACHE.getAbsolutePath());
+        envMap.put("HOME", PathManager.DIR_GAME_HOME);
+        envMap.put("TMPDIR", PathManager.DIR_CACHE.getAbsolutePath());
         envMap.put("LD_LIBRARY_PATH", LD_LIBRARY_PATH);
         envMap.put("PATH", jreHome + "/bin:" + Os.getenv("PATH"));
-        envMap.put("FORCE_VSYNC", String.valueOf(AllSettings.getForceVsync()));
+        envMap.put("FORCE_VSYNC", String.valueOf(AllSettings.getForceVsync().getValue()));
         envMap.put("AWTSTUB_WIDTH", Integer.toString(CallbackBridge.windowWidth > 0 ? CallbackBridge.windowWidth : CallbackBridge.physicalWidth));
         envMap.put("AWTSTUB_HEIGHT", Integer.toString(CallbackBridge.windowHeight > 0 ? CallbackBridge.windowHeight : CallbackBridge.physicalHeight));
 
-        if (AllSettings.getDumpShaders())
+        if (AllSettings.getDumpShaders().getValue())
             envMap.put("LIBGL_VGPU_DUMP", "1");
-        if (AllSettings.getZinkPreferSystemDriver())
+        if (AllSettings.getZinkPreferSystemDriver().getValue())
             envMap.put("POJAV_ZINK_PREFER_SYSTEM_DRIVER", "1");
-        if (AllSettings.getVsyncInZink())
+        if (AllSettings.getVsyncInZink().getValue())
             envMap.put("POJAV_VSYNC_IN_ZINK", "1");
-        if (AllSettings.getBigCoreAffinity())
+        if (AllSettings.getBigCoreAffinity().getValue())
             envMap.put("POJAV_BIG_CORE_AFFINITY", "1");
         if (FFmpegPlugin.isAvailable)
-            envMap.put("PATH", FFmpegPlugin.libraryPath+":"+envMap.get("PATH"));
+            envMap.put("POJAV_FFMPEG_PATH", FFmpegPlugin.executablePath);
 
         for (Map.Entry<String, String> env : envMap.entrySet()) {
             Logger.appendToLog("Added custom env: " + env.getKey() + "=" + env.getValue());
@@ -229,8 +240,8 @@ public class JREUtils {
     private static void setRendererEnv() throws Throwable {
         Map<String, String> envMap = new ArrayMap<>();
 
-        if (LOCAL_RENDERER.startsWith("opengles2")) {
-            envMap.put("LIBGL_ES", "2");
+        if (LOCAL_RENDERER.startsWith("opengles3")) {
+            envMap.put("LIBGL_ES", "3");
             envMap.put("LIBGL_MIPMAP", "3");
             envMap.put("LIBGL_NOERROR", "1");
             envMap.put("LIBGL_NOINTOVLHACK", "1");
@@ -239,21 +250,70 @@ public class JREUtils {
             envMap.put("LIBGL_FB", "3");
         }
 
-        if (LOCAL_RENDERER.equals("opengles3_ltw")) {
-            envMap.put("LIBGL_ES", "3");
-            envMap.put("POJAVEXEC_EGL", "libltw.so");
+        String eglName = null;
+
+        RendererPlugin customRenderer = RendererPluginManager.getSelectedRendererPlugin();
+        if (customRenderer != null && LOCAL_RENDERER.equals(customRenderer.getId())) {
+            customRenderer.getEnv().forEach(envPair -> {
+                String envKey = envPair.getFirst();
+                String envValue = envPair.getSecond();
+                if (envKey.equals("DLOPEN")) return;
+                if (envKey.equals("LIB_MESA_NAME")) {
+                    envMap.put(envKey, customRenderer.getPath() + "/" + envValue);
+                } else {
+                    envMap.put(envKey, envValue);
+                }
+            });
+            String customEglName = customRenderer.getEglName();
+            if (customEglName.startsWith("/")) {
+                eglName = customRenderer.getPath() + customEglName;
+            } else {
+                eglName = customEglName;
+            }
         }
 
-        if (LOCAL_RENDERER.equals("gallium_virgl"))
-            envMap.put("VTEST_SOCKET_NAME", new File(PathAndUrlManager.DIR_CACHE, ".virgl_test").getAbsolutePath());
+        if (LOCAL_RENDERER.equals("opengles3_ltw_in_launcher")) {
+            envMap.put("LIBGL_ES", "3");
+            envMap.put("POJAVEXEC_EGL", "libltw_in_launcher.so");
+        }
+
+        if (LOCAL_RENDERER.equals("opengles3_gl4es_plus")) {
+            envMap.put("LIBGL_ES", "3");
+            envMap.put("LIBGL_BACKEND_ANGLE", "1");
+            envMap.put("LIBGL_USEVBO", "1");
+            envMap.put("LIBGL_GL", "32");
+            envMap.put("LIBGL_SHADERCONVERTER", "1");
+            envMap.put("LIBGL_NOINTOVLHACK", "1");
+            envMap.put("LIBGL_NORMALIZE", "1");
+            envMap.put("LIBGL_MIPMAP", "1");
+            envMap.put("LIBGL_GLES", "libGLESv3.so");
+            envMap.put("LIBGL_EGL", "libEGL.so");
+            envMap.put("POJAVEXEC_EGL", "libEGL.so");
+        }
+
+        if (LOCAL_RENDERER.equals("opengles3_desktopgl_angle")) {
+            envMap.put("LIBGL_ES", "3");
+            envMap.put("POJAVEXEC_EGL", "libEGL_angle.so");
+        }
+
+        if (eglName != null) envMap.put("POJAVEXEC_EGL", eglName);
+
+        if (LOCAL_RENDERER.equals("gallium_virgl")) {
+            envMap.put("VTEST_SOCKET_NAME", new File(PathManager.DIR_CACHE, ".virgl_test").getAbsolutePath());
+        }
 
         if (!LOCAL_RENDERER.startsWith("opengles")) {
             envMap.put("MESA_LOADER_DRIVER_OVERRIDE", "zink");
-            envMap.put("MESA_GLSL_CACHE_DIR", PathAndUrlManager.DIR_CACHE.getAbsolutePath());
+            envMap.put("MESA_GLSL_CACHE_DIR", PathManager.DIR_CACHE.getAbsolutePath());
             envMap.put("force_glsl_extensions_warn", "true");
             envMap.put("allow_higher_compat_version", "true");
             envMap.put("allow_glsl_extension_directive_midshader", "true");
             envMap.put("MESA_LIBRARY", loadGraphicsLibrary());
+        }
+
+        if (LOCAL_RENDERER.equals("vulkan_zink")) {
+            envMap.put("MESA_GL_VERSION_OVERRIDE", "4.6");
+            envMap.put("MESA_GLSL_VERSION_OVERRIDE", "460");
         }
 
         envMap.put("POJAV_RENDERER", LOCAL_RENDERER);
@@ -287,7 +347,7 @@ public class JREUtils {
 
     private static void setCustomEnv() throws Throwable {
         Map<String, String> envMap = new ArrayMap<>();
-        File customEnvFile = new File(PathAndUrlManager.DIR_GAME_HOME, "custom_env.txt");
+        File customEnvFile = new File(PathManager.DIR_GAME_HOME, "custom_env.txt");
         if (customEnvFile.exists() && customEnvFile.isFile()) {
             BufferedReader reader = new BufferedReader(new FileReader(customEnvFile));
             String line;
@@ -323,14 +383,28 @@ public class JREUtils {
         if (LOCAL_RENDERER != null) setRendererEnv();
 
         List<String> userArgs = getJavaArgs(runtimeHome, userArgsString);
+
+        //禁用flite缺失、lwjgl兼容性警告的日志输出
+        userArgs.add("-javaagent:" + LibPath.MIO_LIB_FIXER.getAbsolutePath());
+
         //Add automatically generated args
-        userArgs.add("-Xms" + AllSettings.getRamAllocation() + "M");
-        userArgs.add("-Xmx" + AllSettings.getRamAllocation() + "M");
+        userArgs.add("-Xms" + AllSettings.getRamAllocation().getValue().getValue() + "M");
+        userArgs.add("-Xmx" + AllSettings.getRamAllocation().getValue().getValue() + "M");
         if (LOCAL_RENDERER != null) userArgs.add("-Dorg.lwjgl.opengl.libname=" + loadGraphicsLibrary());
 
+        // Some phones are not using the right number of cores, fix that
+        userArgs.add("-XX:ActiveProcessorCount=" + java.lang.Runtime.getRuntime().availableProcessors());
+
         userArgs.addAll(JVMArgs);
-        activity.runOnUiThread(() -> Toast.makeText(activity, activity.getString(R.string.autoram_info_msg,AllSettings.getRamAllocation()), Toast.LENGTH_SHORT).show());
+        activity.runOnUiThread(() -> Toast.makeText(activity, activity.getString(R.string.autoram_info_msg, AllSettings.getRamAllocation().getValue().getValue()), Toast.LENGTH_SHORT).show());
         System.out.println(JVMArgs);
+        for (int i = 0; i < userArgs.size(); i++) {
+            String arg = userArgs.get(i);
+            if (arg.startsWith("--accessToken")) {
+                i += 1;
+            }
+            Logger.appendToLog("JVMArg: " + arg);
+        }
 
         initJavaRuntime(runtimeHome);
         setupExitTrap(activity.getApplication());
@@ -340,8 +414,7 @@ public class JREUtils {
         int exitCode = VMLauncher.launchJVM(userArgs.toArray(new String[0]));
         Logger.appendToLog("Java Exit code: " + exitCode);
         if (exitCode != 0) {
-            File crashReportPath = new File(gameDirectory, "crash-reports");
-            ErrorActivity.showExitMessage(activity, exitCode, false, crashReportPath.getAbsolutePath());
+            ErrorActivity.showExitMessage(activity, exitCode, false);
         }
         EventBus.getDefault().post(new JvmExitEvent(exitCode));
     }
@@ -354,18 +427,18 @@ public class JREUtils {
     public static List<String> getJavaArgs(String runtimeHome, String userArgumentsString) {
         List<String> userArguments = parseJavaArguments(userArgumentsString);
         String resolvFile;
-        resolvFile = new File(PathAndUrlManager.DIR_DATA,"resolv.conf").getAbsolutePath();
+        resolvFile = new File(PathManager.DIR_DATA,"resolv.conf").getAbsolutePath();
 
         ArrayList<String> overridableArguments = new ArrayList<>(Arrays.asList(
                 "-Djava.home=" + runtimeHome,
-                "-Djava.io.tmpdir=" + PathAndUrlManager.DIR_CACHE.getAbsolutePath(),
+                "-Djava.io.tmpdir=" + PathManager.DIR_CACHE.getAbsolutePath(),
                 "-Djna.boot.library.path=" + DIR_NATIVE_LIB,
                 "-Duser.home=" + ProfilePathManager.getCurrentPath(),
                 "-Duser.language=" + System.getProperty("user.language"),
                 "-Dos.name=Linux",
                 "-Dos.version=Android-" + Build.VERSION.RELEASE,
                 "-Dpojav.path.minecraft=" + ProfilePathHome.getGameHome(),
-                "-Dpojav.path.private.account=" + PathAndUrlManager.DIR_ACCOUNT_NEW,
+                "-Dpojav.path.private.account=" + PathManager.DIR_ACCOUNT_NEW,
                 "-Duser.timezone=" + TimeZone.getDefault().getID(),
 
                 "-Dorg.lwjgl.vulkan.libname=libvulkan.so",
@@ -374,13 +447,13 @@ public class JREUtils {
                 "-Dorg.lwjgl.util.DebugFunctions=true",
                 "-Dorg.lwjgl.util.DebugLoader=true",
                 // GLFW Stub width height
-                "-Dglfwstub.windowWidth=" + Tools.getDisplayFriendlyRes(currentDisplayMetrics.widthPixels, AllSettings.getResolutionRatio() / 100F),
-                "-Dglfwstub.windowHeight=" + Tools.getDisplayFriendlyRes(currentDisplayMetrics.heightPixels, AllSettings.getResolutionRatio() / 100F),
+                "-Dglfwstub.windowWidth=" + Tools.getDisplayFriendlyRes(currentDisplayMetrics.widthPixels, AllSettings.getResolutionRatio().getValue() / 100F),
+                "-Dglfwstub.windowHeight=" + Tools.getDisplayFriendlyRes(currentDisplayMetrics.heightPixels, AllSettings.getResolutionRatio().getValue() / 100F),
                 "-Dglfwstub.initEgl=false",
                 "-Dext.net.resolvPath=" +resolvFile,
                 "-Dlog4j2.formatMsgNoLookups=true", //Log4j RCE mitigation
 
-                "-Dnet.minecraft.clientmodname=" + Tools.APP_NAME,
+                "-Dnet.minecraft.clientmodname=" + InfoCenter.LAUNCHER_NAME,
                 "-Dfml.earlyprogresswindow=false", //Forge 1.14+ workaround
                 "-Dloader.disable_forked_guis=true",
                 "-Dsodium.checks.issue2561=false"
@@ -468,29 +541,45 @@ public class JREUtils {
      * @return The name of the loaded library
      */
     public static String loadGraphicsLibrary() {
-        if (LOCAL_RENDERER == null) return null;
+        RendererPlugin customRenderer = RendererPluginManager.getSelectedRendererPlugin();
+        if (LOCAL_RENDERER == null && customRenderer == null) return null;
         String renderLibrary;
-        switch (LOCAL_RENDERER){
-            case "opengles2":
-                renderLibrary = "libgl4es_114.so";
-                break;
-            case "vulkan_zink":
-            case "gallium_freedreno":
-                renderLibrary = "libOSMesa_8.so";
-                break;
-            case "gallium_virgl":
-                renderLibrary = "libOSMesa_2205.so";
-                break;
-            case "gallium_panfrost":
-                renderLibrary = "libOSMesa_2300d.so";
-                break;
-            case "opengles3_ltw":
-                renderLibrary = "libltw.so";
-                break;
-            default:
-                Logging.w("RENDER_LIBRARY", "No renderer selected, defaulting to opengles2");
-                renderLibrary = "libgl4es_114.so";
-                break;
+        if (customRenderer != null) {
+            renderLibrary = customRenderer.getGlName();
+            customRenderer.getEnv().forEach(envPair -> {
+                if (envPair.getFirst().equals("DLOPEN")) {
+                    String[] libs = envPair.getSecond().split(",");
+                    for (String lib : libs) {
+                        dlopen(customRenderer.getPath() + "/" + lib);
+                    }
+                }
+            });
+        } else {
+            switch (LOCAL_RENDERER){
+                case "opengles3":
+                    renderLibrary = "libgl4es_114.so";
+                    break;
+                case "vulkan_zink":
+                case "gallium_freedreno":
+                    renderLibrary = "libOSMesa_8.so";
+                    break;
+                case "gallium_virgl":
+                    renderLibrary = "libOSMesa_2121.so";
+                    break;
+                case "opengles3_desktopgl_angle":
+                    renderLibrary = "libAngle.so";
+                    break;
+                case "opengles3_gl4es_plus":
+                    renderLibrary = "libgl4es_plus.so";
+                    break;
+                case "opengles3_ltw_in_launcher":
+                    renderLibrary = "libltw_in_launcher.so";
+                    break;
+                default:
+                    Logging.w("RENDER_LIBRARY", "No renderer selected, defaulting to opengles3");
+                    renderLibrary = "libgl4es_114.so";
+                    break;
+            }
         }
 
         if (!dlopen(renderLibrary) && !dlopen(findInLdLibPath(renderLibrary))) {

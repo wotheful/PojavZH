@@ -29,6 +29,7 @@
 #include <android/dlext.h>
 #include "utils.h"
 #include "ctxbridges/bridge_tbl.h"
+#include "ctxbridges/gl_bridge.h"
 #include "ctxbridges/osm_bridge.h"
 
 #define GLFW_CLIENT_API 0x22001
@@ -45,9 +46,9 @@ EGLConfig config;
 struct PotatoBridge potatoBridge;
 
 
-void* gbuffer;
+static void* gbuffer;
 
-EXTERNAL_API void pojavTerminate() {
+EXTERNAL_API void pojavTerminate(void) {
     printf("EGLBridge: Terminating\n");
 
     switch (pojav_environ->config_renderer) {
@@ -72,7 +73,7 @@ EXTERNAL_API void pojavTerminate() {
 
 JNIEXPORT void JNICALL Java_net_kdt_pojavlaunch_utils_JREUtils_setupBridgeWindow(JNIEnv* env, ABI_COMPAT jclass clazz, jobject surface) {
     pojav_environ->pojavWindow = ANativeWindow_fromSurface(env, surface);
-    if (br_setup_window) br_setup_window();
+    if (br_setup_window != NULL) br_setup_window();
 }
 
 JNIEXPORT void JNICALL
@@ -124,7 +125,7 @@ bool checkAdrenoGraphics() {
 }
 void* load_turnip_vulkan() {
     if(!checkAdrenoGraphics()) return NULL;
-    const char* native_dir = getenv("POJAV_NATIVEDIR");
+    const char* native_dir = getenv("DRIVER_PATH");
     const char* cache_dir = getenv("TMPDIR");
     if(!linker_ns_load(native_dir)) return NULL;
     void* linkerhook = linker_ns_dlopen("liblinkerhook.so", RTLD_LOCAL | RTLD_NOW);
@@ -155,13 +156,13 @@ void* load_turnip_vulkan() {
 }
 #endif
 
-void set_vulkan_ptr(void* ptr) {
+static void set_vulkan_ptr(void* ptr) {
     char envval[64];
     sprintf(envval, "%"PRIxPTR, (uintptr_t)ptr);
     setenv("VULKAN_PTR", envval, 1);
 }
 
-void load_vulkan() {
+static void load_vulkan(void) {
     if(getenv("POJAV_ZINK_PREFER_SYSTEM_DRIVER") == NULL &&
         android_get_device_api_level() >= 28) { // the loader does not support below that
 #ifdef ADRENO_POSSIBLE
@@ -179,28 +180,32 @@ void load_vulkan() {
     set_vulkan_ptr(vulkan_ptr);
 }
 
-int pojavInitOpenGL() {
+static int pojavInitOpenGL(void) {
     const char *forceVsync = getenv("FORCE_VSYNC");
-    if (!strcmp(forceVsync, "true"))
+    if (!strcmp(forceVsync, "true") == 0)
         pojav_environ->force_vsync = true;
 
     const char *renderer = getenv("POJAV_RENDERER");
 
-    if (!strncmp("opengles", renderer, 8))
+    if (strncmp("opengles", renderer, 8) == 0)
     {
         pojav_environ->config_renderer = RENDERER_GL4ES;
         set_gl_bridge_tbl();
     }
 
-    if (!strcmp(renderer, "vulkan_zink"))
+    if (strcmp(renderer, "vulkan_zink") == 0)
     {
         pojav_environ->config_renderer = RENDERER_VK_ZINK;
         load_vulkan();
         setenv("GALLIUM_DRIVER", "zink", 1);
+        setenv("MESA_GL_VERSION_OVERRIDE", "4.6COMPAT", 1);
+        setenv("MESA_GLSL_VERSION_OVERRIDE", "460", 1);
+        setenv("mesa_glthread", "true", 1);
+        setenv("vblank_mode", "0", 1);
         set_osm_bridge_tbl();
     }
 
-    if (!strcmp(renderer, "gallium_freedteno"))
+    if (strcmp(renderer, "gallium_freedteno") == 0)
     {
         pojav_environ->config_renderer = RENDERER_VK_ZINK;
         setenv("MESA_LOADER_DRIVER_OVERRIDE", "kgsl", 1);
@@ -208,7 +213,7 @@ int pojavInitOpenGL() {
         set_osm_bridge_tbl();
     }
 
-    if (!strcmp(renderer, "gallium_panfrost"))
+    if (strcmp(renderer, "gallium_panfrost") == 0)
     {
         pojav_environ->config_renderer = RENDERER_VK_ZINK;
         setenv("GALLIUM_DRIVER", "panfrost", 1);
@@ -216,26 +221,33 @@ int pojavInitOpenGL() {
         set_osm_bridge_tbl();
     }
 
-    if (!strcmp(renderer, "gallium_virgl"))
+    if (strcmp(renderer, "gallium_virgl") == 0)
     {
         pojav_environ->config_renderer = RENDERER_VIRGL;
         setenv("GALLIUM_DRIVER", "virpipe", 1);
-        setenv("OSMESA_NO_FLUSH_FRONTBUFFER", "1", false);
-        setenv("MESA_GL_VERSION_OVERRIDE", "4.3", 1);
-        setenv("MESA_GLSL_VERSION_OVERRIDE", "430", 1);
-        if (!strcmp(getenv("OSMESA_NO_FLUSH_FRONTBUFFER"), "1"))
-            printf("VirGL: OSMesa buffer flush is DISABLED!\n");
+        setenv("MESA_GL_VERSION_OVERRIDE", "4.6COMPAT", 1);
+        setenv("MESA_GLSL_VERSION_OVERRIDE", "460", 1);
+        setenv("mesa_glthread", "true", 1);
+        setenv("OSMESA_NO_FLUSH_FRONTBUFFER", "0", 1);
+        setenv("vblank_mode", "0", 1);
+        setenv("force_glsl_extensions_warn", "true", 1);
+        setenv("allow_higher_compat_version", "true", 1);
+        setenv("allow_glsl_extension_directive_midshader", "true", 1);
+        setenv("MESA_NO_ERROR", "1", 1);
+        if (!strcmp(getenv("OSMESA_NO_FLUSH_FRONTBUFFER"), "0"))
+            printf("VirGL: OSMesa buffer flush is ENABLED!\n");
         loadSymbolsVirGL();
         virglInit();
         return 0;
     }
 
-    if (br_init()) br_setup_window();
-
+    if(br_init()) {
+        br_setup_window();
+    }
     return 0;
 }
 
-EXTERNAL_API int pojavInit() {
+EXTERNAL_API int pojavInit(void) {
     ANativeWindow_acquire(pojav_environ->pojavWindow);
     pojav_environ->savedWidth = ANativeWindow_getWidth(pojav_environ->pojavWindow);
     pojav_environ->savedHeight = ANativeWindow_getHeight(pojav_environ->pojavWindow);
@@ -262,7 +274,7 @@ EXTERNAL_API void pojavSetWindowHint(int hint, int value) {
     }
 }
 
-EXTERNAL_API void pojavSwapBuffers() {
+EXTERNAL_API void pojavSwapBuffers(void) {
     if (pojav_environ->config_renderer == RENDERER_VK_ZINK
      || pojav_environ->config_renderer == RENDERER_GL4ES)
     {
@@ -300,14 +312,18 @@ EXTERNAL_API void* pojavCreateContext(void* contextSrc) {
     return br_init_context((basic_render_window_t*)contextSrc);
 }
 
-EXTERNAL_API JNIEXPORT jlong JNICALL
-Java_org_lwjgl_vulkan_VK_getVulkanDriverHandle(ABI_COMPAT JNIEnv *env, ABI_COMPAT jclass thiz) {
-    printf("EGLBridge: LWJGL-side Vulkan loader requested the Vulkan handle\n");
-    // The code below still uses the env var because
+void* maybe_load_vulkan(void) {
+    // We use the env var because
     // 1. it's easier to do that
     // 2. it won't break if something will try to load vulkan and osmesa simultaneously
     if(getenv("VULKAN_PTR") == NULL) load_vulkan();
-    return strtoul(getenv("VULKAN_PTR"), NULL, 0x10);
+    return (void*) strtoul(getenv("VULKAN_PTR"), NULL, 0x10);
+}
+
+EXTERNAL_API JNIEXPORT jlong JNICALL
+Java_org_lwjgl_vulkan_VK_getVulkanDriverHandle(ABI_COMPAT JNIEnv *env, ABI_COMPAT jclass thiz) {
+    printf("EGLBridge: LWJGL-side Vulkan loader requested the Vulkan handle\n");
+    return (jlong) maybe_load_vulkan();
 }
 
 EXTERNAL_API void pojavSwapInterval(int interval) {

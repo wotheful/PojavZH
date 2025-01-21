@@ -19,7 +19,9 @@
 
     <color name="background_item">#CCFFFFFF</color>
     <color name="background_item_selected">#D8DEEEF1</color>
-    <color name="background_sponsor_advanced">#CCFDAA95</color>
+    <color name="background_item_disabled">#D9FFDADA</color>
+    <color name="background_sponsor_intermediate">#CCFFCB8B</color>
+    <color name="background_sponsor_advanced">#CCFDA28A</color>
 
     <color name="edit_box_fill">#E1EDEC</color>
     <color name="edit_box_fill_selected">#D2E8E5</color>
@@ -28,6 +30,8 @@
     <color name="text_background_fill">#B3DEDEDE</color>
 
     <color name="settings_category">#17958B</color>
+
+    <color name="favorite_color">#FA7C7C</color>
 
     <color name="icon_color">#151515</color>
 

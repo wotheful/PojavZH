@@ -1,5 +1,7 @@
 package net.kdt.pojavlaunch.fragments;
 
+import static com.movtery.zalithlauncher.event.single.RefreshVersionsEvent.MODE.END;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,21 +13,25 @@ import androidx.annotation.Nullable;
 
 import com.movtery.anim.AnimPlayer;
 import com.movtery.anim.animations.Animations;
+import com.movtery.zalithlauncher.InfoCenter;
 import com.movtery.zalithlauncher.R;
 import com.movtery.zalithlauncher.databinding.FragmentLauncherBinding;
 import com.movtery.zalithlauncher.event.single.AccountUpdateEvent;
 import com.movtery.zalithlauncher.event.single.LaunchGameEvent;
-import com.movtery.zalithlauncher.event.single.RefreshVersionSpinnerEvent;
+import com.movtery.zalithlauncher.event.single.RefreshVersionsEvent;
+import com.movtery.zalithlauncher.feature.version.Version;
+import com.movtery.zalithlauncher.feature.version.utils.VersionIconUtils;
+import com.movtery.zalithlauncher.feature.version.VersionInfo;
+import com.movtery.zalithlauncher.feature.version.VersionsManager;
 import com.movtery.zalithlauncher.task.TaskExecutors;
-import com.movtery.zalithlauncher.ui.dialog.ShareLogDialog;
 import com.movtery.zalithlauncher.ui.fragment.AboutFragment;
 import com.movtery.zalithlauncher.ui.fragment.ControlButtonFragment;
 import com.movtery.zalithlauncher.ui.fragment.FilesFragment;
 import com.movtery.zalithlauncher.ui.fragment.FragmentWithAnim;
-import com.movtery.zalithlauncher.ui.fragment.ProfileManagerFragment;
-import com.movtery.zalithlauncher.ui.fragment.ProfilePathManagerFragment;
+import com.movtery.zalithlauncher.ui.fragment.VersionManagerFragment;
+import com.movtery.zalithlauncher.ui.fragment.VersionsListFragment;
 import com.movtery.zalithlauncher.ui.subassembly.account.AccountViewWrapper;
-import com.movtery.zalithlauncher.utils.PathAndUrlManager;
+import com.movtery.zalithlauncher.utils.path.PathManager;
 import com.movtery.zalithlauncher.utils.ZHTools;
 import com.movtery.zalithlauncher.utils.anim.ViewAnimUtils;
 
@@ -34,6 +40,7 @@ import net.kdt.pojavlaunch.progresskeeper.ProgressKeeper;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 public class MainMenuFragment extends FragmentWithAnim {
     public static final String TAG = "MainMenuFragment";
@@ -48,19 +55,19 @@ public class MainMenuFragment extends FragmentWithAnim {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentLauncherBinding.inflate(getLayoutInflater());
-        accountViewWrapper = new AccountViewWrapper(this, binding.viewAccount.getRoot());
+        accountViewWrapper = new AccountViewWrapper(this, binding.viewAccount);
         accountViewWrapper.refreshAccountInfo();
         return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        binding.mcVersionSpinner.setParentFragment(this);
+        binding.aboutButton.setText(InfoCenter.replaceName(requireActivity(), R.string.about_tab));
         binding.aboutButton.setOnClickListener(v -> ZHTools.swapFragmentWithAnim(this, AboutFragment.class, AboutFragment.TAG, null));
         binding.customControlButton.setOnClickListener(v -> ZHTools.swapFragmentWithAnim(this, ControlButtonFragment.class, ControlButtonFragment.TAG, null));
         binding.openMainDirButton.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
-            bundle.putString(FilesFragment.BUNDLE_LIST_PATH, PathAndUrlManager.DIR_GAME_HOME);
+            bundle.putString(FilesFragment.BUNDLE_LIST_PATH, PathManager.DIR_GAME_HOME);
             ZHTools.swapFragmentWithAnim(this, FilesFragment.class, FilesFragment.TAG, bundle);
         });
         binding.installJarButton.setOnClickListener(v -> runInstallerWithConfirmation(false));
@@ -68,42 +75,66 @@ public class MainMenuFragment extends FragmentWithAnim {
             runInstallerWithConfirmation(true);
             return true;
         });
-        binding.shareLogsButton.setOnClickListener(v -> {
-            ShareLogDialog shareLogDialog = new ShareLogDialog(requireContext());
-            shareLogDialog.show();
-        });
+        binding.shareLogsButton.setOnClickListener(v -> ZHTools.shareLogs(requireActivity()));
 
-        binding.pathManagerButton.setOnClickListener(v -> {
+        binding.version.setOnClickListener(v -> {
             if (!isTaskRunning()) {
-                checkPermissions(R.string.profiles_path_title, () -> {
-                    ViewAnimUtils.setViewAnim(binding.pathManagerButton, Animations.Pulse);
-                    ZHTools.swapFragmentWithAnim(this, ProfilePathManagerFragment.class, ProfilePathManagerFragment.TAG, null);
-                });
+                ZHTools.swapFragmentWithAnim(this, VersionsListFragment.class, VersionsListFragment.TAG, null);
             } else {
-                ViewAnimUtils.setViewAnim(binding.pathManagerButton, Animations.Shake);
-                TaskExecutors.runInUIThread(() -> Toast.makeText(requireContext(), R.string.profiles_path_task_in_progress, Toast.LENGTH_SHORT).show());
+                ViewAnimUtils.setViewAnim(binding.version, Animations.Shake);
+                TaskExecutors.runInUIThread(() -> Toast.makeText(requireContext(), R.string.version_manager_task_in_progress, Toast.LENGTH_SHORT).show());
             }
         });
         binding.managerProfileButton.setOnClickListener(v -> {
-            ViewAnimUtils.setViewAnim(binding.managerProfileButton, Animations.Pulse);
-            ZHTools.swapFragmentWithAnim(this, ProfileManagerFragment.class, ProfileManagerFragment.TAG, null);
+            if (!isTaskRunning()) {
+                ViewAnimUtils.setViewAnim(binding.managerProfileButton, Animations.Pulse);
+                ZHTools.swapFragmentWithAnim(this, VersionManagerFragment.class, VersionManagerFragment.TAG, null);
+            } else {
+                ViewAnimUtils.setViewAnim(binding.managerProfileButton, Animations.Shake);
+                TaskExecutors.runInUIThread(() -> Toast.makeText(requireContext(), R.string.version_manager_task_in_progress, Toast.LENGTH_SHORT).show());
+            }
         });
 
         binding.playButton.setOnClickListener(v -> EventBus.getDefault().post(new LaunchGameEvent()));
+
+        binding.versionName.setSelected(true);
+        binding.versionInfo.setSelected(true);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        event(new RefreshVersionSpinnerEvent());
+        VersionsManager.INSTANCE.refresh();
     }
 
     @Subscribe()
-    public void event(RefreshVersionSpinnerEvent event) {
-        binding.mcVersionSpinner.reloadProfiles();
+    public void event(RefreshVersionsEvent event) {
+        if (event.getMode() == END) {
+            TaskExecutors.runInUIThread(() -> {
+                Version version = VersionsManager.INSTANCE.getCurrentVersion();
+
+                int versionInfoVisibility;
+                if (version != null) {
+                    binding.versionName.setText(version.getVersionName());
+                    VersionInfo versionInfo = version.getVersionInfo();
+                    if (versionInfo != null) {
+                        binding.versionInfo.setText(versionInfo.getInfoString());
+                        versionInfoVisibility = View.VISIBLE;
+                    } else versionInfoVisibility = View.GONE;
+
+                    new VersionIconUtils(version).start(binding.versionIcon);
+                    binding.managerProfileButton.setVisibility(View.VISIBLE);
+                } else {
+                    binding.versionName.setText(R.string.version_no_versions);
+                    binding.managerProfileButton.setVisibility(View.GONE);
+                    versionInfoVisibility = View.GONE;
+                }
+                binding.versionInfo.setVisibility(versionInfoVisibility);
+            });
+        }
     }
 
-    @Subscribe()
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void event(AccountUpdateEvent event) {
         if (accountViewWrapper != null) accountViewWrapper.refreshAccountInfo();
     }

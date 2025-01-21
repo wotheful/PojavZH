@@ -13,9 +13,97 @@
         android:paddingVertical="@dimen/_12sdp">
 
         <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/version_category"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/background_card"
+            android:orientation="vertical"
+            android:paddingVertical="@dimen/_12sdp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_12sdp"
+                android:text="@string/setting_category_version"
+                android:textColor="@color/settings_category" />
+
+            <com.movtery.zalithlauncher.ui.layout.AnimRelativeLayout
+                android:id="@+id/version_isolation_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="@dimen/_12sdp">
+
+                <TextView
+                    android:id="@+id/version_isolation_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginEnd="@dimen/_8sdp"
+                    android:layout_toStartOf="@+id/version_isolation"
+                    android:text="@string/setting_version_isolation_title"
+                    android:textColor="@color/black_or_white" />
+
+                <TextView
+                    android:id="@+id/version_isolation_summary"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/version_isolation_title"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginEnd="@dimen/_8sdp"
+                    android:layout_toStartOf="@+id/version_isolation"
+                    android:text="@string/setting_version_isolation_desc" />
+
+                <Switch
+                    android:id="@+id/version_isolation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true" />
+            </com.movtery.zalithlauncher.ui.layout.AnimRelativeLayout>
+
+            <com.movtery.zalithlauncher.ui.layout.AnimRelativeLayout
+                android:id="@+id/versionCustomInfo_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="@dimen/_12sdp">
+
+                <TextView
+                    android:id="@+id/versionCustomInfo_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentEnd="true"
+                    android:text="@string/setting_version_custom_info_title"
+                    android:textColor="@color/black_or_white" />
+
+                <TextView
+                    android:id="@+id/versionCustomInfo_summary"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/versionCustomInfo_title"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentEnd="true"
+                    android:text="@string/setting_version_custom_info_desc" />
+
+                <com.movtery.zalithlauncher.ui.view.AnimEditText
+                    android:id="@+id/versionCustomInfo_edittext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/versionCustomInfo_summary"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:background="@drawable/background_edit_box"
+                    android:paddingHorizontal="@dimen/_8sdp" />
+            </com.movtery.zalithlauncher.ui.layout.AnimRelativeLayout>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/language_category"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_12sdp"
             android:background="@drawable/background_card"
             android:orientation="vertical"
             android:paddingVertical="@dimen/_12sdp">
@@ -38,6 +126,9 @@
                     android:id="@+id/autoSetGameLanguage_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginEnd="@dimen/_8sdp"
+                    android:layout_toStartOf="@+id/autoSetGameLanguage"
                     android:text="@string/setting_set_game_language_title"
                     android:textColor="@color/black_or_white" />
 
@@ -71,6 +162,9 @@
                     android:id="@+id/gameLanguageOverridden_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginEnd="@dimen/_8sdp"
+                    android:layout_toStartOf="@+id/gameLanguageOverridden"
                     android:text="@string/setting_set_game_language_overridden_title"
                     android:textColor="@color/black_or_white" />
 
@@ -103,6 +197,8 @@
                     android:id="@+id/setGameLanguage_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentEnd="true"
                     android:text="@string/setting_set_game_language_list"
                     android:textColor="@color/black_or_white" />
 
@@ -145,6 +241,8 @@
                     android:id="@+id/install_jre_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentEnd="true"
                     android:text="@string/setting_java_multirt_title"
                     android:textColor="@color/black_or_white" />
 
@@ -159,6 +257,41 @@
             </com.movtery.zalithlauncher.ui.layout.AnimRelativeLayout>
 
             <com.movtery.zalithlauncher.ui.layout.AnimRelativeLayout
+                android:id="@+id/selectRuntimeMode_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="@dimen/_12sdp">
+
+                <TextView
+                    android:id="@+id/selectRuntimeMode_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentEnd="true"
+                    android:text="@string/setting_java_select_runtime_title"
+                    android:textColor="@color/black_or_white" />
+
+                <TextView
+                    android:id="@+id/selectRuntimeMode_summary"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/selectRuntimeMode_title"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentEnd="true"
+                    android:text="@string/setting_java_select_runtime_desc" />
+
+                <TextView
+                    android:id="@+id/selectRuntimeMode_value"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/selectRuntimeMode_summary"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentEnd="true"
+                    android:text="@string/setting_java_select_runtime_ask_me" />
+            </com.movtery.zalithlauncher.ui.layout.AnimRelativeLayout>
+
+            <com.movtery.zalithlauncher.ui.layout.AnimRelativeLayout
                 android:id="@+id/javaArgs_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -169,6 +302,8 @@
                     android:id="@+id/javaArgs_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentEnd="true"
                     android:text="@string/setting_java_args_title"
                     android:textColor="@color/black_or_white" />
 
@@ -201,6 +336,8 @@
                     android:id="@+id/allocation_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentEnd="true"
                     android:layout_marginHorizontal="@dimen/_12sdp"
                     android:layout_marginTop="@dimen/_12sdp"
                     android:text="@string/setting_java_memory_title"
@@ -257,6 +394,9 @@
                     android:id="@+id/java_sandbox_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginEnd="@dimen/_8sdp"
+                    android:layout_toStartOf="@+id/java_sandbox"
                     android:text="@string/setting_java_sandbox_title"
                     android:textColor="@color/black_or_white" />
 
@@ -307,6 +447,9 @@
                     android:id="@+id/gameMenuShowMemory_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginEnd="@dimen/_8sdp"
+                    android:layout_toStartOf="@+id/gameMenuShowMemory"
                     android:text="@string/setting_game_menu_show_memory_title"
                     android:textColor="@color/black_or_white" />
 
@@ -340,6 +483,8 @@
                     android:id="@+id/gameMenuMemoryText_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentEnd="true"
                     android:text="@string/setting_game_menu_memory_text_title"
                     android:textColor="@color/black_or_white" />
 
@@ -373,6 +518,8 @@
                     android:id="@+id/gameMenuLocation_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentEnd="true"
                     android:text="@string/setting_game_menu_location_title"
                     android:textColor="@color/black_or_white" />
 
@@ -396,6 +543,8 @@
                     android:id="@+id/gameMenuAlpha_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentEnd="true"
                     android:layout_marginHorizontal="@dimen/_12sdp"
                     android:layout_marginTop="@dimen/_12sdp"
                     android:text="@string/setting_game_menu_alpha_title"
@@ -435,10 +584,10 @@
 
             <include
                 android:id="@+id/game_menu_preview"
-                layout="@layout/view_game_menu"
+                layout="@layout/view_game_menu_window"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"/>
+                android:layout_gravity="center_horizontal" />
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 

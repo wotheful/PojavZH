@@ -17,14 +17,14 @@ import com.google.gson.JsonSyntaxException;
 import com.movtery.zalithlauncher.R;
 import com.movtery.zalithlauncher.feature.log.Logging;
 import com.movtery.zalithlauncher.setting.AllSettings;
-import com.movtery.zalithlauncher.setting.Settings;
 import com.movtery.zalithlauncher.task.Task;
 import com.movtery.zalithlauncher.task.TaskExecutors;
 import com.movtery.zalithlauncher.ui.dialog.EditControlInfoDialog;
 import com.movtery.zalithlauncher.ui.dialog.SelectControlsDialog;
 import com.movtery.zalithlauncher.ui.dialog.TipDialog;
 import com.movtery.zalithlauncher.ui.subassembly.customcontrols.ControlInfoData;
-import com.movtery.zalithlauncher.utils.PathAndUrlManager;
+import com.movtery.zalithlauncher.utils.path.PathManager;
+import com.movtery.zalithlauncher.utils.stringutils.StringUtilsKt;
 
 import net.kdt.pojavlaunch.MinecraftGLSurface;
 import net.kdt.pojavlaunch.Tools;
@@ -71,18 +71,18 @@ public class ControlLayout extends FrameLayout {
 
 
 	public void loadLayout(String jsonPath) throws IOException, JsonSyntaxException {
-		File jsonFile = new File(jsonPath);
+		File jsonFile = jsonPath != null ? new File(jsonPath) : new File(AllSettings.getDefaultCtrl().getValue());
 
 		CustomControls layout;
 		if (jsonFile.exists()) {
-			layout = LayoutConverter.loadAndConvertIfNecessary(getContext(), jsonPath);
+			layout = LayoutConverter.loadAndConvertIfNecessary(getContext(), jsonFile.getAbsolutePath());
 		} else {
 			layout = LayoutConverter.loadFromAssets(getContext(), "default.json");
 		}
-		if(layout != null) {
+		if (layout != null) {
 			loadLayout(layout);
 			if (jsonFile.exists()) {
-				updateLoadedFileName(jsonPath);
+				mLayoutFileName = StringUtilsKt.removeSuffix(jsonFile.getName(), ".json");
 			} else {
 				mLayoutFileName = "default";
 			}
@@ -131,7 +131,7 @@ public class ControlLayout extends FrameLayout {
 			if(mModifiable) drawer.areButtonsVisible = true;
 		}
 
-		mLayout.scaledAt = AllSettings.getButtonscale();
+		mLayout.scaledAt = AllSettings.getButtonScale().getValue();
 
 		setModified(false);
 		mButtons = null;
@@ -332,11 +332,11 @@ public class ControlLayout extends FrameLayout {
 
 		mControlPopup.internalChanges = true;
 		mControlPopup.setCurrentlyEditedButton(button);
+
+		mControlPopup.appear(button.getControlView().getX() + button.getControlView().getWidth()/2f < currentDisplayMetrics.widthPixels/2f);
 		button.loadEditValues(mControlPopup);
 
 		mControlPopup.internalChanges = false;
-
-		mControlPopup.appear(button.getControlView().getX() + button.getControlView().getWidth()/2f < currentDisplayMetrics.widthPixels/2f);
 		mControlPopup.disappearColor();
 
 		if(mHandleView == null){
@@ -350,8 +350,7 @@ public class ControlLayout extends FrameLayout {
 
 	/** Swap the panel if the button position requires it */
 	public void adaptPanelPosition(){
-		if(mControlPopup != null)
-			mControlPopup.adaptPanelPosition();
+		if(mControlPopup != null) mControlPopup.adaptPanelPosition();
 	}
 
 
@@ -485,14 +484,8 @@ public class ControlLayout extends FrameLayout {
 		}
 	}
 
-	public void updateLoadedFileName(String path) {
-		path = path.replace(PathAndUrlManager.DIR_CTRLMAP_PATH, ".");
-		path = path.substring(0, path.length() - 5);
-		mLayoutFileName = path;
-	}
-
 	public String saveToDirectory(String name) throws Exception{
-		String jsonPath = PathAndUrlManager.DIR_CTRLMAP_PATH + "/" + name + ".json";
+		String jsonPath = PathManager.DIR_CTRLMAP_PATH + "/" + name + ".json";
 		saveLayout(jsonPath);
 		return jsonPath;
 	}
@@ -529,8 +522,7 @@ public class ControlLayout extends FrameLayout {
 	}
 
 	public void openLoadDialog() {
-		SelectControlsDialog dialog = new SelectControlsDialog(getContext());
-		dialog.setOnSelectedListener(file -> {
+		SelectControlsDialog dialog = new SelectControlsDialog(getContext(), file -> {
 			try {
 				loadLayout(file.getAbsolutePath());
 			} catch (IOException e) {
@@ -541,17 +533,16 @@ public class ControlLayout extends FrameLayout {
 	}
 
 	public void openSetDefaultDialog() {
-		SelectControlsDialog dialog = new SelectControlsDialog(getContext());
-		dialog.setOnSelectedListener(file -> {
-            String absolutePath = file.getAbsolutePath();
-            try {
-				Settings.Manager.put("defaultCtrl", absolutePath).save();
+		SelectControlsDialog dialog = new SelectControlsDialog(getContext(), file -> {
+			String absolutePath = file.getAbsolutePath();
+			try {
+				AllSettings.getDefaultCtrl().put(absolutePath).save();
 				loadLayout(absolutePath);
-            }catch (IOException|JsonSyntaxException e) {
-                Tools.showError(getContext(), e);
-            }
-            dialog.dismiss();
-        });
+			} catch (IOException|JsonSyntaxException e) {
+				Tools.showError(getContext(), e);
+			}
+		});
+		dialog.setTitleText(R.string.customctrl_selectdefault);
 		dialog.show();
 	}
 
@@ -559,8 +550,8 @@ public class ControlLayout extends FrameLayout {
 		new TipDialog.Builder(getContext())
 				.setTitle(R.string.customctrl_editor_exit_title)
 				.setMessage(R.string.customctrl_editor_exit_msg)
-				.setConfirmClickListener(exitListener::exitEditor)
-				.buildDialog();
+				.setConfirmClickListener(checked -> exitListener.exitEditor())
+				.showDialog();
 	}
 
 	public boolean areControlVisible(){

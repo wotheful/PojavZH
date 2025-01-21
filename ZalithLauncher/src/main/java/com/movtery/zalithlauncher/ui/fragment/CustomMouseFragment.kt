@@ -17,7 +17,7 @@ import com.movtery.anim.AnimPlayer
 import com.movtery.anim.animations.Animations
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.databinding.FragmentCustomMouseBinding
-import com.movtery.zalithlauncher.setting.Settings
+import com.movtery.zalithlauncher.setting.AllSettings
 import com.movtery.zalithlauncher.task.Task
 import com.movtery.zalithlauncher.task.TaskExecutors
 import com.movtery.zalithlauncher.ui.dialog.FilesDialog
@@ -26,12 +26,13 @@ import com.movtery.zalithlauncher.ui.subassembly.filelist.FileIcon
 import com.movtery.zalithlauncher.ui.subassembly.filelist.FileItemBean
 import com.movtery.zalithlauncher.ui.subassembly.filelist.FileRecyclerViewCreator
 import com.movtery.zalithlauncher.utils.NewbieGuideUtils
-import com.movtery.zalithlauncher.utils.PathAndUrlManager
+import com.movtery.zalithlauncher.utils.path.PathManager
 import com.movtery.zalithlauncher.utils.ZHTools
-import com.movtery.zalithlauncher.utils.file.FileTools.Companion.copyFileInBackground
+import com.movtery.zalithlauncher.utils.file.FileTools
 import com.movtery.zalithlauncher.utils.file.FileTools.Companion.mkdirs
 import com.movtery.zalithlauncher.utils.image.ImageUtils.Companion.isImage
 import com.movtery.zalithlauncher.utils.stringutils.StringUtils
+import net.kdt.pojavlaunch.Tools
 import java.io.File
 
 class CustomMouseFragment : FragmentWithAnim(R.layout.fragment_custom_mouse) {
@@ -40,19 +41,21 @@ class CustomMouseFragment : FragmentWithAnim(R.layout.fragment_custom_mouse) {
     }
 
     private lateinit var binding: FragmentCustomMouseBinding
-    private var openDocumentLauncher: ActivityResultLauncher<Array<String>>? = null
+    private lateinit var openDocumentLauncher: ActivityResultLauncher<Array<String>>
     private var fileRecyclerViewCreator: FileRecyclerViewCreator? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         openDocumentLauncher = registerForActivityResult<Array<String>, Uri>(ActivityResultContracts.OpenDocument()) { result: Uri? ->
-            result?.let {
+            result?.let { uri ->
                 val dialog = ZHTools.showTaskRunningDialog(requireContext())
                 Task.runTask {
-                    copyFileInBackground(requireActivity(), result, mousePath().absolutePath)
+                    FileTools.copyFileInBackground(requireActivity(), uri, mousePath().absolutePath)
                 }.ended(TaskExecutors.getAndroidUI()) {
                     Toast.makeText(requireActivity(), getString(R.string.file_added), Toast.LENGTH_SHORT).show()
                     loadData()
+                }.onThrowable { e ->
+                    Tools.showErrorRemote(e)
                 }.finallyTask(TaskExecutors.getAndroidUI()) {
                     dialog.dismiss()
                 }.execute()
@@ -74,7 +77,7 @@ class CustomMouseFragment : FragmentWithAnim(R.layout.fragment_custom_mouse) {
 
         binding.actionBar.apply {
             returnButton.setOnClickListener { ZHTools.onBackPressed(requireActivity()) }
-            addFileButton.setOnClickListener { openDocumentLauncher?.launch(arrayOf("image/*")) }
+            addFileButton.setOnClickListener { openDocumentLauncher.launch(arrayOf("image/*")) }
             refreshButton.setOnClickListener { loadData() }
         }
 
@@ -117,7 +120,7 @@ class CustomMouseFragment : FragmentWithAnim(R.layout.fragment_custom_mouse) {
     }
 
     private fun mousePath(): File {
-        val path = File(PathAndUrlManager.DIR_CUSTOM_MOUSE)
+        val path = File(PathManager.DIR_CUSTOM_MOUSE)
         if (!path.exists()) mkdirs(path)
         return path
     }
@@ -170,7 +173,7 @@ class CustomMouseFragment : FragmentWithAnim(R.layout.fragment_custom_mouse) {
 
                 val filesDialog = FilesDialog(requireActivity(), filesButton, Task.runTask { loadData() }, mousePath(), file)
                 filesDialog.setMoreButtonClick {
-                    Settings.Manager.put("custom_mouse", fileName).save()
+                    AllSettings.customMouse.put(fileName ?: "").save()
                     refreshIcon()
                     Toast.makeText(requireActivity(),
                         StringUtils.insertSpace(getString(R.string.custom_mouse_added), (fileName ?: getString(R.string.custom_mouse_default))),

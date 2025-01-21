@@ -3,8 +3,9 @@ package net.kdt.pojavlaunch.utils;
 import androidx.annotation.Nullable;
 
 import com.movtery.zalithlauncher.feature.log.Logging;
-import com.movtery.zalithlauncher.utils.PathAndUrlManager;
+import com.movtery.zalithlauncher.utils.path.PathManager;
 import com.movtery.zalithlauncher.utils.ZHTools;
+import com.movtery.zalithlauncher.utils.path.UrlManager;
 
 import net.kdt.pojavlaunch.Tools;
 
@@ -31,7 +32,7 @@ public class DownloadUtils {
     public static void download(URL url, OutputStream os) throws IOException {
         InputStream is = null;
         try {
-            HttpURLConnection conn = PathAndUrlManager.createHttpConnection(url);
+            HttpURLConnection conn = UrlManager.createHttpConnection(url);
             conn.setDoInput(true);
             conn.connect();
             if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
@@ -91,7 +92,7 @@ public class DownloadUtils {
     }
 
     public static <T> T downloadStringCached(String url, String cacheName, boolean force, ParseCallback<T> parseCallback) throws IOException, ParseException{
-        File cacheDestination = new File(PathAndUrlManager.DIR_CACHE_STRING, cacheName);
+        File cacheDestination = new File(PathManager.DIR_CACHE_STRING, cacheName);
         if (force && cacheDestination.exists()) org.apache.commons.io.FileUtils.deleteQuietly(cacheDestination);
         if (cacheDestination.isFile() && cacheDestination.canRead() &&
                 ZHTools.getCurrentTimeMillis() < (cacheDestination.lastModified() + 86400000)) {
@@ -157,6 +158,23 @@ public class DownloadUtils {
         }
         if(!fileOkay) throw new SHA1VerificationException("SHA1 verifcation failed after 5 download attempts");
         return result;
+    }
+
+    /**
+     * Get the content length for a given URL.
+     * @param url the URL to get the length for
+     * @return the length in bytes or -1 if not available
+     * @throws IOException if an I/O error occurs.
+     */
+    public static long getContentLength(String url) throws IOException {
+        HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
+        urlConnection.setRequestMethod("HEAD");
+        urlConnection.setDoInput(false);
+        urlConnection.setDoOutput(false);
+        urlConnection.connect();
+        int responseCode = urlConnection.getResponseCode();
+        if(responseCode >= 200 && responseCode <= 299) return urlConnection.getContentLength();
+        return -1;
     }
 
     public interface ParseCallback<T> {

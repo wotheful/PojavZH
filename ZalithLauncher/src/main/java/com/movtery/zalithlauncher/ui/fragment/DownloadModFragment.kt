@@ -12,22 +12,29 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.movtery.anim.AnimPlayer
+import com.movtery.anim.animations.Animations
+import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.event.value.DownloadRecyclerEnableEvent
 import com.movtery.zalithlauncher.feature.download.InfoViewModel
 import com.movtery.zalithlauncher.feature.download.ScreenshotAdapter
 import com.movtery.zalithlauncher.feature.download.VersionAdapter
+import com.movtery.zalithlauncher.feature.download.enums.Classify
+import com.movtery.zalithlauncher.feature.download.enums.ModLoader
 import com.movtery.zalithlauncher.feature.download.item.InfoItem
 import com.movtery.zalithlauncher.feature.download.item.ModVersionItem
 import com.movtery.zalithlauncher.feature.download.item.ScreenshotItem
 import com.movtery.zalithlauncher.feature.download.item.VersionItem
 import com.movtery.zalithlauncher.feature.download.platform.AbstractPlatformHelper
 import com.movtery.zalithlauncher.feature.log.Logging
+import com.movtery.zalithlauncher.feature.version.VersionsManager
 import com.movtery.zalithlauncher.setting.AllSettings
 import com.movtery.zalithlauncher.task.Task
 import com.movtery.zalithlauncher.task.TaskExecutors
 import com.movtery.zalithlauncher.ui.subassembly.modlist.ModListAdapter
 import com.movtery.zalithlauncher.ui.subassembly.modlist.ModListFragment
 import com.movtery.zalithlauncher.ui.subassembly.modlist.ModListItemBean
+import com.movtery.zalithlauncher.ui.view.AnimButton
 import com.movtery.zalithlauncher.utils.MCVersionRegex.Companion.RELEASE_REGEX
 import com.movtery.zalithlauncher.utils.ZHTools
 import com.movtery.zalithlauncher.utils.stringutils.StringUtilsKt
@@ -35,7 +42,7 @@ import net.kdt.pojavlaunch.Tools
 import org.greenrobot.eventbus.EventBus
 import org.jackhuang.hmcl.ui.versions.ModTranslations
 import org.jackhuang.hmcl.util.versioning.VersionNumber
-import java.io.File
+import java.util.Objects
 import java.util.concurrent.Future
 import java.util.function.Consumer
 
@@ -46,7 +53,6 @@ class DownloadModFragment : ModListFragment() {
 
     private lateinit var platformHelper: AbstractPlatformHelper
     private lateinit var mInfoItem: InfoItem
-    private var mPath: File? = null
     private var linkGetSubmit: Future<*>? = null
 
     override fun init() {
@@ -101,7 +107,8 @@ class DownloadModFragment : ModListFragment() {
         val pattern = RELEASE_REGEX
 
         val releaseCheckBoxChecked = releaseCheckBox.isChecked
-        val mModVersionsByMinecraftVersion: MutableMap<String, MutableList<VersionItem>> = HashMap()
+        //在Key内同时记录MC版本，与Mod加载器信息，以便之后细分Mod加载器
+        val mModVersionsByMinecraftVersion: MutableMap<Pair<String, ModLoader?>, MutableList<VersionItem>> = HashMap()
 
         versions?.forEach(Consumer { versionItem ->
             currentTask?.apply { if (isCancelled) return@Consumer }
@@ -121,66 +128,108 @@ class DownloadModFragment : ModListFragment() {
                     val modloaders = versionItem.modloaders
                     if (modloaders.isNotEmpty()) {
                         modloaders.forEach {
-                            addIfAbsent(mModVersionsByMinecraftVersion, "${it.loaderName} $mcVersion", versionItem)
+                            addIfAbsent(mModVersionsByMinecraftVersion, Pair(mcVersion, it), versionItem)
                         }
                         //当这个版本是一个 ModVersionItem 的时候，则检查其Mod加载器是否不为空，如果不为空，则将版本支持的Mod加载器，放到不同的Mod加载器列表中
                         //这样会让用户更容易找到匹配自己需要的Mod加载器的版本
                         continue //已经分类完毕，没有必要再将这个版本加入进普通的版本列表中了
                     }
                 }
-                addIfAbsent(mModVersionsByMinecraftVersion, mcVersion, versionItem)
+                addIfAbsent(mModVersionsByMinecraftVersion, Pair(mcVersion, null), versionItem)
             }
         })
 
         currentTask?.apply { if (isCancelled) return }
 
+        val currentVersion = VersionsManager.getCurrentVersion()
+        //定位首次适配的版本，并记录其索引，在加载完成之后，RecyclerView 会滚动到这个索引处
+        var firstAdaptIndex: Int? = null
+
         val mData: MutableList<ModListItemBean> = ArrayList()
         mModVersionsByMinecraftVersion.entries
             .sortedWith { entry1, entry2 ->
-                //忽略这些可能会影响到排序的字符串
-                fun String.ignoreSpecific(): String {
-                    val rawString =
-                        //因为NeoForge也有"Forge"，如果不放在Forge前面，那么可能会被替换为"Neo"
-                        listOf("Minecraft", "Fabric", "Quilt", "NeoForge", "Forge")
-                            .fold(this) { acc, str ->
-                                acc.replace(str, "")
-                            }
-                    return rawString.trim()
+                val mcVersionComparison = -VersionNumber.compare(entry1.key.first, entry2.key.first)
+                if (mcVersionComparison != 0) {
+                    mcVersionComparison
+                } else {
+                    val name1 = entry1.key.second?.name ?: ""
+                    val name2 = entry2.key.second?.name ?: ""
+                    //保证有ModLoader的版本在前
+                    if (name1.isEmpty() && name2.isNotEmpty()) 1
+                    else if (name1.isNotEmpty() && name2.isEmpty()) -1
+                    else name1.compareTo(name2)
                 }
-
-                -VersionNumber.compare(
-                    entry1.key.ignoreSpecific(),
-                    entry2.key.ignoreSpecific()
-                )
             }
-            .forEach { entry: Map.Entry<String, List<VersionItem>> ->
+            .forEachIndexed { index: Int, entry: Map.Entry<Pair<String, ModLoader?>, List<VersionItem>> ->
                 currentTask?.apply { if (isCancelled) return }
 
+                val isAdapt: Boolean = when (mInfoItem.classify) {
+                    Classify.MODPACK -> false
+                    else -> currentVersion?.let { version ->
+                        val itemVersion = VersionNumber.asVersion(entry.key.first).canonical
+                        val currentVersionString = VersionNumber.asVersion(version.getVersionInfo()?.minecraftVersion ?: "").canonical
+
+                        if (!Objects.equals(itemVersion, currentVersionString)) return@let false
+
+                        val modloader = entry.key.second
+                        val loaderInfo = version.getVersionInfo()?.loaderInfo
+
+                        when {
+                            //资源没有模组加载器信息，直接判定适配
+                            modloader == null -> true
+                            //资源有模组加载器，但当前版本没有模组加载器信息，不适配
+                            //（不装模组加载器你想装什么模组？）
+                            loaderInfo == null -> false
+                            //匹配模组加载器
+                            else -> loaderInfo.any { loader -> Objects.equals(modloader.loaderName, loader.name) }
+                        }
+                    } ?: false
+                }
+
+                if (isAdapt) {
+                    firstAdaptIndex ?: run {
+                        firstAdaptIndex = index
+                    }
+                }
+
                 mData.add(
-                    ModListItemBean("Minecraft " + entry.key,
-                    VersionAdapter(this, mInfoItem, platformHelper, entry.value, mPath))
+                    ModListItemBean(
+                        entry.key.first,
+                        entry.key.second,
+                        isAdapt,
+                        VersionAdapter(mInfoItem, platformHelper, entry.value)
+                    )
                 )
             }
 
         currentTask?.apply { if (isCancelled) return }
 
         Task.runTask(TaskExecutors.getAndroidUI()) {
-            val modVersionView = recyclerView
             runCatching {
-                var mModAdapter = modVersionView.adapter as ModListAdapter?
-                mModAdapter ?: run {
-                    mModAdapter = ModListAdapter(this, mData)
-                    modVersionView.layoutManager = LinearLayoutManager(fragmentActivity!!)
-                    modVersionView.adapter = mModAdapter
+                var modAdapter = recyclerView.adapter as ModListAdapter?
+                modAdapter ?: run {
+                    modAdapter = ModListAdapter(this, mData)
+                    recyclerView.layoutManager = LinearLayoutManager(fragmentActivity!!)
+                    recyclerView.adapter = modAdapter
                     return@runCatching
                 }
-                mModAdapter?.updateData(mData)
+                modAdapter?.updateData(mData)
             }.getOrElse { e ->
                 Logging.e("Set Adapter", Tools.printToString(e))
             }
 
             componentProcessing(false)
-            modVersionView.scheduleLayoutAnimation()
+            recyclerView.scheduleLayoutAnimation()
+
+            firstAdaptIndex?.let {
+                recyclerView.postDelayed(
+                    {
+                        //直接滚动到先前获取到的“首次适配”的索引，并且往下偏移两个索引
+                        recyclerView.smoothScrollToPosition((it + 2).coerceAtMost(mData.size - 1))
+                    },
+                    500
+                )
+            }
         }.execute()
     }
 
@@ -189,7 +238,6 @@ class DownloadModFragment : ModListFragment() {
         val viewModel = ViewModelProvider(fragmentActivity!!)[InfoViewModel::class.java]
         platformHelper = viewModel.platformHelper
         mInfoItem = viewModel.infoItem
-        mPath = viewModel.targetPath
 
         mInfoItem.apply {
             val type = ModTranslations.getTranslationsByRepositoryType(classify)
@@ -210,7 +258,7 @@ class DownloadModFragment : ModListFragment() {
 
             iconUrl?.apply {
                 Glide.with(fragmentActivity!!).load(this).apply {
-                    if (!AllSettings.resourceImageCache) diskCacheStrategy(DiskCacheStrategy.NONE)
+                    if (!AllSettings.resourceImageCache.getValue()) diskCacheStrategy(DiskCacheStrategy.NONE)
                 }.into(getIconView())
             }
         }
@@ -223,7 +271,22 @@ class DownloadModFragment : ModListFragment() {
         Task.runTask {
             platformHelper.getScreenshots(mInfoItem.projectId)
         }.ended(TaskExecutors.getAndroidUI()) { screenshotItems ->
-            screenshotItems?.let { setScreenshotView(it) }
+            screenshotItems?.let addButton@{ items ->
+                if (items.isEmpty()) return@addButton
+                fragmentActivity?.let { activity ->
+                    //添加一个按钮，通过点击这个按钮来加载屏幕截图数据
+                    addMoreView(AnimButton(activity).apply {
+                        layoutParams = RecyclerView.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
+                        setText(R.string.download_info_load_screenshot)
+                        setOnClickListener {
+                            setScreenshotView(items)
+                            AnimPlayer.play().apply(AnimPlayer.Entry(this, Animations.FadeOut))
+                                .setOnEnd { removeMoreView(this) }
+                                .start()
+                        }
+                    })
+                }
+            }
             removeMoreView(progressBar)
         }.onThrowable { e ->
             Logging.e(

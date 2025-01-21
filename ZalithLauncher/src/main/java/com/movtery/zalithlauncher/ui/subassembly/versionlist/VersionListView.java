@@ -11,24 +11,28 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.movtery.zalithlauncher.R;
 import com.movtery.zalithlauncher.event.sticky.MinecraftVersionValueEvent;
-import com.movtery.zalithlauncher.feature.customprofilepath.ProfilePathHome;
+import com.movtery.zalithlauncher.feature.log.Logging;
 import com.movtery.zalithlauncher.task.TaskExecutors;
 import com.movtery.zalithlauncher.ui.subassembly.filelist.FileItemBean;
 import com.movtery.zalithlauncher.ui.subassembly.filelist.FileRecyclerViewCreator;
 
 import net.kdt.pojavlaunch.JMinecraftVersionList;
+import net.kdt.pojavlaunch.Tools;
 import net.kdt.pojavlaunch.utils.FilteredSubList;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.io.File;
-import java.util.Arrays;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import kotlin.Pair;
 
 public class VersionListView extends LinearLayout {
     private Context context;
     private List<JMinecraftVersionList.Version> releaseList, snapshotList, betaList, alphaList;
-    private String[] mInstalledVersions;
     private FileRecyclerViewCreator fileRecyclerViewCreator;
     private VersionSelectedListener versionSelectedListener;
 
@@ -66,10 +70,6 @@ public class VersionListView extends LinearLayout {
             versionArray = new JMinecraftVersionList.Version[0];
         }
 
-        mInstalledVersions = new File(ProfilePathHome.getGameHome() + "/versions").list();
-        if (mInstalledVersions != null)
-            Arrays.sort(mInstalledVersions);
-
         releaseList = new FilteredSubList<>(versionArray, item -> item.type.equals("release"));
         snapshotList = new FilteredSubList<>(versionArray, item -> item.type.equals("snapshot"));
         betaList = new FilteredSubList<>(versionArray, item -> item.type.equals("old_beta"));
@@ -86,12 +86,22 @@ public class VersionListView extends LinearLayout {
         addView(mainListView, layParam);
     }
 
-    private String[] getVersionIds(List<JMinecraftVersionList.Version> versions) {
-        String[] strings = new String[versions.size()];
+    private Pair<String, Date>[] getVersionPair(List<JMinecraftVersionList.Version> versions) {
+        List<Pair<String, Date>> pairList = new ArrayList<>();
         for (int i = 0; i < versions.size(); i++) {
-            strings[i] = versions.get(i).id;
+            JMinecraftVersionList.Version version = versions.get(i);
+            Date date;
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+                ZonedDateTime zonedDateTime = ZonedDateTime.parse(version.releaseTime, formatter);
+                date = Date.from(zonedDateTime.toInstant());
+            } catch (Exception e) {
+                Logging.e("Version List", Tools.printToString(e));
+                date = null;
+            }
+            pairList.add(new Pair<>(version.id, date));
         }
-        return strings;
+        return pairList.toArray(new Pair[0]);
     }
 
     public void setVersionSelectedListener(VersionSelectedListener versionSelectedListener) {
@@ -105,22 +115,20 @@ public class VersionListView extends LinearLayout {
     @SuppressLint("UseCompatLoadingForDrawables")
     private List<FileItemBean> showVersions(VersionType versionType) {
         switch (versionType) {
-            case RELEASE:
-                return getVersion(context.getDrawable(R.drawable.ic_minecraft), getVersionIds(releaseList));
             case SNAPSHOT:
-                return getVersion(context.getDrawable(R.drawable.ic_command_block), getVersionIds(snapshotList));
+                return getVersion(context.getDrawable(R.drawable.ic_command_block), getVersionPair(snapshotList));
             case BETA:
-                return getVersion(context.getDrawable(R.drawable.ic_old_cobblestone), getVersionIds(betaList));
+                return getVersion(context.getDrawable(R.drawable.ic_old_cobblestone), getVersionPair(betaList));
             case ALPHA:
-                return getVersion(context.getDrawable(R.drawable.ic_old_grass_block), getVersionIds(alphaList));
-            case INSTALLED:
+                return getVersion(context.getDrawable(R.drawable.ic_old_grass_block), getVersionPair(alphaList));
+            case RELEASE:
             default:
-                return getVersion(context.getDrawable(R.drawable.ic_barrel), mInstalledVersions);
+                return getVersion(context.getDrawable(R.drawable.ic_minecraft), getVersionPair(releaseList));
         }
     }
 
-    private List<FileItemBean> getVersion(Drawable icon, String[] names) {
-        List<FileItemBean> itemBeans = FileRecyclerViewCreator.loadItemBean(icon, names);
+    private List<FileItemBean> getVersion(Drawable icon, Pair<String, Date>[] namesPair) {
+        List<FileItemBean> itemBeans = FileRecyclerViewCreator.loadItemBean(icon, namesPair);
         TaskExecutors.runInUIThread(() -> fileRecyclerViewCreator.loadData(itemBeans));
         return itemBeans;
     }

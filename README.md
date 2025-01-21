@@ -2,8 +2,9 @@
     <img width="256" src="ZalithLauncher/src/main/res/drawable/app_name_title.png"></img>
 </div>
 
-[![Android CI](https://github.com/MovTery/ZalithLauncher/actions/workflows/android.yml/badge.svg)](https://github.com/MovTery/ZalithLauncher/actions/workflows/android.yml)
-![Downloads](https://img.shields.io/github/downloads/MovTery/ZalithLauncher/total)
+[![Android CI](https://github.com/ZalithLauncher/ZalithLauncher/actions/workflows/android.yml/badge.svg)](https://github.com/ZalithLauncher/ZalithLauncher/actions/workflows/android.yml)
+![Downloads](https://img.shields.io/github/downloads/ZalithLauncher/ZalithLauncher/total)
+[![QQ](https://img.shields.io/badge/QQ-blue)](https://qm.qq.com/q/2MVxS0B29y)
 [![Sponsor](https://img.shields.io/badge/sponsor-30363D?logo=GitHub-Sponsors)](https://afdian.com/a/MovTery)
 
 - <a href="/README_ZH_CN.md">简体中文</a>丨<a href="/README-ZH_TW.md">繁體中文</a>
@@ -16,9 +17,9 @@
 
 - [x] Refactored app layout for improved aesthetics and usability.
 - [x] Built-in simple file manager to eliminate worries about Android permission restrictions!
-- [x] Customizable game directory location, with support for external storage directories.
-- [x] Add more renderers!
-- [x] Download Mods, ModPacks, Resource Packs, and Saves within the launcher!
+- [x] Better version management, customizable game directory location, allowing settings in external storage directories.
+- [x] Add more renderers, with support for renderer plugins!
+- [x] Download Mods, ModPacks, resource packs, saves, and shader packs directly within the launcher!
 - [x] Customizable virtual mouse icon and launcher background image.
 - [x] Light and dark themes available.
 - [x] And more features!
@@ -31,9 +32,7 @@
 
 <h2 align="center">Download</h2>
 
-- Visit [Release](https://github.com/MovTery/ZalithLauncher/releases) to check the latest stable version (updates are infrequent).
-- (Not recommended) Visit [Actions](https://github.com/MovTery/ZalithLauncher/actions) to see the latest versions (main branch: main, other branches can be ignored!)  
-  After entering, click **ZalithLauncher** to download (Debug is for test builds, Release is for release builds).
+- Visit [Release](https://github.com/ZalithLauncher/ZalithLauncher/releases) to check the latest stable version (updates are infrequent).
 
 <h2 align="center">License</h2>
 

@@ -13,6 +13,7 @@ import com.movtery.zalithlauncher.setting.AllSettings;
 import com.movtery.zalithlauncher.utils.stringutils.StringUtils;
 
 import net.kdt.pojavlaunch.Tools;
+import net.kdt.pojavlaunch.customcontrols.buttons.ControlInterface;
 import net.kdt.pojavlaunch.utils.JSONUtils;
 import net.objecthunter.exp4j.ExpressionBuilder;
 import net.objecthunter.exp4j.function.Function;
@@ -88,7 +89,7 @@ public class ControlData {
         this(name, keycodes, x, y, 50, 50);
     }
 
-    public ControlData(android.content.Context ctx, int resId, int[] keycodes, float x, float y, boolean isSquare) {
+    public ControlData(Context ctx, int resId, int[] keycodes, float x, float y, boolean isSquare) {
         this(ctx.getResources().getString(resId), keycodes, x, y, isSquare);
     }
 
@@ -104,7 +105,7 @@ public class ControlData {
         this(name, keycodes, dynamicX, dynamicY, 50, 50, false);
     }
 
-    public ControlData(android.content.Context ctx, int resId, int[] keycodes, String dynamicX, String dynamicY, boolean isSquare) {
+    public ControlData(Context ctx, int resId, int[] keycodes, String dynamicX, String dynamicY, boolean isSquare) {
         this(ctx.getResources().getString(resId), keycodes, dynamicX, dynamicY, isSquare);
     }
 
@@ -245,7 +246,7 @@ public class ControlData {
         keyValueMap.put("height", "DUMMY_HEIGHT");
         keyValueMap.put("screen_width", "DUMMY_DATA");
         keyValueMap.put("screen_height", "DUMMY_DATA");
-        keyValueMap.put("margin", Integer.toString((int) Tools.dpToPx(2)));
+        keyValueMap.put("margin", Integer.toString((int) ControlInterface.getMarginDistance()));
         keyValueMap.put("preferred_scale", "DUMMY_DATA");
 
         conversionMap = new WeakReference<>(keyValueMap);
@@ -304,7 +305,7 @@ public class ControlData {
         valueMap.put("height", Float.toString(getHeight()));
         valueMap.put("screen_width", Integer.toString(CallbackBridge.physicalWidth));
         valueMap.put("screen_height", Integer.toString(CallbackBridge.physicalHeight));
-        valueMap.put("preferred_scale", Float.toString(AllSettings.getButtonscale()));
+        valueMap.put("preferred_scale", Float.toString(AllSettings.getButtonScale().getValue()));
 
         return valueMap;
     }

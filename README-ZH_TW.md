@@ -2,8 +2,9 @@
     <img width="256" src="ZalithLauncher/src/main/res/drawable/app_name_title.png"></img>
 </div>
 
-[![Android CI](https://github.com/MovTery/ZalithLauncher/actions/workflows/android.yml/badge.svg)](https://github.com/MovTery/ZalithLauncher/actions/workflows/android.yml)
-![Downloads](https://img.shields.io/github/downloads/MovTery/ZalithLauncher/total)
+[![Android CI](https://github.com/ZalithLauncher/ZalithLauncher/actions/workflows/android.yml/badge.svg)](https://github.com/ZalithLauncher/ZalithLauncher/actions/workflows/android.yml)
+![Downloads](https://img.shields.io/github/downloads/ZalithLauncher/ZalithLauncher/total)
+[![QQ](https://img.shields.io/badge/QQ-blue)](https://qm.qq.com/q/2MVxS0B29y)
 [![Sponsor](https://img.shields.io/badge/sponsor-30363D?logo=GitHub-Sponsors)](https://afdian.com/a/MovTery)
 
 - <a href="/README.md">English</a>丨<a href="/README_ZH_CN.md">简体中文</a>
@@ -16,9 +17,9 @@
 
 - [x] 重構應用佈局，更加美觀更加合理。
 - [x] 內建簡單的檔案管理器，再也不必為安卓權限限制而煩惱！
-- [x] 自訂遊戲目錄位置，允許設定於外部儲存目錄。
-- [x] 添加更多渲染器！
-- [x] 在啟動器內下載 Mod、ModPack、資源包和存檔！
+- [x] 更好的版本管理，自訂遊戲目錄位置，允許設定於外部存儲目錄。
+- [x] 新增更多渲染器，支援使用渲染器插件！
+- [x] 在啟動器內下載模組、模組包、資源包、存檔、光影包！
 - [x] 自訂虛擬滑鼠圖示，與自訂啟動器背景圖片。
 - [x] 淺色主題與深色主題自由選擇。
 - [x] 以及更多功能！
@@ -31,8 +32,8 @@
 
 <h2 align="center">下載</h2>
 
-- 前往 [Release](https://github.com/MovTery/ZalithLauncher/releases) 查看最新且經過測試的穩定版本（更新並不頻繁）。
-- (並不推薦) 前往 [Actions](https://github.com/MovTery/ZalithLauncher/actions) 查看最新的版本 ( 主線：main，其他任何支線均可忽略！)，  
+- 前往 [Release](https://github.com/ZalithLauncher/ZalithLauncher/releases) 查看最新且經過測試的穩定版本（更新並不頻繁）。
+- (並不推薦) 前往 [Actions](https://github.com/ZalithLauncher/ZalithLauncher/actions) 查看最新的版本 ( 主線：main，其他任何支線均可忽略！)，  
   進入後，點擊 **ZalithLauncher** 下載 (Debug 為測試構建版本，Release 為發行構建版本)。
 
 <h2 align="center">協議</h2>

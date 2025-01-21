@@ -6,7 +6,8 @@ import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.movtery.zalithlauncher.event.single.SettingsChangeEvent
 import com.movtery.zalithlauncher.feature.log.Logging
-import com.movtery.zalithlauncher.utils.PathAndUrlManager
+import com.movtery.zalithlauncher.setting.unit.AbstractSettingUnit
+import com.movtery.zalithlauncher.utils.path.PathManager
 import net.kdt.pojavlaunch.Tools
 import org.apache.commons.io.FileUtils
 import org.greenrobot.eventbus.EventBus
@@ -20,7 +21,7 @@ class Settings {
         private var settings: List<SettingAttribute> = refresh()
 
         private fun refresh(): List<SettingAttribute> {
-            return PathAndUrlManager.FILE_SETTINGS.takeIf { it.exists() }?.let { file ->
+            return PathManager.FILE_SETTINGS.takeIf { it.exists() }?.let { file ->
                 try {
                     val jsonString = Tools.read(file)
                     val listType: Type = object : TypeToken<List<SettingAttribute>>() {}.type
@@ -39,37 +40,13 @@ class Settings {
 
     class Manager {
         companion object {
-            private fun <T> getValue(key: String, defaultValue: T, parser: (String) -> T?): T {
+            fun <T> getValue(key: String, defaultValue: T, parser: (String) -> T?): T {
                 settings.forEach {
                     if (Objects.equals(it.key, key)) {
                         return it.value?.let { value -> parser(value) } ?: defaultValue
                     }
                 }
                 return defaultValue
-            }
-
-            fun getInt(key: String, defaultValue: Int): Int {
-                return getValue(key, defaultValue) { it.toIntOrNull() }
-            }
-
-            fun getFloat(key: String, defaultValue: Float): Float {
-                return getValue(key, defaultValue) { it.toFloatOrNull() }
-            }
-
-            fun getDouble(key: String, defaultValue: Double): Double {
-                return getValue(key, defaultValue) { it.toDoubleOrNull() }
-            }
-
-            fun getLong(key: String, defaultValue: Long): Long {
-                return getValue(key, defaultValue) { it.toLongOrNull() }
-            }
-
-            fun getBoolean(key: String, defaultValue: Boolean): Boolean {
-                return getValue(key, defaultValue) { it.toBoolean() }
-            }
-
-            fun getString(key: String, defaultValue: String?): String? {
-                return getValue(key, defaultValue) { it }
             }
 
             @JvmStatic
@@ -79,44 +56,43 @@ class Settings {
 
             @JvmStatic
             @CheckResult
-            fun put(key: String, value: Any?) = SettingBuilder().put(key, value)
+            fun put(key: String, value: Any) = SettingBuilder().put(key, value)
         }
 
         class SettingBuilder {
             private val valueMap: MutableMap<String, Any?> = HashMap()
 
             @CheckResult
-            fun put(key: String, value: Any?): SettingBuilder {
+            fun put(key: String, value: Any): SettingBuilder {
                 valueMap[key] = value
                 return this
             }
 
+            @CheckResult
+            fun put(unit: AbstractSettingUnit<*>, value: Any): SettingBuilder {
+                valueMap[unit.key] = value
+                return this
+            }
+
             fun save() {
-                val settingsFile = PathAndUrlManager.FILE_SETTINGS
+                val settingsFile = PathManager.FILE_SETTINGS
                 if (!settingsFile.exists()) settingsFile.createNewFile()
 
                 val currentSettings = settings.toMutableList()
-                val nullValueList: MutableSet<SettingAttribute> = HashSet()
 
                 valueMap.forEach { (key, value) ->
                     val attribute = currentSettings.find { it.key == key }
 
-                    if (value == null) {
-                        attribute?.apply { nullValueList.add(this) }
+                    if (attribute != null) {
+                        attribute.value = value.toString()
                     } else {
-                        if (attribute != null) {
-                            attribute.value = value.toString()
-                        } else {
-                            val newAttribute = SettingAttribute().apply {
-                                this.key = key
-                                this.value = value.toString()
-                            }
-                            currentSettings.add(newAttribute)
+                        val newAttribute = SettingAttribute().apply {
+                            this.key = key
+                            this.value = value.toString()
                         }
+                        currentSettings.add(newAttribute)
                     }
                 }
-
-                currentSettings.removeAll(nullValueList)
 
                 val json = GSON.toJson(currentSettings)
 

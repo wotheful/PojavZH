@@ -1,6 +1,7 @@
 package net.kdt.pojavlaunch;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import static com.movtery.zalithlauncher.utils.ZHTools.getVersionCode;
 import static com.movtery.zalithlauncher.utils.ZHTools.getVersionName;
 
 import android.app.Application;
@@ -15,13 +16,15 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 
+import com.movtery.zalithlauncher.InfoCenter;
 import com.movtery.zalithlauncher.context.ContextExecutor;
 import com.movtery.zalithlauncher.context.LocaleHelper;
+import com.movtery.zalithlauncher.feature.customprofilepath.ProfilePathHome;
 import com.movtery.zalithlauncher.feature.log.Logging;
 import com.movtery.zalithlauncher.setting.AllSettings;
 import com.movtery.zalithlauncher.setting.LegacySettingsSync;
 import com.movtery.zalithlauncher.ui.activity.ErrorActivity;
-import com.movtery.zalithlauncher.utils.PathAndUrlManager;
+import com.movtery.zalithlauncher.utils.path.PathManager;
 import com.movtery.zalithlauncher.utils.ZHTools;
 
 import net.kdt.pojavlaunch.utils.FileUtils;
@@ -42,17 +45,17 @@ public class PojavApplication extends Application {
 
 		Thread.setDefaultUncaughtExceptionHandler((thread, th) -> {
 			boolean storagePermAllowed = (Build.VERSION.SDK_INT >= 29 || ActivityCompat.checkSelfPermission(PojavApplication.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) && Tools.checkStorageRoot();
-			File crashFile = new File(storagePermAllowed ? PathAndUrlManager.DIR_LAUNCHER_LOG : PathAndUrlManager.DIR_DATA, "latestcrash.txt");
+			File crashFile = new File(storagePermAllowed ? PathManager.DIR_LAUNCHER_LOG : PathManager.DIR_DATA, "latestcrash.txt");
 			try {
 				// Write to file, since some devices may not able to show error
 				FileUtils.ensureParentDirectory(crashFile);
 				PrintStream crashStream = new PrintStream(crashFile);
-				crashStream.append("Zalith Launcher crash report\n");
+				crashStream.append(InfoCenter.APP_NAME + " crash report\n");
 				crashStream.append(" - Time: ").append(DateFormat.getDateTimeInstance().format(new Date())).append("\n");
 				crashStream.append(" - Device: ").append(Build.PRODUCT).append(" ").append(Build.MODEL).append("\n");
 				crashStream.append(" - Android version: ").append(Build.VERSION.RELEASE).append("\n");
 				crashStream.append(" - Crash stack trace:\n");
-				crashStream.append(" - Launcher version: ").append(getVersionName()).append("\n");
+				crashStream.append(" - Launcher version: ").append(getVersionName()).append(" (").append(String.valueOf(getVersionCode())).append(")").append("\n");
 				crashStream.append(Log.getStackTraceString(th));
 				crashStream.close();
 			} catch (Throwable throwable) {
@@ -66,10 +69,9 @@ public class PojavApplication extends Application {
 		
 		try {
 			super.onCreate();
-			
-			PathAndUrlManager.DIR_DATA = getDir("files", MODE_PRIVATE).getParent();
-			PathAndUrlManager.DIR_CACHE = getCacheDir();
-			PathAndUrlManager.DIR_ACCOUNT_NEW = PathAndUrlManager.DIR_DATA + "/accounts";
+			PathManager.DIR_DATA = getDir("files", MODE_PRIVATE).getParent();
+			PathManager.DIR_CACHE = getCacheDir();
+			PathManager.DIR_ACCOUNT_NEW = PathManager.DIR_DATA + "/accounts";
 			Tools.DEVICE_ARCHITECTURE = Architecture.getDeviceArchitecture();
 			//Force x86 lib directory for Asus x86 based zenfones
 			if(Architecture.isx86Device() && Architecture.is32BitsDevice()){
@@ -86,7 +88,7 @@ public class PojavApplication extends Application {
 		}
 
 		//设置主题
-		String launcherTheme = AllSettings.getLauncherTheme();
+		String launcherTheme = AllSettings.getLauncherTheme().getValue();
 		Objects.requireNonNull(launcherTheme);
 		if (!Objects.equals(launcherTheme, "system")) {
 			switch (launcherTheme) {
@@ -108,8 +110,8 @@ public class PojavApplication extends Application {
 
 	@Override
     protected void attachBaseContext(Context base) {
-        super.attachBaseContext(LocaleHelper.Companion.setLocale(base));
 		ContextExecutor.setApplication(this);
+        super.attachBaseContext(LocaleHelper.Companion.setLocale(base));
     }
 
     @Override

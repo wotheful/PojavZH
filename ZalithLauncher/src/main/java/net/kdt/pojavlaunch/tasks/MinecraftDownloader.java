@@ -34,14 +34,18 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class MinecraftDownloader {
+    private static final double ONE_MEGABYTE = (1024d * 1024d);
     public static final String MINECRAFT_RES = "https://resources.download.minecraft.net/";
     private AtomicReference<Exception> mDownloaderThreadException;
     private ArrayList<DownloaderTask> mScheduledDownloadTasks;
-    private AtomicLong mDownloadFileCounter;
-    private AtomicLong mDownloadSizeCounter;
-    private long mDownloadFileCount;
+    private AtomicLong mProcessedFileCounter;
+    private AtomicLong mProcessedSizeCounter; // Total bytes of processed files (passed SHA1 or downloaded)
+    private AtomicLong mInternetUsageCounter; // How many bytes downloaded over Internet
+    private long mTotalFileCount;
+    private long mTotalSize;
     private File mSourceJarFile; // The source client JAR picked during the inheritance process
     private File mTargetJarFile; // The destination client JAR to which the source will be copied to.
+    private boolean mUseFileCounter; // Whether a file counter or a size counter should be used for progress
 
     private static final ThreadLocal<byte[]> sThreadLocalDownloadBuffer = new ThreadLocal<>();
 
@@ -73,19 +77,19 @@ public class MinecraftDownloader {
         // Put up a dummy progress line, for the activity to start the service and do all the other necessary
         // work to keep the launcher alive. We will replace this line when we will start downloading stuff.
         ProgressLayout.setProgress(ProgressLayout.DOWNLOAD_MINECRAFT, 0, R.string.newdl_starting);
+        SpeedCalculator speedCalculator = new SpeedCalculator();
 
         mTargetJarFile = createGameJarPath(versionName);
         mScheduledDownloadTasks = new ArrayList<>();
-        mDownloadFileCounter = new AtomicLong(0);
-        mDownloadSizeCounter = new AtomicLong(0);
+        mProcessedFileCounter = new AtomicLong(0);
+        mProcessedSizeCounter = new AtomicLong(0);
+        mInternetUsageCounter = new AtomicLong(0);
         mDownloaderThreadException = new AtomicReference<>(null);
+        mUseFileCounter = false;
 
         downloadAndProcessMetadata(verInfo, versionName);
 
-        ArrayBlockingQueue<Runnable> taskQueue =
-                new ArrayBlockingQueue<>(mScheduledDownloadTasks.size(), false);
-        ThreadPoolExecutor downloaderPool =
-                new ThreadPoolExecutor(4, 4, 500, TimeUnit.MILLISECONDS, taskQueue);
+        ThreadPoolExecutor downloaderPool = createThreadPoolExecutor();
 
         // I have tried pre-filling the queue directly instead of doing this, but it didn't work.
         // What a shame.
@@ -95,11 +99,10 @@ public class MinecraftDownloader {
         try {
             while (mDownloaderThreadException.get() == null &&
                     !downloaderPool.awaitTermination(33, TimeUnit.MILLISECONDS)) {
-                long dlFileCounter = mDownloadFileCounter.get();
-                int progress = (int)((dlFileCounter * 100L) / mDownloadFileCount);
-                ProgressLayout.setProgress(ProgressLayout.DOWNLOAD_MINECRAFT, progress,
-                        R.string.newdl_downloading_game_files, dlFileCounter,
-                        mDownloadFileCount, (double)mDownloadSizeCounter.get() / (1024d * 1024d));
+                double speed = speedCalculator.feed(mInternetUsageCounter.get()) / ONE_MEGABYTE;
+                if(mUseFileCounter) reportProgressFileCounter(speed);
+                else reportProgressSizeCounter(speed);
+
             }
             Exception thrownException = mDownloaderThreadException.get();
             if(thrownException != null) {
@@ -112,6 +115,37 @@ public class MinecraftDownloader {
             // Kill all downloading threads immediately, and ignore any exceptions thrown by them
             downloaderPool.shutdownNow();
         }
+    }
+
+    @NonNull
+    private ThreadPoolExecutor createThreadPoolExecutor() {
+        int maxThreads = AllSettings.getMaxDownloadThreads().getValue();
+        if (mScheduledDownloadTasks.size() <= maxThreads) {
+            maxThreads = mScheduledDownloadTasks.size();
+        }
+        return new ThreadPoolExecutor(
+                Math.max(1, (int) (maxThreads / 2)),
+                maxThreads,
+                500,
+                TimeUnit.MILLISECONDS,
+                new ArrayBlockingQueue<>(mScheduledDownloadTasks.size(), false)
+        );
+    }
+
+    private void reportProgressFileCounter(double speed) {
+        long dlFileCounter = mProcessedFileCounter.get();
+        int progress = (int)((dlFileCounter * 100L) / mTotalFileCount);
+        ProgressLayout.setProgress(ProgressLayout.DOWNLOAD_MINECRAFT, progress,
+                R.string.newdl_downloading_game_files, dlFileCounter,
+                mTotalFileCount, speed);
+    }
+    private void reportProgressSizeCounter(double speed) {
+        long dlFileSize = mProcessedSizeCounter.get();
+        double dlSizeMegabytes = (double) dlFileSize / ONE_MEGABYTE;
+        double dlTotalMegabytes = (double) mTotalSize / ONE_MEGABYTE;
+        int progress = (int)((dlFileSize * 100L) / mTotalSize);
+        ProgressLayout.setProgress(ProgressLayout.DOWNLOAD_MINECRAFT, progress,
+                R.string.newdl_downloading_game_files_size, dlSizeMegabytes, dlTotalMegabytes, speed);
     }
 
     private File createGameJsonPath(String versionId) {
@@ -142,7 +176,7 @@ public class MinecraftDownloader {
             return targetFile;
         FileUtils.ensureParentDirectory(targetFile);
         try {
-            DownloadUtils.ensureSha1(targetFile, AllSettings.getVerifyManifest() ? verInfo.sha1 : null, () -> {
+            DownloadUtils.ensureSha1(targetFile, AllSettings.getVerifyManifest().getValue() ? verInfo.sha1 : null, () -> {
                 ProgressLayout.setProgress(ProgressLayout.DOWNLOAD_MINECRAFT, 0,
                         R.string.newdl_downloading_metadata, targetFile.getName());
                 DownloadMirror.downloadFileMirrored(DownloadMirror.DOWNLOAD_CLASS_METADATA, verInfo.url, targetFile);
@@ -215,7 +249,19 @@ public class MinecraftDownloader {
     private void scheduleDownload(File targetFile, int downloadClass, String url, String sha1,
                                   long size, boolean skipIfFailed) throws IOException {
         FileUtils.ensureParentDirectory(targetFile);
-        mDownloadFileCount++;
+        mTotalFileCount++;
+        if(size < 0) {
+            size = DownloadMirror.getContentLengthMirrored(downloadClass, url);
+        }
+        if(size < 0) {
+            // If we were unable to get the content length ourselves, we automatically fall back
+            // to tracking the progress using the file counter.
+            size = 0;
+            mUseFileCounter = true;
+            Logging.i("MinecraftDownloader", "Failed to determine size of "+targetFile.getName()+", switching to file counter");
+        }else {
+            mTotalSize += size;
+        }
         mScheduledDownloadTasks.add(
                 new DownloaderTask(targetFile, downloadClass, url, sha1, size, skipIfFailed)
         );
@@ -251,7 +297,7 @@ public class MinecraftDownloader {
                         : dependentLibrary.url.replace("http://","https://")) + libArtifactPath;
                 skipIfFailed = true;
             }
-            if(!AllSettings.getCheckLibraries()) sha1 = null;
+            if(!AllSettings.getCheckLibraries().getValue()) sha1 = null;
             scheduleDownload(new File(ProfilePathHome.getLibrariesHome(), libArtifactPath),
                     DownloadMirror.DOWNLOAD_CLASS_LIBRARIES,
                     url, sha1, size, skipIfFailed
@@ -275,7 +321,7 @@ public class MinecraftDownloader {
             } else {
                 targetFile = new File(basePath, "objects" + File.separator + hashedPath);
             }
-            String sha1 = AllSettings.getCheckLibraries() ? assetInfo.hash : null;
+            String sha1 = AllSettings.getCheckLibraries().getValue() ? assetInfo.hash : null;
             scheduleDownload(targetFile,
                     DownloadMirror.DOWNLOAD_CLASS_ASSETS,
                     MINECRAFT_RES + hashedPath,
@@ -287,7 +333,7 @@ public class MinecraftDownloader {
 
     private void scheduleGameJarDownload(MinecraftClientInfo minecraftClientInfo, String versionName) throws IOException {
         File clientJar = createGameJarPath(versionName);
-        String clientSha1 = AllSettings.getCheckLibraries() ?
+        String clientSha1 = AllSettings.getCheckLibraries().getValue() ?
                 minecraftClientInfo.sha1 : null;
         growDownloadList(1);
         scheduleDownload(clientJar,
@@ -368,18 +414,20 @@ public class MinecraftDownloader {
             }catch (Exception e) {
                 if(!mSkipIfFailed) throw e;
             }
-            mDownloadFileCounter.incrementAndGet();
+            mProcessedFileCounter.incrementAndGet();
         }
 
         private void finishWithoutDownloading() {
-            mDownloadFileCounter.incrementAndGet();
-            mDownloadSizeCounter.addAndGet(mDownloadSize);
+            mProcessedFileCounter.incrementAndGet();
+            mProcessedSizeCounter.addAndGet(mDownloadSize);
         }
 
         @Override
         public void updateProgress(int curr, int max) {
-           mDownloadSizeCounter.addAndGet(curr - mLastCurr);
-           mLastCurr = curr;
+            int delta = curr - mLastCurr;
+            mProcessedSizeCounter.addAndGet(delta);
+            mInternetUsageCounter.addAndGet(delta);
+            mLastCurr = curr;
         }
     }
 }

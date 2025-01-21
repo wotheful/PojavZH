@@ -5,9 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.DocumentsContract
-import android.widget.EditText
 import com.movtery.zalithlauncher.R
-import com.movtery.zalithlauncher.feature.log.Logging
 import com.movtery.zalithlauncher.task.Task
 import com.movtery.zalithlauncher.ui.dialog.EditTextDialog
 import com.movtery.zalithlauncher.ui.dialog.EditTextDialog.ConfirmListener
@@ -16,7 +14,6 @@ import net.kdt.pojavlaunch.Tools
 import org.apache.commons.io.FileUtils
 import java.io.File
 import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.io.FilenameFilter
 import java.io.IOException
 import java.io.InputStream
@@ -37,18 +34,17 @@ class FileTools {
         }
 
         @JvmStatic
-        fun copyFileInBackground(context: Context, fileUri: Uri?, rootPath: String?): File {
+        fun copyFileInBackground(context: Context, fileUri: Uri, rootPath: String): File {
             val fileName = Tools.getFileName(context, fileUri)
             val outputFile = File(rootPath, fileName)
-            runCatching {
-                context.contentResolver.openInputStream(fileUri!!).use { inputStream ->
-                    FileUtils.copyInputStreamToFile(inputStream, outputFile)
-                }
-            }.getOrElse { e ->
-                Logging.e("CopyFileInBackground", Tools.printToString(e))
-                throw RuntimeException(e)
-            }
+            return copyFileInBackground(context, fileUri, outputFile)
+        }
 
+        @JvmStatic
+        fun copyFileInBackground(context: Context, fileUri: Uri, outputFile: File): File {
+            context.contentResolver.openInputStream(fileUri).use { inputStream ->
+                FileUtils.copyInputStreamToFile(inputStream, outputFile)
+            }
             return outputFile
         }
 
@@ -120,15 +116,17 @@ class FileTools {
             EditTextDialog.Builder(context)
                 .setTitle(R.string.generic_rename)
                 .setEditText(getFileNameWithoutExtension(fileName, suffix))
-                .setConfirmListener(ConfirmListener { editBox: EditText ->
-                    val newName = editBox.text.toString().replace("/", "")
-                    if (fileName == newName) {
-                        return@ConfirmListener true
+                .setAsRequired()
+                .setConfirmListener(ConfirmListener { editBox, _ ->
+                    val newName = editBox.text.toString()
+
+                    if (newName.contains("/")) {
+                        editBox.error = context.getString(R.string.generic_input_invalid_character, "/")
+                        return@ConfirmListener false
                     }
 
-                    if (newName.isEmpty()) {
-                        editBox.error = context.getString(R.string.file_rename_empty)
-                        return@ConfirmListener false
+                    if (fileName == newName) {
+                        return@ConfirmListener true
                     }
 
                     val newFile = File(fileParent, newName + suffix)
@@ -142,7 +140,7 @@ class FileTools {
                         endTask?.execute()
                     }
                     true
-                }).buildDialog()
+                }).showDialog()
         }
 
         @JvmStatic
@@ -154,15 +152,17 @@ class FileTools {
             EditTextDialog.Builder(context)
                 .setTitle(R.string.generic_rename)
                 .setEditText(fileName)
-                .setConfirmListener(ConfirmListener { editBox: EditText ->
-                    val newName = editBox.text.toString().replace("/", "")
-                    if (fileName == newName) {
-                        return@ConfirmListener true
+                .setAsRequired()
+                .setConfirmListener(ConfirmListener { editBox, _ ->
+                    val newName = editBox.text.toString()
+
+                    if (newName.contains("/")) {
+                        editBox.error = context.getString(R.string.generic_input_invalid_character, "/")
+                        return@ConfirmListener false
                     }
 
-                    if (newName.isEmpty()) {
-                        editBox.error = context.getString(R.string.file_rename_empty)
-                        return@ConfirmListener false
+                    if (fileName == newName) {
+                        return@ConfirmListener true
                     }
 
                     val newFile = File(fileParent, newName)
@@ -176,7 +176,7 @@ class FileTools {
                         endTask?.execute()
                     }
                     true
-                }).buildDialog()
+                }).showDialog()
         }
 
         @JvmStatic
@@ -222,48 +222,33 @@ class FileTools {
             return String.format("%.2f %s", value, units[unitIndex])
         }
 
+        @JvmStatic
         @Throws(IOException::class)
-        fun packZip(files: Array<File>, outputZipFile: File?) {
-            if (files.isEmpty()) return
-
-            FileOutputStream(outputZipFile).use { fos ->
-                ZipOutputStream(fos).use { zos ->
-                    files.forEach { file ->
-                        FileInputStream(file).use { fis ->
-                            val zipEntry = ZipEntry(file.name).apply {
-                                time = file.lastModified() //保留原始文件的修改时间
-                            }
-                            zos.putNextEntry(zipEntry)
-                            fis.copyTo(zos, bufferSize = 1024)
-                            zos.closeEntry()
-                        }
-                    }
+        fun zipDirectory(folder: File, parentPath: String, filter: (File) -> Boolean, zos: ZipOutputStream) {
+            val files = folder.listFiles()?.filter(filter) ?: return
+            for (file in files) {
+                if (file.isDirectory) {
+                    zipDirectory(file, parentPath + file.name + "/", filter, zos)
+                } else {
+                    zipFile(file, parentPath + file.name, zos)
                 }
             }
         }
 
         @JvmStatic
-        fun getFileHashMD5(inputStream: InputStream): String {
-            runCatching {
-                val md = MessageDigest.getInstance("MD5")
-                val buffer = ByteArray(8192)
-                var bytesRead: Int
-                while ((inputStream.read(buffer).also { bytesRead = it }) != -1) {
-                    md.update(buffer, 0, bytesRead)
-                }
-                val hash = md.digest()
+        @Throws(IOException::class)
+        fun zipFile(file: File, entryName: String, zos: ZipOutputStream) {
+            FileInputStream(file).use { fis ->
+                val zipEntry = ZipEntry(entryName)
+                zipEntry.time = file.lastModified() //保留文件的修改时间
+                zos.putNextEntry(zipEntry)
 
-                //将哈希值转换为十六进制字符串
-                val hexString = StringBuilder()
-                for (b in hash) {
-                    val hex = Integer.toHexString(0xff and b.toInt())
-                    if (hex.length == 1) hexString.append('0')
-                    hexString.append(hex)
+                val buffer = ByteArray(4096)
+                var length: Int
+                while ((fis.read(buffer).also { length = it }) >= 0) {
+                    zos.write(buffer, 0, length)
                 }
-
-                return hexString.toString()
-            }.getOrElse { e ->
-                throw RuntimeException(e)
+                zos.closeEntry()
             }
         }
 

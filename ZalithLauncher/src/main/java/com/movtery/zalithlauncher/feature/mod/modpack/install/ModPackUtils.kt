@@ -1,19 +1,16 @@
 package com.movtery.zalithlauncher.feature.mod.modpack.install
 
-import android.graphics.Bitmap
-import android.util.Base64
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.FutureTarget
-import com.movtery.zalithlauncher.context.ContextExecutor
-import com.movtery.zalithlauncher.feature.customprofilepath.ProfilePathManager.Companion.currentProfile
+import android.app.Activity
+import com.movtery.zalithlauncher.R
+import com.movtery.zalithlauncher.utils.LauncherProfiles
+import com.movtery.zalithlauncher.feature.download.item.ModLoaderWrapper
 import com.movtery.zalithlauncher.feature.log.Logging
 import com.movtery.zalithlauncher.feature.mod.models.MCBBSPackMeta
+import com.movtery.zalithlauncher.utils.runtime.SelectRuntimeUtils
+import net.kdt.pojavlaunch.JavaGUILauncherActivity
 import net.kdt.pojavlaunch.Tools
 import net.kdt.pojavlaunch.modloaders.modpacks.models.CurseManifest
 import net.kdt.pojavlaunch.modloaders.modpacks.models.ModrinthIndex
-import net.kdt.pojavlaunch.value.launcherprofiles.LauncherProfiles
-import net.kdt.pojavlaunch.value.launcherprofiles.MinecraftProfile
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.zip.ZipFile
 
@@ -53,20 +50,10 @@ class ModPackUtils {
                     }
                 }
             }.getOrElse { e ->
-                Logging.e("determineModpack", e.toString())
+                Logging.e("determineModpack", "There was a problem checking the ModPack", e)
             }
 
             return ModPackEnum.UNKNOWN
-        }
-
-        fun createModPackProfiles(modpackName: String, profileName: String?, versionId: String?) {
-            val profile = MinecraftProfile()
-            profile.gameDir = "./modpack_instances/$modpackName"
-            profile.name = profileName
-            profile.lastVersionId = versionId
-
-            LauncherProfiles.mainProfileJson.profiles[modpackName] = profile
-            LauncherProfiles.write(currentProfile)
         }
 
         @JvmStatic
@@ -95,23 +82,15 @@ class ModPackUtils {
         }
 
         @JvmStatic
-        fun getIcon(imageUrl: String?): String? {
-            runCatching {
-                val context = ContextExecutor.getApplication()
-                val futureTarget: FutureTarget<Bitmap> = Glide.with(context)
-                    .asBitmap()
-                    .load(imageUrl)
-                    .submit()
-                val bitmap: Bitmap = futureTarget.get()
-
-                val byteArrayOutputStream = ByteArrayOutputStream()
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
-                val byteArray = byteArrayOutputStream.toByteArray()
-
-                return "data:image/png;base64,${Base64.encodeToString(byteArray, Base64.DEFAULT)}"
-            }.getOrElse { e -> Logging.e("Load Image To Base64", Tools.printToString(e)) }
-
-            return null
+        @Throws(Throwable::class)
+        fun startModLoaderInstall(modLoader: ModLoaderWrapper, activity: Activity, modInstallFile: File, customName: String) {
+            modLoader.getInstallationIntent(activity, modInstallFile, customName)?.let { installIntent ->
+                SelectRuntimeUtils.selectRuntime(activity, activity.getString(R.string.version_install_new_modloader, modLoader.modLoader.loaderName)) { jreName ->
+                    LauncherProfiles.generateLauncherProfiles()
+                    installIntent.putExtra(JavaGUILauncherActivity.EXTRAS_JRE_NAME, jreName)
+                    activity.startActivity(installIntent)
+                }
+            }
         }
     }
 

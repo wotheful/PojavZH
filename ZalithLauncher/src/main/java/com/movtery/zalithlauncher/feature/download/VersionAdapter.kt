@@ -3,12 +3,9 @@ package com.movtery.zalithlauncher.feature.download
 import android.content.Context
 import android.util.TypedValue
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.FlexboxLayout
 import com.movtery.anim.animations.Animations
@@ -20,7 +17,6 @@ import com.movtery.zalithlauncher.feature.download.item.ModLikeVersionItem
 import com.movtery.zalithlauncher.feature.download.item.ModVersionItem
 import com.movtery.zalithlauncher.feature.download.item.VersionItem
 import com.movtery.zalithlauncher.feature.download.platform.AbstractPlatformHelper
-import com.movtery.zalithlauncher.ui.dialog.EditTextDialog
 import com.movtery.zalithlauncher.ui.dialog.ModDependenciesDialog
 import com.movtery.zalithlauncher.utils.NumberWithUnits.Companion.formatNumberWithUnit
 import com.movtery.zalithlauncher.utils.ZHTools
@@ -28,23 +24,17 @@ import com.movtery.zalithlauncher.utils.anim.ViewAnimUtils.Companion.setViewAnim
 import com.movtery.zalithlauncher.utils.stringutils.StringUtils
 import net.kdt.pojavlaunch.Tools
 import net.kdt.pojavlaunch.progresskeeper.ProgressKeeper
-import net.kdt.pojavlaunch.progresskeeper.TaskCountListener
-import java.io.File
 import java.util.Locale
 import java.util.StringJoiner
 import java.util.TimeZone
 
 class VersionAdapter(
-    private val parentFragment: Fragment,
     private val infoItem: InfoItem,
     private val platformHelper: AbstractPlatformHelper,
-    private val mData: List<VersionItem>?,
-    private val targetFile: File?
-) : RecyclerView.Adapter<VersionAdapter.InnerHolder>(), TaskCountListener {
-    private var mTasksRunning = false
+    private val mData: List<VersionItem>?
+) : RecyclerView.Adapter<VersionAdapter.InnerHolder>() {
 
     init {
-        ProgressKeeper.addTaskCountListener(this)
         mData?.sortedWith { o1, o2 ->  //按照日期进行一波排序
             o1.uploadDate.compareTo(o2.uploadDate)
         }
@@ -59,10 +49,6 @@ class VersionAdapter(
     }
 
     override fun getItemCount(): Int = mData?.size ?: 0
-
-    override fun onUpdateTaskCount(taskCount: Int) {
-        mTasksRunning = taskCount != 0
-    }
 
     inner class InnerHolder(private val binding: ItemModVersionBinding) : RecyclerView.ViewHolder(
         binding.root
@@ -93,53 +79,28 @@ class VersionAdapter(
             }
             binding.tagsLayout.addView(getTagTextView(getDownloadTypeText(versionItem.versionType)))
 
-            itemView.setOnClickListener { _: View? ->
+            binding.downloadLink.setOnClickListener { ZHTools.openLink(mContext, versionItem.fileUrl) }
+
+            itemView.setOnClickListener {
                 if (versionItem is ModVersionItem && versionItem.dependencies.isNotEmpty()) {
-                    ModDependenciesDialog(parentFragment, infoItem, versionItem.dependencies) {
-                        preInstall(versionItem)
+                    ModDependenciesDialog(mContext, infoItem, versionItem.dependencies) {
+                        startInstall(versionItem)
                     }.show()
                 } else {
-                    preInstall(versionItem)
+                    startInstall(versionItem)
                 }
             }
         }
 
-        private fun preInstall(versionItem: VersionItem) {
-            targetFile?.let {
-                val file = File(versionItem.fileName)
-
-                EditTextDialog.Builder(mContext)
-                    .setTitle(R.string.download_install_custom_name)
-                    .setEditText(file.nameWithoutExtension)
-                    .setConfirmListener { editText: EditText ->
-                        val string = editText.text.toString()
-                        if (string.contains("/")) {
-                            editText.error = mContext.getString(
-                                R.string.generic_input_invalid_character,
-                                "/"
-                            )
-                            return@setConfirmListener false
-                        }
-
-                        val installFile = File(it, "${string}.${file.extension}")
-                        println(installFile)
-                        startInstall(versionItem, installFile)
-                        true
-                    }.buildDialog()
-                return
+        private fun startInstall(versionItem: VersionItem) {
+            platformHelper.install(mContext, infoItem, versionItem) { key ->
+                val containsProgress = ProgressKeeper.containsProgress(key)
+                if (containsProgress) {
+                    setViewAnim(itemView, Animations.Shake)
+                    Toast.makeText(mContext, mContext.getString(R.string.tasks_ongoing), Toast.LENGTH_SHORT).show()
+                }
+                containsProgress
             }
-
-            startInstall(versionItem, null)
-        }
-
-        private fun startInstall(versionItem: VersionItem, targetFile: File?) {
-            if (mTasksRunning) {
-                setViewAnim(itemView, Animations.Shake)
-                Toast.makeText(mContext, mContext.getString(R.string.tasks_ongoing), Toast.LENGTH_SHORT).show()
-                return
-            }
-
-            platformHelper.install(mContext, infoItem, versionItem, targetFile)
         }
 
         private fun getDownloadType(versionType: VersionType): Int {
@@ -152,9 +113,9 @@ class VersionAdapter(
 
         private fun getDownloadTypeText(versionType: VersionType): String {
             val text = when (versionType) {
-                VersionType.RELEASE -> mContext.getString(R.string.version_release)
-                VersionType.BETA -> mContext.getString(R.string.download_info_release_type_beta)
-                VersionType.ALPHA -> mContext.getString(R.string.download_info_release_type_alpha)
+                VersionType.RELEASE -> mContext.getString(R.string.generic_release)
+                VersionType.BETA -> mContext.getString(R.string.generic_beta)
+                VersionType.ALPHA -> mContext.getString(R.string.generic_alpha)
             }
             return text
         }

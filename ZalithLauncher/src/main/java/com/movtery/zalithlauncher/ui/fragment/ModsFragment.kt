@@ -20,7 +20,6 @@ import com.movtery.zalithlauncher.task.Task
 import com.movtery.zalithlauncher.task.TaskExecutors
 import com.movtery.zalithlauncher.ui.dialog.FilesDialog
 import com.movtery.zalithlauncher.ui.dialog.FilesDialog.FilesButton
-import com.movtery.zalithlauncher.ui.dialog.TipDialog
 import com.movtery.zalithlauncher.ui.subassembly.filelist.FileIcon
 import com.movtery.zalithlauncher.ui.subassembly.filelist.FileItemBean
 import com.movtery.zalithlauncher.ui.subassembly.filelist.FileSelectedListener
@@ -29,8 +28,9 @@ import com.movtery.zalithlauncher.utils.NewbieGuideUtils
 import com.movtery.zalithlauncher.utils.ZHTools
 import com.movtery.zalithlauncher.utils.anim.AnimUtils.Companion.setVisibilityAnim
 import com.movtery.zalithlauncher.utils.file.FileCopyHandler
-import com.movtery.zalithlauncher.utils.file.FileTools.Companion.copyFileInBackground
+import com.movtery.zalithlauncher.utils.file.FileTools
 import com.movtery.zalithlauncher.utils.file.PasteFile
+import net.kdt.pojavlaunch.Tools
 import net.kdt.pojavlaunch.contracts.OpenDocumentWithExtension
 import java.io.File
 import java.util.function.Consumer
@@ -43,8 +43,8 @@ class ModsFragment : FragmentWithAnim(R.layout.fragment_mods) {
 
     private lateinit var binding: FragmentModsBinding
     private lateinit var mSearchViewWrapper: SearchViewWrapper
-    private var openDocumentLauncher: ActivityResultLauncher<Any>? = null
-    private var mRootPath: String? = null
+    private lateinit var mRootPath: String
+    private lateinit var openDocumentLauncher: ActivityResultLauncher<Any>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,11 +53,13 @@ class ModsFragment : FragmentWithAnim(R.layout.fragment_mods) {
                 val dialog = ZHTools.showTaskRunningDialog(requireContext())
                 Task.runTask {
                     uriList.forEach { uri ->
-                        copyFileInBackground(requireContext(), uri, mRootPath)
+                        FileTools.copyFileInBackground(requireContext(), uri, mRootPath)
                     }
                 }.ended(TaskExecutors.getAndroidUI()) {
                     Toast.makeText(requireContext(), getString(R.string.profile_mods_added_mod), Toast.LENGTH_SHORT).show()
                     binding.fileRecyclerView.refreshPath()
+                }.onThrowable { e ->
+                    Tools.showErrorRemote(e)
                 }.finallyTask(TaskExecutors.getAndroidUI()) {
                     dialog.dismiss()
                 }.execute()
@@ -200,7 +202,7 @@ class ModsFragment : FragmentWithAnim(R.layout.fragment_mods) {
                         String.format(getString(R.string.file_add_file_tip), suffix),
                         Toast.LENGTH_SHORT
                     ).show()
-                    openDocumentLauncher?.launch(suffix)
+                    openDocumentLauncher.launch(suffix)
                 }
 
                 pasteButton.setOnClickListener {
@@ -222,21 +224,6 @@ class ModsFragment : FragmentWithAnim(R.layout.fragment_mods) {
 
                 createFolderButton.setOnClickListener { goDownloadMod() }
 
-                downloadOptifine.setOnClickListener {
-                    TipDialog.Builder(requireContext())
-                        .setMessage(R.string.profile_manager_download_optifine_message)
-                        .setConfirmClickListener {
-                            val bundle = Bundle()
-                            bundle.putBoolean(DownloadOptiFineFragment.BUNDLE_DOWNLOAD_MOD, true)
-                            ZHTools.swapFragmentWithAnim(
-                                this@ModsFragment,
-                                DownloadOptiFineFragment::class.java,
-                                DownloadOptiFineFragment.TAG,
-                                bundle
-                            )
-                        }.buildDialog()
-                }
-
                 searchButton.setOnClickListener {
                     closeMultiSelect()
                     mSearchViewWrapper.setVisibility()
@@ -250,7 +237,7 @@ class ModsFragment : FragmentWithAnim(R.layout.fragment_mods) {
 
             goDownloadText.setOnClickListener{ goDownloadMod() }
 
-            fileRecyclerView.lockAndListAt(mRootPath?.let { File(it) }, mRootPath?.let { File(it) })
+            fileRecyclerView.lockAndListAt(File(mRootPath), File(mRootPath))
         }
 
         startNewbieGuide()
@@ -302,8 +289,8 @@ class ModsFragment : FragmentWithAnim(R.layout.fragment_mods) {
     }
 
     private fun parseBundle() {
-        val bundle = arguments ?: return
-        mRootPath = bundle.getString(BUNDLE_ROOT_PATH, mRootPath)
+        val bundle = arguments ?: throw NullPointerException("The argument is null!")
+        mRootPath = bundle.getString(BUNDLE_ROOT_PATH) ?: throw IllegalStateException("root path is not set！")
     }
 
     private fun initViews() {
@@ -350,7 +337,6 @@ class ModsFragment : FragmentWithAnim(R.layout.fragment_mods) {
         binding.apply {
             animPlayer.apply(AnimPlayer.Entry(modsLayout, Animations.BounceInDown))
                 .apply(AnimPlayer.Entry(operateLayout, Animations.BounceInLeft))
-                .apply(AnimPlayer.Entry(operateButtonsLayout, Animations.FadeInLeft))
         }
     }
 
@@ -358,7 +344,6 @@ class ModsFragment : FragmentWithAnim(R.layout.fragment_mods) {
         binding.apply {
             animPlayer.apply(AnimPlayer.Entry(modsLayout, Animations.FadeOutUp))
                 .apply(AnimPlayer.Entry(operateLayout, Animations.FadeOutRight))
-                .apply(AnimPlayer.Entry(operateButtonsLayout, Animations.BounceShrink))
         }
     }
 }

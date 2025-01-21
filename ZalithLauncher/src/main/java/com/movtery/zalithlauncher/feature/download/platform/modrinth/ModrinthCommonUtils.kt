@@ -34,7 +34,7 @@ class ModrinthCommonUtils {
                 }
             }
             return if (categories.isEmpty()) ""
-            else categories.joinToString(prefix = "[", postfix = "]") { "\"categories:$it\"" }
+            else categories.joinToString { "[\"categories:$it\"]" }
         }
 
         private fun putDefaultParams(params: HashMap<String, Any>, filters: Filters, previousCount: Int) {
@@ -139,6 +139,25 @@ class ModrinthCommonUtils {
             )
         }
 
+        fun getInfo(api: ApiHandler, classify: Classify, projectId: String): InfoItem? {
+            searchModFromID(api, projectId)?.let { hit ->
+                return InfoItem(
+                    classify,
+                    Platform.MODRINTH,
+                    projectId,
+                    hit.get("slug").asString,
+                    null,
+                    hit.get("title").asString,
+                    hit.get("description").asString,
+                    hit.get("downloads").asLong,
+                    ZHTools.getDate(hit.get("published").asString),
+                    getIconUrl(hit),
+                    getAllCategories(hit).toList()
+                )
+            }
+            return null
+        }
+
         @Throws(Throwable::class)
         internal fun <T> getCommonVersions(
             api: ApiHandler,
@@ -156,10 +175,15 @@ class ModrinthCommonUtils {
             //如果第一次获取依赖信息失败，则记录其id，之后不再尝试获取
             val invalidDependencies: MutableList<String> = ArrayList()
             for (element in response) {
-                val versionObject = element.asJsonObject
-                val filesJsonObject: JsonObject = versionObject.getAsJsonArray("files").get(0).asJsonObject
+                try {
+                    val versionObject = element.asJsonObject
+                    val filesJsonObject: JsonObject = versionObject.getAsJsonArray("files").get(0).asJsonObject
 
-                items.add(createItem(versionObject, filesJsonObject, invalidDependencies))
+                    items.add(createItem(versionObject, filesJsonObject, invalidDependencies))
+                } catch (e: Exception) {
+                    Logging.e("ModrinthHelper", Tools.printToString(e))
+                    continue
+                }
             }
 
             cache.put(infoItem.projectId, items)

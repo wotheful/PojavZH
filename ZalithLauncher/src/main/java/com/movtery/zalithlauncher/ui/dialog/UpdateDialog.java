@@ -4,17 +4,19 @@ import static com.movtery.zalithlauncher.utils.stringutils.StringUtils.markdownT
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Bundle;
 import android.view.Window;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.movtery.zalithlauncher.R;
 import com.movtery.zalithlauncher.databinding.DialogUpdateBinding;
 import com.movtery.zalithlauncher.feature.update.LauncherVersion;
 import com.movtery.zalithlauncher.feature.update.UpdateLauncher;
 import com.movtery.zalithlauncher.feature.update.UpdateUtils;
-import com.movtery.zalithlauncher.setting.Settings;
+import com.movtery.zalithlauncher.setting.AllSettings;
 import com.movtery.zalithlauncher.task.TaskExecutors;
 import com.movtery.zalithlauncher.utils.ZHTools;
 import com.movtery.zalithlauncher.utils.file.FileTools;
@@ -27,9 +29,15 @@ public class UpdateDialog extends FullScreenDialog implements DraggableDialog.Di
     public UpdateDialog(@NonNull Context context, LauncherVersion launcherVersion) {
         super(context);
         this.launcherVersion = launcherVersion;
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
         this.setCancelable(false);
         this.setContentView(binding.getRoot());
+
         init();
         DraggableDialog.initDialog(this);
     }
@@ -68,13 +76,13 @@ public class UpdateDialog extends FullScreenDialog implements DraggableDialog.Di
         });
         binding.cancelButton.setOnClickListener(view -> this.dismiss());
         binding.ignoreButton.setOnClickListener(view -> {
-            Settings.Manager.put("ignoreUpdate", launcherVersion.getVersionName()).save();
+            AllSettings.getIgnoreUpdate().put(launcherVersion.getVersionName()).save();
             this.dismiss();
         });
     }
 
     private String getVersionType() {
-        return getContext().getString(launcherVersion.isPreRelease() ? R.string.about_version_status_pre_release : R.string.version_release);
+        return getContext().getString(launcherVersion.isPreRelease() ? R.string.generic_pre_release : R.string.generic_release);
     }
 
     private String getLanguageText(LauncherVersion.WhatsNew whatsNew) {

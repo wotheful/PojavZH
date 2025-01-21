@@ -24,8 +24,10 @@ import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
+import com.movtery.zalithlauncher.event.single.RefreshHotbarEvent;
 import com.movtery.zalithlauncher.feature.log.Logging;
 import com.movtery.zalithlauncher.setting.AllSettings;
+import com.movtery.zalithlauncher.setting.AllStaticSettings;
 import com.movtery.zalithlauncher.ui.activity.BaseActivity;
 
 import net.kdt.pojavlaunch.customcontrols.ControlLayout;
@@ -39,6 +41,7 @@ import net.kdt.pojavlaunch.customcontrols.mouse.TouchEventProcessor;
 import net.kdt.pojavlaunch.utils.JREUtils;
 import net.kdt.pojavlaunch.utils.MCOptionUtils;
 
+import org.greenrobot.eventbus.EventBus;
 import org.lwjgl.glfw.CallbackBridge;
 
 import fr.spse.gamepad_remapper.RemapperManager;
@@ -67,8 +70,6 @@ public class MinecraftGLSurface extends View implements GrabListener {
             .remapRightTrigger(true)
             .remapDpad(true));
 
-    /* Resolution scaler option, allow downsizing a window */
-    private float mScaleFactor = AllSettings.getResolutionRatio() / 100f;
     /* Sensitivity, adjusted according to screen size */
     private final double mSensitivityFactor = (1.4 * (1080f/ Tools.getDisplayMetrics((BaseActivity) getContext()).heightPixels));
 
@@ -79,10 +80,13 @@ public class MinecraftGLSurface extends View implements GrabListener {
     View mSurface;
 
     private final InGameEventProcessor mIngameProcessor = new InGameEventProcessor(mSensitivityFactor);
-    private final InGUIEventProcessor mInGUIProcessor = new InGUIEventProcessor(mScaleFactor);
+    private final InGUIEventProcessor mInGUIProcessor = new InGUIEventProcessor();
     private TouchEventProcessor mCurrentTouchProcessor = mInGUIProcessor;
     private AndroidPointerCapture mPointerCapture;
     private boolean mLastGrabState = false;
+
+    private OnRenderingStartedListener mOnRenderingStartedListener = null;
+    private boolean mIsRenderingStarted = false;
 
     public MinecraftGLSurface(Context context) {
         this(context, null);
@@ -93,18 +97,9 @@ public class MinecraftGLSurface extends View implements GrabListener {
         setFocusable(true);
     }
 
-    public void refreshSize(int value) {
-        mScaleFactor = value / 100f;
-        mInGUIProcessor.refreshScaleFactor(mScaleFactor);
-        if (mPointerCapture != null) mPointerCapture.refreshScaleFactor(mScaleFactor);
-        if (mGamepad != null) mGamepad.refreshScaleFactor(mScaleFactor);
-        refreshSize();
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
     private void setUpPointerCapture(AbstractTouchpad touchpad) {
         if(mPointerCapture != null) mPointerCapture.detach();
-        mPointerCapture = new AndroidPointerCapture(touchpad, this, mScaleFactor);
+        mPointerCapture = new AndroidPointerCapture(touchpad, this);
     }
 
     /** Initialize the view and all its settings
@@ -116,7 +111,7 @@ public class MinecraftGLSurface extends View implements GrabListener {
     public void start(boolean isAlreadyRunning, AbstractTouchpad touchpad){
         if(MainActivity.isAndroid8OrHigher()) setUpPointerCapture(touchpad);
         mInGUIProcessor.setAbstractTouchpad(touchpad);
-        if(AllSettings.getAlternateSurface()){
+        if(AllSettings.getAlternateSurface().getValue()){
             SurfaceView surfaceView = new SurfaceView(getContext());
             mSurface = surfaceView;
 
@@ -143,7 +138,7 @@ public class MinecraftGLSurface extends View implements GrabListener {
             });
 
             ((ViewGroup)getParent()).addView(surfaceView);
-        }else{
+        } else {
             TextureView textureView = new TextureView(getContext());
             textureView.setOpaque(true);
             textureView.setAlpha(1.0f);
@@ -174,7 +169,13 @@ public class MinecraftGLSurface extends View implements GrabListener {
                 }
 
                 @Override
-                public void onSurfaceTextureUpdated(@NonNull SurfaceTexture surface) {}
+                public void onSurfaceTextureUpdated(@NonNull SurfaceTexture surface) {
+                    if (!mIsRenderingStarted) {
+                        mIsRenderingStarted = true;
+                        //在正式渲染画面的时候，调用这个监听器，关闭启动器背景图像，防止一些设备的半透明问题
+                        if (mOnRenderingStartedListener != null) mOnRenderingStartedListener.isStarted();
+                    }
+                }
             });
 
             ((ViewGroup)getParent()).addView(textureView);
@@ -205,7 +206,7 @@ public class MinecraftGLSurface extends View implements GrabListener {
 
             // Mouse found
             if(CallbackBridge.isGrabbing()) return false;
-            CallbackBridge.sendCursorPos(   e.getX(i) * mScaleFactor, e.getY(i) * mScaleFactor);
+            CallbackBridge.sendCursorPos(   e.getX(i) * AllStaticSettings.scaleFactor, e.getY(i) * AllStaticSettings.scaleFactor);
             return true; //mouse event handled successfully
         }
         if (mIngameProcessor == null || mInGUIProcessor == null) return true;
@@ -244,8 +245,8 @@ public class MinecraftGLSurface extends View implements GrabListener {
 
         switch(event.getActionMasked()) {
             case MotionEvent.ACTION_HOVER_MOVE:
-                CallbackBridge.mouseX = (event.getX(mouseCursorIndex) * mScaleFactor);
-                CallbackBridge.mouseY = (event.getY(mouseCursorIndex) * mScaleFactor);
+                CallbackBridge.mouseX = (event.getX(mouseCursorIndex) * AllStaticSettings.scaleFactor);
+                CallbackBridge.mouseY = (event.getY(mouseCursorIndex) * AllStaticSettings.scaleFactor);
                 CallbackBridge.sendCursorPos(CallbackBridge.mouseX, CallbackBridge.mouseY);
                 return true;
             case MotionEvent.ACTION_SCROLL:
@@ -258,6 +259,14 @@ public class MinecraftGLSurface extends View implements GrabListener {
             default:
                 return false;
         }
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        if (mCurrentTouchProcessor != null) {
+            mCurrentTouchProcessor.dispatchTouchEvent(event, this);
+        }
+        return super.dispatchTouchEvent(event);
     }
 
     /** The event for keyboard/ gamepad button inputs */
@@ -340,13 +349,13 @@ public class MinecraftGLSurface extends View implements GrabListener {
 
     /** Called when the size need to be set at any point during the surface lifecycle **/
     public void refreshSize(){
-        windowWidth = Tools.getDisplayFriendlyRes(Tools.currentDisplayMetrics.widthPixels, mScaleFactor);
-        windowHeight = Tools.getDisplayFriendlyRes(Tools.currentDisplayMetrics.heightPixels, mScaleFactor);
+        windowWidth = Tools.getDisplayFriendlyRes(Tools.currentDisplayMetrics.widthPixels, AllStaticSettings.scaleFactor);
+        windowHeight = Tools.getDisplayFriendlyRes(Tools.currentDisplayMetrics.heightPixels, AllStaticSettings.scaleFactor);
         if(mSurface == null){
             Logging.w("MGLSurface", "Attempt to refresh size on null surface");
             return;
         }
-        if(AllSettings.getAlternateSurface()){
+        if(AllSettings.getAlternateSurface().getValue()){
             SurfaceView view = (SurfaceView) mSurface;
             if(view.getHolder() != null){
                 view.getHolder().setFixedSize(windowWidth, windowHeight);
@@ -359,7 +368,7 @@ public class MinecraftGLSurface extends View implements GrabListener {
         }
 
         CallbackBridge.sendUpdateWindowSize(windowWidth, windowHeight);
-
+        EventBus.getDefault().post(new RefreshHotbarEvent());
     }
 
     private void realStart(Surface surface){
@@ -416,5 +425,13 @@ public class MinecraftGLSurface extends View implements GrabListener {
             mSurfaceReadyListener = listener;
             mSurfaceReadyListenerLock.notifyAll();
         }
+    }
+
+    public interface OnRenderingStartedListener {
+        void isStarted();
+    }
+
+    public void setOnRenderingStartedListener(OnRenderingStartedListener listener) {
+        mOnRenderingStartedListener = listener;
     }
 }

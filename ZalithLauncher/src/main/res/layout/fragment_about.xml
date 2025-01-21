@@ -45,7 +45,7 @@
                     <ImageView
                         android:id="@+id/title"
                         android:layout_width="0dp"
-                        android:layout_height="28dp"
+                        android:layout_height="@dimen/_28sdp"
                         android:layout_marginTop="@dimen/_16sdp"
                         android:src="@drawable/app_name_title"
                         android:scaleType="centerInside"
@@ -60,8 +60,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="@dimen/_8sdp"
                         android:layout_marginTop="@dimen/_16sdp"
-                        android:text="@string/about_dec1"
-                        android:textSize="12sp"
+                        android:textSize="@dimen/_12ssp"
                         android:textStyle="bold"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -72,9 +71,8 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="@dimen/_8sdp"
-                        android:layout_marginTop="8dp"
-                        android:text="@string/about_dec2"
-                        android:textSize="12sp"
+                        android:layout_marginTop="@dimen/_8sdp"
+                        android:textSize="@dimen/_12ssp"
                         android:textStyle="bold"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -86,8 +84,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="@dimen/_8sdp"
                         android:layout_marginTop="@dimen/_8sdp"
-                        android:text="@string/about_dec3"
-                        android:textSize="12sp"
+                        android:textSize="@dimen/_12ssp"
                         android:textStyle="bold"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -124,7 +121,7 @@
                         android:layout_marginHorizontal="@dimen/_8sdp"
                         android:layout_marginTop="@dimen/_8sdp"
                         android:text="@string/about_contributors"
-                        android:textSize="14sp"
+                        android:textSize="@dimen/_14ssp"
                         android:textStyle="bold"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -160,7 +157,7 @@
                         android:layout_marginHorizontal="@dimen/_8sdp"
                         android:layout_marginTop="@dimen/_8sdp"
                         android:text="@string/about_sponsors"
-                        android:textSize="14sp"
+                        android:textSize="@dimen/_14ssp"
                         android:textStyle="bold"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -172,7 +169,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/_8sdp"
                         android:text="@string/about_sponsors_desc"
-                        android:textSize="12sp"
+                        android:textSize="@dimen/_12ssp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toStartOf="@+id/sponsor_time_and_amount"
                         app:layout_constraintTop_toBottomOf="@+id/sponsor_title" />
@@ -183,7 +180,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="@dimen/_8sdp"
                         android:text="@string/about_sponsors_amount"
-                        android:textSize="12sp"
+                        android:textSize="@dimen/_12ssp"
                         app:layout_constraintBottom_toBottomOf="@+id/sponsor_desc"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/sponsor_desc" />
@@ -193,13 +190,19 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="@dimen/_8sdp"
-                        android:layout_marginBottom="@dimen/_4sdp"
                         android:paddingVertical="@dimen/_4sdp"
                         android:maxHeight="@dimen/_300sdp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintBottom_toTopOf="@+id/sponsor_all"
                         app:layout_constraintTop_toBottomOf="@+id/sponsor_desc" />
+
+                    <com.movtery.zalithlauncher.ui.view.AnimButton
+                        android:id="@+id/sponsor_all"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/_4sdp"
+                        android:layout_marginBottom="@dimen/_4sdp"
+                        android:text="@string/generic_all"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -221,7 +224,7 @@
 
         <View
             android:id="@+id/shadowView"
-            android:layout_width="4dp"
+            android:layout_width="@dimen/_4sdp"
             android:layout_height="match_parent"
             android:background="@drawable/shadow_gradient_right"
             app:layout_constraintBottom_toBottomOf="parent"

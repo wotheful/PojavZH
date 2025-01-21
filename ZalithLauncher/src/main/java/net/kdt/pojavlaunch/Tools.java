@@ -2,14 +2,13 @@ package net.kdt.pojavlaunch;
 
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.P;
+import static com.movtery.zalithlauncher.setting.AllStaticSettings.notchSize;
 import static android.os.Build.VERSION_CODES.Q;
-import static net.kdt.pojavlaunch.prefs.LauncherPreferences.PREF_NOTCH_SIZE;
 
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -33,20 +32,21 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.movtery.zalithlauncher.InfoCenter;
 import com.movtery.zalithlauncher.R;
 import com.movtery.zalithlauncher.context.ContextExecutor;
+import com.movtery.zalithlauncher.plugins.renderer.RendererPluginManager;
+import com.movtery.zalithlauncher.utils.LauncherProfiles;
 import com.movtery.zalithlauncher.feature.customprofilepath.ProfilePathHome;
-import com.movtery.zalithlauncher.feature.customprofilepath.ProfilePathManager;
 import com.movtery.zalithlauncher.feature.log.Logging;
-import com.movtery.zalithlauncher.setting.AllSettings;
+import com.movtery.zalithlauncher.feature.version.Version;
 import com.movtery.zalithlauncher.task.Task;
 import com.movtery.zalithlauncher.ui.activity.BaseActivity;
 import com.movtery.zalithlauncher.ui.dialog.EditTextDialog;
-import com.movtery.zalithlauncher.ui.dialog.SelectRuntimeDialog;
-import com.movtery.zalithlauncher.ui.dialog.TipDialog;
-import com.movtery.zalithlauncher.utils.PathAndUrlManager;
+import com.movtery.zalithlauncher.utils.path.PathManager;
 import com.movtery.zalithlauncher.utils.ZHTools;
 import com.movtery.zalithlauncher.utils.file.FileTools;
+import com.movtery.zalithlauncher.utils.runtime.SelectRuntimeUtils;
 import com.movtery.zalithlauncher.utils.stringutils.StringUtils;
 
 import net.kdt.pojavlaunch.fragments.MainMenuFragment;
@@ -54,12 +54,9 @@ import net.kdt.pojavlaunch.lifecycle.ContextExecutorTask;
 import net.kdt.pojavlaunch.memory.MemoryHoleFinder;
 import net.kdt.pojavlaunch.memory.SelfMapsParser;
 import net.kdt.pojavlaunch.multirt.MultiRTUtils;
-import net.kdt.pojavlaunch.multirt.Runtime;
-import net.kdt.pojavlaunch.utils.DownloadUtils;
 import net.kdt.pojavlaunch.utils.FileUtils;
 import net.kdt.pojavlaunch.value.DependentLibrary;
 import net.kdt.pojavlaunch.value.MinecraftLibraryArtifact;
-import net.kdt.pojavlaunch.value.launcherprofiles.MinecraftProfile;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
@@ -87,39 +84,20 @@ public final class Tools {
     public static final Gson GLOBAL_GSON = new GsonBuilder().setPrettyPrinting().create();
     public static final String LAUNCHERPROFILES_RTPREFIX = "pojav://";
     private final static boolean isClientFirst = false;
-    public static final String APP_NAME = "Zalith Launcher";
     public static String LOCAL_RENDERER = null;
     public static int DEVICE_ARCHITECTURE;
     // New since 3.0.0
     public static String DIRNAME_HOME_JRE = "lib";
     private static RenderersList sCompatibleRenderers;
 
-    public static File getPojavStorageRoot(Context ctx) {
-        if(SDK_INT >= 29) {
-            return ctx.getExternalFilesDir(null);
-        }else{
-            return new File(Environment.getExternalStorageDirectory(),"games/ZalithLauncher");
-        }
-    }
-
     /**
      * Checks if the Pojav's storage root is accessible and read-writable
      * @return true if storage is fine, false if storage is not accessible
      */
     public static boolean checkStorageRoot() {
-        File externalFilesDir = new File(PathAndUrlManager.DIR_GAME_HOME);
+        File externalFilesDir = new File(PathManager.DIR_GAME_HOME);
         //externalFilesDir == null when the storage is not mounted if it was obtained with the context call
         return Environment.getExternalStorageState(externalFilesDir).equals(Environment.MEDIA_MOUNTED);
-    }
-
-    public static File getGameDirPath(@NonNull MinecraftProfile minecraftProfile){
-        if(minecraftProfile.gameDir != null){
-            if(minecraftProfile.gameDir.startsWith(Tools.LAUNCHERPROFILES_RTPREFIX))
-                return new File(minecraftProfile.gameDir.replace(Tools.LAUNCHERPROFILES_RTPREFIX,ProfilePathManager.getCurrentPath() +"/"));
-            else
-                return new File(ProfilePathManager.getCurrentPath(),minecraftProfile.gameDir);
-        }
-        return new File(PathAndUrlManager.DIR_GAME_DEFAULT);
     }
 
     public static void buildNotificationChannel(Context context) {
@@ -145,10 +123,10 @@ public final class Tools {
                             forgeSplashContent.replace("enabled=true", "enabled=false"));
                 }
             } catch (IOException e) {
-                Logging.w(Tools.APP_NAME, "Could not disable Forge 1.12.2 and below splash screen!", e);
+                Logging.w(InfoCenter.LAUNCHER_NAME, "Could not disable Forge 1.12.2 and below splash screen!", e);
             }
         } else {
-            Logging.w(Tools.APP_NAME, "Failed to create the configuration directory");
+            Logging.w(InfoCenter.LAUNCHER_NAME, "Failed to create the configuration directory");
         }
     }
 
@@ -171,13 +149,13 @@ public final class Tools {
         return libInfos[0].replaceAll("\\.", "/") + "/" + libInfos[1] + "/" + libInfos[2] + "/" + libInfos[1] + "-" + libInfos[2] + ".jar";
     }
 
-    public static String getClientClasspath(String version) {
-        return ProfilePathHome.getVersionsHome() + "/" + version + "/" + version + ".jar";
+    public static String getClientClasspath(Version version) {
+        return new File(version.getVersionPath(), version.getVersionName() + ".jar").getAbsolutePath();
     }
 
     public static String getLWJGL3ClassPath() {
         StringBuilder libStr = new StringBuilder();
-        File lwjgl3Folder = new File(PathAndUrlManager.DIR_GAME_HOME, "lwjgl3");
+        File lwjgl3Folder = new File(PathManager.DIR_GAME_HOME, "lwjgl3");
         File[] lwjgl3Files = lwjgl3Folder.listFiles();
         if (lwjgl3Files != null) {
             for (File file: lwjgl3Files) {
@@ -191,23 +169,23 @@ public final class Tools {
         return libStr.toString();
     }
 
-    public static String generateLaunchClassPath(JMinecraftVersionList.Version info, String actualname) {
+    public static String generateLaunchClassPath(JMinecraftVersionList.Version info, Version minecraftVersion) {
         StringBuilder finalClasspath = new StringBuilder(); //versnDir + "/" + version + "/" + version + ".jar:";
 
         String[] classpath = generateLibClasspath(info);
 
         if (isClientFirst) {
-            finalClasspath.append(getClientClasspath(actualname));
+            finalClasspath.append(getClientClasspath(minecraftVersion));
         }
         for (String jarFile : classpath) {
             if (!FileUtils.exists(jarFile)) {
-                Logging.d(APP_NAME, "Ignored non-exists file: " + jarFile);
+                Logging.d(InfoCenter.LAUNCHER_NAME, "Ignored non-exists file: " + jarFile);
                 continue;
             }
             finalClasspath.append((isClientFirst ? ":" : "")).append(jarFile).append(!isClientFirst ? ":" : "");
         }
         if (!isClientFirst) {
-            finalClasspath.append(getClientClasspath(actualname));
+            finalClasspath.append(getClientClasspath(minecraftVersion));
         }
 
         return finalClasspath.toString();
@@ -229,9 +207,9 @@ public final class Tools {
             if (!activity.shouldIgnoreNotch()) {
                 //Remove notch width when it isn't ignored.
                 if (activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
-                    displayMetrics.heightPixels -= PREF_NOTCH_SIZE;
+                    displayMetrics.heightPixels -= notchSize;
                 else
-                    displayMetrics.widthPixels -= PREF_NOTCH_SIZE;
+                    displayMetrics.widthPixels -= notchSize;
             }
         }
         currentDisplayMetrics = displayMetrics;
@@ -389,20 +367,6 @@ public final class Tools {
         ContextExecutor.executeTask(new ShowErrorActivity.RemoteErrorTask(e, rolledMessage));
     }
 
-    public static void dialog(final Context context, final CharSequence title, final CharSequence message) {
-        new TipDialog.Builder(context)
-                .setTitle(title.toString())
-                .setMessage(message.toString())
-                .setConfirm(android.R.string.ok)
-                .setShowCancel(false)
-                .buildDialog();
-    }
-
-    public static void openURL(Activity act, String url) {
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-        act.startActivity(browserIntent);
-    }
-
     private static boolean checkRules(JMinecraftVersionList.Arguments.ArgValue.ArgRules[] rules) {
         if(rules == null) return true; // always allow
         for (JMinecraftVersionList.Arguments.ArgValue.ArgRules rule : rules) {
@@ -421,19 +385,18 @@ public final class Tools {
                 // we have libjnidispatch 5.13.0 in jniLibs directory
                 if (Integer.parseInt(version[0]) >= 5 && Integer.parseInt(version[1]) >= 13)
                     continue;
-                Logging.d(APP_NAME, "Library " + libItem.name + " has been changed to version 5.13.0");
+                Logging.d(InfoCenter.LAUNCHER_NAME, "Library " + libItem.name + " has been changed to version 5.15.0");
                 createLibraryInfo(libItem);
-                libItem.name = "net.java.dev.jna:jna:5.13.0";
-                libItem.downloads.artifact.path = "net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar";
-                libItem.downloads.artifact.sha1 = "1200e7ebeedbe0d10062093f32925a912020e747";
-                libItem.downloads.artifact.url = "https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar";
+                libItem.name = "net.java.dev.jna:jna:5.15.0";
+                libItem.downloads.artifact.path = "net/java/dev/jna/jna/5.15.0/jna-5.15.0.jar";
+                libItem.downloads.artifact.url = "https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.15.0/jna-5.15.0.jar";
             } else if (libItem.name.startsWith("com.github.oshi:oshi-core:")) {
                 //if (Integer.parseInt(version[0]) >= 6 && Integer.parseInt(version[1]) >= 3) return;
                 // FIXME: ensure compatibility
 
                 if (Integer.parseInt(version[0]) != 6 || Integer.parseInt(version[1]) != 2)
                     continue;
-                Logging.d(APP_NAME, "Library " + libItem.name + " has been changed to version 6.3.0");
+                Logging.d(InfoCenter.LAUNCHER_NAME, "Library " + libItem.name + " has been changed to version 6.3.0");
                 createLibraryInfo(libItem);
                 libItem.name = "com.github.oshi:oshi-core:6.3.0";
                 libItem.downloads.artifact.path = "com/github/oshi/oshi-core/6.3.0/oshi-core-6.3.0.jar";
@@ -444,13 +407,12 @@ public final class Tools {
                 // Java 8, which is not supported by old ASM versions. Mod loaders like Forge, which depend on this
                 // library, often include lwjgl in their class transformations, which causes errors with old ASM versions.
                 if (Integer.parseInt(version[0]) >= 5) continue;
-                Logging.d(APP_NAME, "Library " + libItem.name + " has been changed to version 5.0.4");
+                Logging.d(InfoCenter.LAUNCHER_NAME, "Library " + libItem.name + " has been changed to version 5.2");
                 createLibraryInfo(libItem);
-                libItem.name = "org.ow2.asm:asm-all:5.0.4";
+                libItem.name = "org.ow2.asm:asm-all:5.2";
                 libItem.url = null;
-                libItem.downloads.artifact.path = "org/ow2/asm/asm-all/5.0.4/asm-all-5.0.4.jar";
-                libItem.downloads.artifact.sha1 = "e6244859997b3d4237a552669279780876228909";
-                libItem.downloads.artifact.url = "https://repo1.maven.org/maven2/org/ow2/asm/asm-all/5.0.4/asm-all-5.0.4.jar";
+                libItem.downloads.artifact.path = "org/ow2/asm/asm-all/5.2/asm-all-5.2.jar";
+                libItem.downloads.artifact.url = "https://repo1.maven.org/maven2/org/ow2/asm/asm-all/5.2/asm-all-5.2.jar";
             }
         }
     }
@@ -469,23 +431,23 @@ public final class Tools {
         return libDir.toArray(new String[0]);
     }
 
-    public static JMinecraftVersionList.Version getVersionInfo(String versionName) {
-        return getVersionInfo(versionName, false);
+    public static JMinecraftVersionList.Version getVersionInfo(Version version) {
+        return getVersionInfo(version, false);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public static JMinecraftVersionList.Version getVersionInfo(String versionName, boolean skipInheriting) {
+    public static JMinecraftVersionList.Version getVersionInfo(Version version, boolean skipInheriting) {
         try {
-            JMinecraftVersionList.Version customVer = Tools.GLOBAL_GSON.fromJson(read(ProfilePathHome.getVersionsHome() + "/" + versionName + "/" + versionName + ".json"), JMinecraftVersionList.Version.class);
+            JMinecraftVersionList.Version customVer = Tools.GLOBAL_GSON.fromJson(read(new File(version.getVersionPath(), version.getVersionName() + ".json")), JMinecraftVersionList.Version.class);
             if (skipInheriting || customVer.inheritsFrom == null || customVer.inheritsFrom.equals(customVer.id)) {
                 preProcessLibraries(customVer.libraries);
             } else {
                 JMinecraftVersionList.Version inheritsVer;
                 //If it won't download, just search for it
                 try {
-                    inheritsVer = Tools.GLOBAL_GSON.fromJson(read(ProfilePathHome.getVersionsHome() + "/" + customVer.inheritsFrom + "/" + customVer.inheritsFrom + ".json"), JMinecraftVersionList.Version.class);
+                    inheritsVer = Tools.GLOBAL_GSON.fromJson(read(version.getVersionsFolder() + "/" + customVer.inheritsFrom + "/" + customVer.inheritsFrom + ".json"), JMinecraftVersionList.Version.class);
                 } catch (IOException e) {
-                    throw new RuntimeException("Can't find the source version for " + versionName + " (req version=" + customVer.inheritsFrom + ")");
+                    throw new RuntimeException("Can't find the source version for " + version.getVersionName() + " (req version=" + customVer.inheritsFrom + ")");
                 }
                 //inheritsVer.inheritsFrom = inheritsVer.id;
                 insertSafety(inheritsVer, customVer,
@@ -505,7 +467,7 @@ public final class Tools {
                         String inheritLibName = inheritLibrary.name.substring(0, inheritLibrary.name.lastIndexOf(":"));
 
                         if(libName.equals(inheritLibName)){
-                            Logging.d(APP_NAME, "Library " + libName + ": Replaced version " +
+                            Logging.d(InfoCenter.LAUNCHER_NAME, "Library " + libName + ": Replaced version " +
                                     libName.substring(libName.lastIndexOf(":") + 1) + " with " +
                                     inheritLibName.substring(inheritLibName.lastIndexOf(":") + 1));
 
@@ -582,7 +544,7 @@ public final class Tools {
                     fieldB.set(targetVer, value);
                 }
             } catch (Throwable th) {
-                Logging.w(Tools.APP_NAME, "Unable to insert " + key + "=" + value, th);
+                Logging.w(InfoCenter.LAUNCHER_NAME, "Unable to insert " + key + "=" + value, th);
             }
         }
     }
@@ -609,10 +571,6 @@ public final class Tools {
         }
     }
 
-    public static void downloadFile(String urlInput, String nameOutput) throws IOException {
-        File file = new File(nameOutput);
-        DownloadUtils.downloadFile(urlInput, file);
-    }
     public interface DownloaderFeedback {
         void updateProgress(int curr, int max);
     }
@@ -705,10 +663,6 @@ public final class Tools {
     }
 
     public static void installMod(Activity activity, boolean customJavaArgs) {
-        if (MultiRTUtils.getExactJreName(8) == null) {
-            Toast.makeText(activity, R.string.multirt_nojava8rt, Toast.LENGTH_LONG).show();
-            return;
-        }
 
         if(!customJavaArgs){ // Launch the intent to get the jar file
             if(!(activity instanceof LauncherActivity))
@@ -722,35 +676,17 @@ public final class Tools {
         new EditTextDialog.Builder(activity)
                 .setTitle(R.string.dialog_select_jar)
                 .setHintText("-jar/-cp /path/to/file.jar ...")
-                .setConfirmListener(editBox -> {
-                    if (editBox.getText().toString().isEmpty()) {
-                        editBox.setError(activity.getString(R.string.generic_error_field_empty));
-                        return false;
-                    }
-
+                .setAsRequired()
+                .setConfirmListener((editBox, checked) -> {
                     Intent intent = new Intent(activity, JavaGUILauncherActivity.class);
                     intent.putExtra("javaArgs", editBox.getText().toString());
-                    SelectRuntimeDialog selectRuntimeDialog = new SelectRuntimeDialog(activity);
-                    selectRuntimeDialog.setListener(jreName -> {
+                    SelectRuntimeUtils.selectRuntime(activity, null, jreName -> {
                         intent.putExtra(JavaGUILauncherActivity.EXTRAS_JRE_NAME, jreName);
-                        selectRuntimeDialog.dismiss();
                         activity.startActivity(intent);
                     });
-                    selectRuntimeDialog.show();
 
                     return true;
-                }).buildDialog();
-    }
-
-    /** Display and return a progress dialog, instructing to wait */
-    public static ProgressDialog getWaitingDialog(Context ctx, int message){
-        final ProgressDialog barrier = new ProgressDialog(ctx);
-        barrier.setMessage(ctx.getString(message));
-        barrier.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        barrier.setCancelable(false);
-        barrier.show();
-
-        return barrier;
+                }).showDialog();
     }
 
     /** Launch the mod installer activity. The Uri must be from our own content provider or
@@ -759,13 +695,11 @@ public final class Tools {
     public static void launchModInstaller(Activity activity, @NonNull Uri uri){
         Intent intent = new Intent(activity, JavaGUILauncherActivity.class);
         intent.putExtra("modUri", uri);
-        SelectRuntimeDialog selectRuntimeDialog = new SelectRuntimeDialog(activity);
-        selectRuntimeDialog.setListener(jreName -> {
+        SelectRuntimeUtils.selectRuntime(activity, null, jreName -> {
+            LauncherProfiles.generateLauncherProfiles();
             intent.putExtra(JavaGUILauncherActivity.EXTRAS_JRE_NAME, jreName);
-            selectRuntimeDialog.dismiss();
             activity.startActivity(intent);
         });
-        selectRuntimeDialog.show();
     }
 
 
@@ -773,7 +707,7 @@ public final class Tools {
         Task.runTask(() -> {
             String name = getFileName(context, uri);
             MultiRTUtils.installRuntimeNamed(
-                    PathAndUrlManager.DIR_NATIVE_LIB,
+                    PathManager.DIR_NATIVE_LIB,
                     context.getContentResolver().openInputStream(uri),
                     name);
 
@@ -796,45 +730,11 @@ public final class Tools {
         return string != null && !string.isEmpty();
     }
 
-    public static String getRuntimeName(String prefixedName) {
-        if(prefixedName == null) return null;
-        if(!prefixedName.startsWith(Tools.LAUNCHERPROFILES_RTPREFIX)) return null;
-        return prefixedName.substring(Tools.LAUNCHERPROFILES_RTPREFIX.length());
-    }
-
-    public static String getSelectedRuntime(MinecraftProfile minecraftProfile) {
-        String runtime = AllSettings.getDefaultRuntime();
-        String profileRuntime = getRuntimeName(minecraftProfile.javaDir);
-        if(profileRuntime != null) {
-            if(MultiRTUtils.forceReread(profileRuntime).versionString != null) {
-                runtime = profileRuntime;
-            }
-        }
-        return runtime;
-    }
-
-    public static @NonNull String pickRuntime(Activity activity, MinecraftProfile minecraftProfile, int targetJavaVersion) {
-        String runtime = getSelectedRuntime(minecraftProfile);
-        String profileRuntime = getRuntimeName(minecraftProfile.javaDir);
-        Runtime pickedRuntime = MultiRTUtils.read(runtime);
-        if (pickedRuntime.javaVersion == 0 || pickedRuntime.javaVersion < targetJavaVersion) {
-            String preferredRuntime = MultiRTUtils.getNearestJreName(targetJavaVersion);
-            if (preferredRuntime == null) {
-                activity.runOnUiThread(() -> Toast.makeText(activity, activity.getString(R.string.game_autopick_runtime_failed), Toast.LENGTH_LONG).show());
-                return runtime; //返回选择的runtime
-            }
-            if (profileRuntime != null)
-                minecraftProfile.javaDir = Tools.LAUNCHERPROFILES_RTPREFIX + preferredRuntime;
-            runtime = preferredRuntime;
-        }
-        return runtime;
-    }
-
     /**
      * Triggers the share intent chooser, with the latestlog file attached to it
      */
     public static void shareLog(Context context) {
-        FileTools.shareFile(context, "latestlog.txt", PathAndUrlManager.DIR_GAME_HOME + "/latestlog.txt");
+        FileTools.shareFile(context, "latestlog.txt", PathManager.DIR_GAME_HOME + "/latestlog.txt");
     }
 
     /** Mesure the textview height, given its current parameters */
@@ -882,6 +782,21 @@ public final class Tools {
             if(rendererId.contains("zink") && !deviceHasZinkBinary) continue;
             rendererIds.add(rendererId);
             rendererNames.add(defaultRendererNames[i]);
+        }
+        // 渲染器插件
+        if (RendererPluginManager.isAvailable()) {
+            RendererPluginManager.getRendererList().forEach(renderer -> {
+                if (rendererIds.contains(renderer.getId())) {
+                    //尝试进行覆盖
+                    int rendererIndex = rendererIds.indexOf(renderer.getId());
+                    if (rendererIndex != -1) {
+                        rendererIds.remove(renderer.getId());
+                        rendererNames.remove(rendererIndex);
+                    }
+                }
+                rendererIds.add(renderer.getId());
+                rendererNames.add(renderer.getDes());
+            });
         }
         sCompatibleRenderers = new RenderersList(rendererIds,
                 rendererNames.toArray(new String[0]));

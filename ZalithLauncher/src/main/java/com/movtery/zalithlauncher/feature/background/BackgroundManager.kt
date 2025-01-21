@@ -5,9 +5,10 @@ import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.DrawableImageViewTarget
+import com.movtery.zalithlauncher.InfoCenter
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.feature.log.Logging
-import com.movtery.zalithlauncher.utils.PathAndUrlManager
+import com.movtery.zalithlauncher.utils.path.PathManager
 import com.movtery.zalithlauncher.utils.file.FileTools.Companion.mkdirs
 import com.movtery.zalithlauncher.utils.image.ImageUtils.Companion.isImage
 import net.kdt.pojavlaunch.Tools
@@ -17,14 +18,15 @@ import java.io.FileWriter
 import java.util.Properties
 
 object BackgroundManager {
-    private val FILE_BACKGROUND_PROPERTIES: File = File(PathAndUrlManager.DIR_DATA, "background.properties")
+    private val FILE_BACKGROUND_PROPERTIES: File = File(PathManager.DIR_DATA, "background.properties")
+    const val NULL: String = "null"
 
     private val defaultProperties: Properties
         get() {
             val properties = Properties()
-            properties.setProperty(BackgroundType.MAIN_MENU.name, "null")
-            properties.setProperty(BackgroundType.CUSTOM_CONTROLS.name, "null")
-            properties.setProperty(BackgroundType.IN_GAME.name, "null")
+            properties.setProperty(BackgroundType.MAIN_MENU.name, NULL)
+            properties.setProperty(BackgroundType.CUSTOM_CONTROLS.name, NULL)
+            properties.setProperty(BackgroundType.IN_GAME.name, NULL)
             return properties
         }
 
@@ -69,41 +71,49 @@ object BackgroundManager {
             .into(DrawableImageViewTarget(backgroundView))
     }
 
+    @JvmStatic
+    fun clearBackgroundImage(
+        backgroundView: ImageView
+    ) {
+        backgroundView.background = null
+        backgroundView.setImageDrawable(null)
+    }
+
     fun getBackgroundImage(backgroundType: BackgroundType): File? {
         val pngName = properties[backgroundType.name] as String?
-        if (pngName == null || pngName == "null") return null
+        if (pngName == null || pngName == NULL) return null
 
-        val backgroundImage = File(PathAndUrlManager.DIR_BACKGROUND, pngName)
+        val backgroundImage = File(PathManager.DIR_BACKGROUND, pngName)
         if (!backgroundImage.exists() || !isImage(backgroundImage)) return null
         return backgroundImage
     }
 
     private fun saveProperties(properties: Properties) {
-        PathAndUrlManager.DIR_BACKGROUND.apply {
+        PathManager.DIR_BACKGROUND.apply {
             if (!exists()) mkdirs(this)
         }
 
         runCatching {
             properties.store(
                 FileWriter(FILE_BACKGROUND_PROPERTIES),
-                "Zalith Launcher Background Properties File"
+                "${InfoCenter.APP_NAME} Background Properties File"
             )
         }.getOrElse { e -> Logging.e("saveProperties", Tools.printToString(e)) }
     }
 
-    fun saveProperties(map: Map<BackgroundType?, String?>) {
+    fun saveProperties(map: Map<BackgroundType, String>) {
         val properties = Properties()
         properties.setProperty(
             BackgroundType.MAIN_MENU.name,
-            map[BackgroundType.MAIN_MENU] ?: "null"
+            map[BackgroundType.MAIN_MENU] ?: NULL
         )
         properties.setProperty(
             BackgroundType.CUSTOM_CONTROLS.name,
-            map[BackgroundType.CUSTOM_CONTROLS] ?: "null"
+            map[BackgroundType.CUSTOM_CONTROLS] ?: NULL
         )
         properties.setProperty(
             BackgroundType.IN_GAME.name,
-            map[BackgroundType.IN_GAME] ?: "null"
+            map[BackgroundType.IN_GAME] ?: NULL
         )
 
         saveProperties(properties)
