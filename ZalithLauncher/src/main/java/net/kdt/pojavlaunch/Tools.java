@@ -846,4 +846,8 @@ public final class Tools {
         sCompatibleRenderers = null;
         System.gc();
     }
+
+    public static boolean isAndroid8OrHigher() {
+        return SDK_INT >= 26;
+    }
 }
