@@ -89,15 +89,14 @@ public class VersionListView extends LinearLayout {
 
     private Pair<String, Date>[] getVersionPair(List<JMinecraftVersionList.Version> versions) {
         List<Pair<String, Date>> pairList = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
         for (int i = 0; i < versions.size(); i++) {
             JMinecraftVersionList.Version version = versions.get(i);
             Date date;
             try {
-                DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
                 date = formatter.parseDateTime(version.releaseTime).toDate();
             } catch (Exception e) {
                 Logging.e("Version List", Tools.printToString(e));
-                date = null;
             }
             pairList.add(new Pair<>(version.id, date));
         }
