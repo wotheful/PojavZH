@@ -97,6 +97,7 @@ public class VersionListView extends LinearLayout {
                 date = formatter.parseDateTime(version.releaseTime).toDate();
             } catch (Exception e) {
                 Logging.e("Version List", Tools.printToString(e));
+                date = null;
             }
             pairList.add(new Pair<>(version.id, date));
         }
