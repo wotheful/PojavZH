@@ -22,7 +22,7 @@ import net.kdt.pojavlaunch.utils.FilteredSubList;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.time.ZonedDateTime;
+import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -94,8 +94,7 @@ public class VersionListView extends LinearLayout {
             Date date;
             try {
                 DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
-                ZonedDateTime zonedDateTime = ZonedDateTime.parse(version.releaseTime, formatter);
-                date = Date.from(zonedDateTime.toInstant());
+                date = formatter.parseDateTime(version.releaseTime).toDate();
             } catch (Exception e) {
                 Logging.e("Version List", Tools.printToString(e));
                 date = null;
