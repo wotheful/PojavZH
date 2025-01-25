@@ -111,7 +111,7 @@ public class JREUtils {
         dlopen(findInLdLibPath("libawt_headless.so"));
         dlopen(findInLdLibPath("libfreetype.so"));
         dlopen(findInLdLibPath("libfontmanager.so"));
-        dlopen(findInLdLibPath("libjspawnhelper.so"));
+        dlopen(findInLdLibPath("jspawnhelper"));
         for (File f : locateLibs(new File(jreHome, Tools.DIRNAME_HOME_JRE))) {
             dlopen(f.getAbsolutePath());
         }
@@ -132,7 +132,7 @@ public class JREUtils {
                     }
 
                     Logging.i("jrelog-logcat","Clearing logcat");
-                    new ProcessBuilder().command("logcat", "-c").redirectErrorStream(true).start();
+                    new ProcessBuilder().command("system/bin/logcat", "-c").redirectErrorStream(true).start();
                     Logging.i("jrelog-logcat","Starting logcat");
                     Process p = logcatPb.start();
 
