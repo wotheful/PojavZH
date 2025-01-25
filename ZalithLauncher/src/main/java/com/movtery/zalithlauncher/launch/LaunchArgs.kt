@@ -147,23 +147,25 @@ class LaunchArgs(
             argsList.add("-Dcacio.managed.screensize=" + AWTCanvasView.AWT_CANVAS_WIDTH + "x" + AWTCanvasView.AWT_CANVAS_HEIGHT)
             argsList.add("-Dcacio.font.fontmanager=sun.awt.X11FontManager")
             argsList.add("-Dcacio.font.fontscaler=sun.font.FreetypeFontScaler")
-            argsList.add("-Dswing.defaultlaf=javax.swing.plaf.metal.MetalLookAndFeel")
             if (isJava8) {
                 argsList.add("-Dawt.toolkit=net.java.openjdk.cacio.ctc.CTCToolkit")
                 argsList.add("-Djava.awt.graphicsenv=net.java.openjdk.cacio.ctc.CTCGraphicsEnvironment")
                 argsList.add("-Djava.awt.headless=false")
+                argsList.add("-Dswing.defaultlaf=javax.swing.plaf.metal.MetalLookAndFeel")
             } else {
                 if (isJava17) {
                 argsList.add("-Dawt.toolkit=com.github.caciocavallosilano.cacio.ctc.CTCToolkit")
                 argsList.add("-Djava.awt.graphicsenv=com.github.caciocavallosilano.cacio.ctc.CTCGraphicsEnvironment")
                 argsList.add("-Djava.system.class.loader=com.github.caciocavallosilano.cacio.ctc.CTCPreloadClassLoader")
                 argsList.add("-Djava.awt.headless=false")
+                argsList.add("-Dswing.defaultlaf=javax.swing.plaf.metal.MetalLookAndFeel")
                 }
                 if (isJava21) {
                 argsList.add("-Dawt.toolkit=com.github.caciocavallosilano.cacio.ctc.CTCToolkit")
                 argsList.add("-Djava.awt.graphicsenv=com.github.caciocavallosilano.cacio.ctc.CTCGraphicsEnvironment")
                 argsList.add("-Djava.system.class.loader=com.github.caciocavallosilano.cacio.ctc.CTCPreloadClassLoader")
                 argsList.add("-Djava.awt.headless=false")
+                argsList.add("-Dswing.defaultlaf=javax.swing.plaf.metal.MetalLookAndFeel")
                 }
                 argsList.add("--add-exports=java.desktop/java.awt=ALL-UNNAMED")
                 argsList.add("--add-exports=java.desktop/java.awt.peer=ALL-UNNAMED")
